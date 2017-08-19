@@ -1,0 +1,10 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^local
+.travis.yml
+.Rhistory
+scripts
+Makefile$
+^\.idea$
+^.*\.iml$
+README\.md$

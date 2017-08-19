@@ -1,0 +1,11 @@
+*.hprof
+*.swp
+*.iml
+*stdout.txt
+/build/
+out/
+.idea/
+*.ipr
+*.iws
+.DS_Store
+.DS_Store?

@@ -1,0 +1,16 @@
+Package: JuniperKernel
+Title: An R Kernel For Jupyter
+Version: 0.0.0.1
+Date: 2017-07-01
+Maintainer: Spencer Aiello <spnrpa@gmail.com>
+Author: Spencer Aiello
+Imports: Rcpp (>= 0.11.0), 
+         utils
+Suggests: RUnit
+Collate: 'init.R'
+         'kernelspec.R'
+         'utils.R'
+         'zzz.R'
+Description: This package provides Jupyter with an R execution environment
+URL: https://github.com/spennihana/JuniperKernel
+License: MIT + file LICENSE
