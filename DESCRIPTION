@@ -5,12 +5,16 @@ Date: 2017-07-01
 Maintainer: Spencer Aiello <spnrpa@gmail.com>
 Author: Spencer Aiello
 Imports: utils,
-         jsonlite
+         jsonlite,
+         Rcpp (>= 0.11.0)
 Suggests: RUnit
 Collate: 'juniper.R'
+         'booter.R'
          'kernelspec.R'
+         'RcppExports.R'
          'utils.R'
          'zzz.R'
+LinkingTo: Rcpp
 Description: A native R kernel for Jupyter.
 URL: https://github.com/spennihana/JuniperKernel
 License: MIT + file LICENSE

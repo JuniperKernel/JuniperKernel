@@ -15,11 +15,14 @@ R_HOME=$(shell R RHOME)
 R=$(R_HOME)/bin/R
 RSCRIPT=$(R_HOME)/bin/Rscript
 
+R_LIB = $(shell $(RSCRIPT) -e 'cat(.Library)')
+
 default: build/JuniperKernel_$(PKG_VERSION).tar.gz
 
-build/JuniperKernel_$(PKG_VERSION).tar.gz: $(wildcard R/*R) DESCRIPTION
+build/JuniperKernel_$(PKG_VERSION).tar.gz: $(wildcard R/*R) $(wildcard src/*cpp) DESCRIPTION
 	@echo "building " $@ " because " $?
 	@$(RSCRIPT) -e 'roxygen2::roxygenize()'
+	@${RSCRIPT} -e 'Rcpp::compileAttributes()'
 	@$(R) CMD build $(R_BUILD_ARGS) .
 	@[ -d build ] || mkdir build
 	@mv JuniperKernel_$(PKG_VERSION).tar.gz build/
@@ -32,3 +35,4 @@ check: build/JuniperKernel_$(PKG_VERSION).tar.gz
 clean:
 	rm -rf build
 	rm -rf man
+	rm -rf JuniperKernel.Rcheck

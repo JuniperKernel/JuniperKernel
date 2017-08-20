@@ -1,0 +1,52 @@
+# Decide OS
+# Essentially switch between osx and Linux; fail if windows
+ifeq ($(OS),Windows_NT)
+  $(error Makevars was run, but OS is windows. Makevars.win should be run instead.)
+else
+  # *nix
+  UNAME = $(shell uname)
+  SYS=unix
+  ifeq ($(UNAME),Darwin)
+    SYS = osx
+  endif
+
+  MACH = $(shell uname -m)
+  ARCH = 32
+  ifeq ($(MACH),x86_64)
+    ARCH = 64
+  endif
+
+  ifeq ($(UNAME),Linux)
+    ARCH=''
+  endif
+endif
+
+R_HOME=$(shell R RHOME)
+RSCRIPT=$(R_HOME)/bin/Rscript
+R_LIB = $(shell $(RSCRIPT) -e 'cat(.Library)')
+
+
+ZMQ_VERSION = 4.2.2
+ZMQ_TAR_FILE= libzmq-${ZMQ_VERSION}.tar.gz
+ZMQ_TAR_URL = https://github.com/foobarOrg/zmq/raw/master/${SYS}${ARCH}/${ZMQ_TAR_FILE}
+ZMQ_HEADER_TAR_FILE = zmq-4.2.2-headers.tar.gz
+ZMQ_HEADERS_URL = https://github.com/foobarOrg/zmq/raw/master/headers/${ZMQ_HEADER_TAR_FILE}
+ZMQ_CPP_HEADER_URL = https://github.com/zeromq/cppzmq/raw/master/zmq.hpp
+
+# set include and linker options
+PKG_CPPFLAGS = -I../inst/include/ -I.
+PKG_LIBS     = -lzmq -L../inst/zmq -Wl,-rpath,$(R_LIB)/JuniperKernel/zmq
+
+all: ../inst/zmq/libzmq.a $(SHLIB)
+
+../inst/zmq/libzmq.a: ../inst/include
+	@echo "Downloading libzmq prebuild"
+	@[ -d ../inst/zmq ] || mkdir -p ../inst/zmq
+	@curl -skLO ${ZMQ_TAR_URL} && tar -xzf ${ZMQ_TAR_FILE} -C ../inst/zmq && rm -rf ${ZMQ_TAR_FILE}
+
+../inst/include:
+	@echo "Downloading ZMQ header files"
+	@[ -d ../inst/include ] || mkdir -p ../inst/include
+	@curl -skLO ${ZMQ_CPP_HEADER_URL}
+	@mv zmq.hpp ../inst/include
+	@curl -skLO ${ZMQ_HEADERS_URL} && tar -xzf ${ZMQ_HEADER_TAR_FILE} && mv include/*h ../inst/include && rm -rf ${ZMQ_HEADER_TAR_FILE} include

@@ -1,0 +1,35 @@
+## Distinguish between 32 and 64 bit windows
+ifeq "$(WIN)" "64"
+    FLV = x64
+else
+    FLV = i386
+endif
+
+CXX_STD = CXX11
+PKG_CPPFLAGS = -I../inst/include -I.
+PKG_LIBS = -lliblibzmq-${ZMQ_VERSION}-${FLV} -L${FLV}
+
+ZMQ_VERSION = 4.2.2
+ZMQ_TAR_FILE= libzmq-${ZMQ_VERSION}-${FLV}.tar.gz
+ZMQ_TAR_URL = https://github.com/foobarOrg/zmq/raw/master/win${WIN}/${ZMQ_TAR_FILE}
+ZMQ_HEADER_TAR_FILE = zmq-4.2.2-headers.tar.gz
+ZMQ_HEADERS_URL = https://github.com/foobarOrg/zmq/raw/master/headers/${ZMQ_HEADER_TAR_FILE}
+ZMQ_CPP_HEADER_URL = https://github.com/zeromq/cppzmq/raw/master/zmq.hpp
+
+all:    	libzmq $(SHLIB)
+
+.Phony:		libzmq
+libzmq: ../inst/include
+		@[ -d ../zmq/win/${FLV} ] || mkdir -p ../zmq/win/${FLV}
+		@[ -f ../zmq/win/${FLV}/${ZMQ_TAR_FILE} ] || curl -skLO ${ZMQ_TAR_URL} && mv ${ZMQ_TAR_FILE} ../zmq/win/${FLV} && tar xfz ../zmq/win/${FLV}/${ZMQ_TAR_FILE} -C ../inst
+		@[ -d ${FLV} ] || mkdir -p ${FLV}
+		@cp libzmq-${ZMQ_VERSION}-${FLV}.lib ${FLV}
+		@[ -d ../inst/libs/${FLV} ] || mkdir -p ../inst/libs/${FLV}
+		@cp libzmq-${ZMQ_VERSION}-${FLV}.lib ../inst/libs/${FLV}
+
+../inst/include:
+	@echo "Downloading ZMQ header files"
+	@[ -d ../inst/include ] || mkdir -p ../inst/include
+	@curl -skLO ${ZMQ_CPP_HEADER_URL}
+	@mv zmq.hpp ../inst/include
+	@curl -skLO ${ZMQ_HEADERS_URL} && tar -xzf ${ZMQ_HEADER_TAR_FILE} && mv include/*h ../inst/include && rm -rf ${ZMQ_HEADER_TAR_FILE}

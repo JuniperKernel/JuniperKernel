@@ -12,3 +12,6 @@ out/
 JuniperKernel.Rcheck/
 NAMESPACE
 man/
+*RcppExports*
+inst/include
+inst/zmq

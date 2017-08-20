@@ -3,9 +3,12 @@
 ## Requires jupyter and installs the kernel via
 ## `jupyter kernelspec install`.
 
+
+# INSTALL HELPERS
+
 .argv <- function() {
   exec <- file.path(R.home('bin'), 'R')
-  c(exec, '--slave', '-e', 'JuniperKernel::launch()', '--args', '{connection_file}')
+  c(exec, '--slave', '-e', 'JuniperKernel::bootKernel()', '--args', '{connection_file}')
 }
 
 .stopIfJupyterMissing <- function() {
@@ -65,7 +68,7 @@ listKernels <- function() {
 #' @title Create the Default Kernel Name
 #' @seealso \code{\link{installJuniper}}.
 #' @export
-kernelName <- function() {
+defaultKernelName <- function() {
   s <- utils::sessionInfo()
   paste0('juniper_r', s$R.version$major, '.', s$R.version$minor)
 }
@@ -75,7 +78,7 @@ kernelName <- function() {
 #' @title Create the Default Kernel Display Name
 #' @seealso \code{\link{installJuniper}}.
 #' @export
-displayName <- function() {
+defaultDisplayName <- function() {
   s <- utils::sessionInfo()
   paste0('R ', s$R.version$major, '.', s$R.version$minor, ' (Juniper)')
 }
@@ -131,7 +134,7 @@ displayName <- function() {
 #'   installJuniper()  # install into user-local directory
 #' }
 #' @export
-installJuniper <- function (user = TRUE, kernelName = kernelName(), displayName = displayName(), prefix='') {
+installJuniper <- function (user = TRUE, kernelName = defaultKernelName(), displayName = defaultDisplayName(), prefix='') {
   .stopIfJupyterMissing()
 
   if( regexpr("^[a-zA-Z_][a-zA-Z0-9_.-]*$", kernelName)[1L] == -1L )

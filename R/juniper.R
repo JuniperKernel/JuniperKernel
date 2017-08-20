@@ -6,4 +6,4 @@ NULL
 
 
 # global package environment
-.jkern <- new.env(parent=emptyenv())
+.JUNIPER <- new.env(parent=emptyenv())
