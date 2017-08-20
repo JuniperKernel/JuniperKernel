@@ -9,3 +9,6 @@ out/
 *.iws
 .DS_Store
 .DS_Store?
+JuniperKernel.Rcheck/
+NAMESPACE
+man/

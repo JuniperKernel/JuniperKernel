@@ -1,2 +1,2 @@
-#' Juniper: A Jupyter R Kernel
-NULL
+.onAttach <- function(lib, pkg) {}
+.onLoad   <- function(lib, pkg) {}

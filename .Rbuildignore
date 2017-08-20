@@ -5,6 +5,9 @@
 .Rhistory
 scripts
 Makefile$
-^\.idea$
+^\.idea
 ^.*\.iml$
 README\.md$
+^\.git
+^\.gitignore
+^\.\.Rcheck
