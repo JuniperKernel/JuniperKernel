@@ -38,7 +38,7 @@ bootKernel <- function() {
     warning("Multiple arguments passed; all but the first will be ignored.")
 
   userConnFile <- argv[1L]
-
+  bootJuniper(userConnFile)
 }
 
 ## Load A Connection File

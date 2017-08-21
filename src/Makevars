@@ -33,13 +33,16 @@ ZMQ_HEADER_TAR_FILE = zmq-4.2.2-headers.tar.gz
 ZMQ_HEADERS_URL = https://github.com/foobarOrg/zmq/raw/master/headers/${ZMQ_HEADER_TAR_FILE}
 ZMQ_CPP_HEADER_URL = https://github.com/zeromq/cppzmq/raw/master/zmq.hpp
 
+## use C++11
+CXX_STD      = CXX11
+
 # set include and linker options
 PKG_CPPFLAGS = -I../inst/include/ -I.
 PKG_LIBS     = -lzmq -L../inst/zmq -Wl,-rpath,$(R_LIB)/JuniperKernel/zmq
 
-all: ../inst/zmq/libzmq.a $(SHLIB)
+all: ../inst/zmq/libzmq.a ../inst/include $(SHLIB)
 
-../inst/zmq/libzmq.a: ../inst/include
+../inst/zmq/libzmq.a:
 	@echo "Downloading libzmq prebuild"
 	@[ -d ../inst/zmq ] || mkdir -p ../inst/zmq
 	@curl -skLO ${ZMQ_TAR_URL} && tar -xzf ${ZMQ_TAR_FILE} -C ../inst/zmq && rm -rf ${ZMQ_TAR_FILE}
