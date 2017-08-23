@@ -15,3 +15,5 @@ man/
 *RcppExports*
 inst/include
 inst/zmq
+.Rproj.user
+*.Rproj
