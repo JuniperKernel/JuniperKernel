@@ -32,6 +32,7 @@ ZMQ_TAR_URL = https://github.com/foobarOrg/zmq/raw/master/${SYS}${ARCH}/${ZMQ_TA
 ZMQ_HEADER_TAR_FILE = zmq-4.2.2-headers.tar.gz
 ZMQ_HEADERS_URL = https://github.com/foobarOrg/zmq/raw/master/headers/${ZMQ_HEADER_TAR_FILE}
 ZMQ_CPP_HEADER_URL = https://github.com/zeromq/cppzmq/raw/master/zmq.hpp
+ZMQ_CPPADDON_HEADER_URL = https://raw.githubusercontent.com/zeromq/cppzmq/master/zmq_addon.hpp
 
 ## use C++11
 CXX_STD      = CXX11
@@ -52,4 +53,6 @@ all: ../inst/zmq/libzmq.a ../inst/include $(SHLIB)
 	@[ -d ../inst/include ] || mkdir -p ../inst/include
 	@curl -skLO ${ZMQ_CPP_HEADER_URL}
 	@mv zmq.hpp ../inst/include
+	@curl -skLO ${ZMQ_CPPADDON_HEADER_URL}
+	@mv zmq_addon.hpp.hpp ../inst/include
 	@curl -skLO ${ZMQ_HEADERS_URL} && tar -xzf ${ZMQ_HEADER_TAR_FILE} && mv include/*h ../inst/include && rm -rf ${ZMQ_HEADER_TAR_FILE} include

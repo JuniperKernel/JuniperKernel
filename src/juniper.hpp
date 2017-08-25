@@ -6,11 +6,11 @@
 #define FINALIZERS_H
 typedef void(*finalizerT)(SEXP);
 template<typename T>
-SEXP createExternalPointer(T* p, finalizerT finalizer, const char* pname) {
-  SEXP _p;
-  _p = Rcpp::Shield<SEXP>(R_MakeExternalPtr(reinterpret_cast<void*>(p),Rf_install(pname),R_NilValue));
-  R_RegisterCFinalizerEx(_p, finalizer, TRUE);
-  return _p;
+SEXP make_externalptr(T* p, finalizerT finalizer, const char* pname) {
+  SEXP kernel;
+  kernel = Rcpp::Shield<SEXP>(R_MakeExternalPtr(reinterpret_cast<void*>(p),Rf_install(pname),R_NilValue));
+  R_RegisterCFinalizerEx(kernel, finalizer, TRUE);
+  return kernel;
 }
 #endif // FINALIZERS_H
 
