@@ -28,6 +28,10 @@ class JuniperKernel {
 
     JuniperKernel(const config& conf)
       : _ctx(new zmq::context_t(1)),
+        _ioport(conf.iopub_port),
+        _hbport(conf.hb_port),
+        _key(conf.key),
+        _sig(conf.signature_scheme),
         
         // these are the 3 incoming Jupyter channels
         _shell(new zmq::socket_t(*_ctx, zmq::socket_type::router)),
@@ -53,11 +57,6 @@ class JuniperKernel {
       // these get bound in the main thread
       init_socket(_inproc_pub, inproc_pub);
       init_socket(_inproc_sig, inproc_sig);
-      
-      _ioport = conf.iopub_port;
-      _hbport = conf.hb_port;
-      _key = conf.key;
-      _sig = conf.signature_scheme;
     }
     
     // Functional style polling with custom message handling
@@ -105,6 +104,7 @@ class JuniperKernel {
         };
         poller(items, [&hb]() {
           zmq::multipart_t msg;
+          // ping-pong the message
           msg.recv(hb);
           msg.send(hb);
         });
@@ -169,11 +169,11 @@ class JuniperKernel {
     const std::string inproc_sig = "inproc://sig";
 
     std::string _endpoint;
-    std::string _hbport;
-    std::string _ioport;
+    const std::string _hbport;
+    const std::string _ioport;
     
-    std::string _key;
-    std::string _sig;
+    const std::string _key;
+    const std::string _sig;
     
     zmq::socket_t subscribe_to(const std::string& inproc_topic) {
       // connect to the inproc signaller
