@@ -6,6 +6,8 @@
 #include <json.hpp>
 #include <juniper.hpp>
 #include <zmq_addon.hpp>
+#include <sockets.hpp>
+#include <background.hpp>
 
 class JuniperKernel {
   public:
@@ -28,10 +30,6 @@ class JuniperKernel {
 
     JuniperKernel(const config& conf)
       : _ctx(new zmq::context_t(1)),
-        _ioport(conf.iopub_port),
-        _hbport(conf.hb_port),
-        _key(conf.key),
-        _sig(conf.signature_scheme),
         
         // these are the 3 incoming Jupyter channels
         _shell(new zmq::socket_t(*_ctx, zmq::socket_type::router)),
@@ -42,7 +40,12 @@ class JuniperKernel {
         // poison pills, results, etc.) to the heartbeat thread and 
         // iopub thread.
         _inproc_pub(new zmq::socket_t(*_ctx, zmq::socket_type::pub)),
-        _inproc_sig(new zmq::socket_t(*_ctx, zmq::socket_type::pub))
+        _inproc_sig(new zmq::socket_t(*_ctx, zmq::socket_type::pub)),
+
+        _hbport(conf.hb_port),
+        _ioport(conf.iopub_port),
+        _key(conf.key),
+        _sig(conf.signature_scheme)
     {
       char sep = (conf.transport=="tcp") ? ':' : '-';
       _endpoint = conf.transport + "://" + conf.ip + sep;
@@ -59,81 +62,40 @@ class JuniperKernel {
       init_socket(_inproc_sig, inproc_sig);
     }
     
-    // Functional style polling with custom message handling
-    // 
-    // This is a lame poller as it expects only 2 items and
-    // has a single handler (for the second item). The first
-    // item is expected to be a signaler to suicide; while 
-    // the second item receives Real Messages.
-    //
-    // would put this thing inside start_bg_threads, but
-    // c++11 does not allow templated lambdas.
-    template<typename OnMessage>
-    void poller(zmq::pollitem_t (&items)[2], OnMessage handler) {
-
-      while( 1 ) {
-        zmq::poll(&items[0], 2, -1);
-        if( /*poison pill*/ items[0].revents & ZMQ_POLLIN ) {
-          // loop over sockets, setting their lingers to 0
-          for(const zmq::pollitem_t item: items)
-            ((zmq::socket_t*)item.socket)->setsockopt(ZMQ_LINGER, 0);
-          break;
-        }
-        
-        if( items[1].revents & ZMQ_POLLIN ) {
-          handler();
-        }
-      }
-    }
-    
     // start the background threads
     // called as part of the kernel boot sequence
     void start_bg_threads() {
-      // heartbeat thread
-      std::thread hb([this]() {
-        // bind to the heartbeat endpoint
-        zmq::socket_t hb(*_ctx, zmq::socket_type::rep);
-        init_socket(&hb, _endpoint + _hbport);
+      start_hb_thread(*_ctx, _endpoint + _hbport, inproc_sig);
+      start_io_thread(*_ctx, _endpoint + _ioport, inproc_sig, inproc_pub);
+    }
 
-        zmq::socket_t sigsub = subscribe_to(inproc_sig);
-        
-        // setup pollitem_t instances and poll
-        zmq::pollitem_t items[] = {
-          {sigsub, 0, ZMQ_POLLIN, 0},
-          {hb,     0, ZMQ_POLLIN, 0}
-        };
-        poller(items, [&hb]() {
+    // runs in the main the thread, polls shell and controller
+    void run() {
+      zmq::socket_t sigsub = subscribe_to(*_ctx, inproc_sig);
+      zmq::pollitem_t items[] = {
+        {sigsub,  0, ZMQ_POLLIN, 0},
+        {*_cntrl, 0, ZMQ_POLLIN, 0},
+        {*_shell, 0, ZMQ_POLLIN, 0}
+      };
+
+      std::function<bool()> handlers[] = {
+        [&sigsub]() {
+          return false;
+        },
+        [this]() {
           zmq::multipart_t msg;
-          // ping-pong the message
-          msg.recv(hb);
-          msg.send(hb);
-        });
-      });
-
-      // iopub thread
-      std::thread io([this]() {
-        // bind to the iopub endpoint
-        zmq::socket_t io(*_ctx, zmq::socket_type::pub);
-        init_socket(&io, _endpoint + _ioport);
-
-        zmq::socket_t sigsub = subscribe_to(inproc_sig);
-        zmq::socket_t pubsub = subscribe_to(inproc_pub);
-
-        // setup pollitem_t instances and poll
-        zmq::pollitem_t items[] = {
-          {sigsub, 0, ZMQ_POLLIN, 0},
-          {pubsub, 0, ZMQ_POLLIN, 0}
-        };
-        poller(items, [&pubsub, &io]() {
-          // we've got some messages to send from the 
-          // execution engine back to the client. Messages
-          // from the executor are published to the inproc_pub
-          // topic, and we forward them to the client here.
+          msg.recv(*_cntrl);
+          // special handling of control messages
+          return true;
+        },
+        [this]() {
           zmq::multipart_t msg;
-          msg.recv(pubsub);
-          msg.send(io);
-        });
-      });
+          msg.recv(*_shell);
+          // special handling of shell messages
+          return true;
+        }
+      };
+      poller(items, handlers, 3);
     }
 
     static void finalizer(SEXP jpro) {
@@ -149,15 +111,18 @@ class JuniperKernel {
       // destroy sockets
       // destoy ctx
       if( _ctx ) {
-        _shell->setsockopt(ZMQ_LINGER, 0); delete _shell;
-        _stdin->setsockopt(ZMQ_LINGER, 0); delete _stdin;
         _cntrl->setsockopt(ZMQ_LINGER, 0); delete _cntrl;
         delete _ctx;
       }
     }
 
   private:
+    // context is shared by all threads, cause there 
+    // ain't no GIL to stop us now! ...we can build this thing together!
     zmq::context_t* const _ctx;
+    
+    
+    // jupyter/zmq routers
     zmq::socket_t*  const _shell;
     zmq::socket_t*  const _stdin;
     zmq::socket_t*  const _cntrl;
@@ -168,27 +133,13 @@ class JuniperKernel {
     const std::string inproc_pub = "inproc://pub";
     const std::string inproc_sig = "inproc://sig";
 
+    //misc
     std::string _endpoint;
     const std::string _hbport;
     const std::string _ioport;
     
     const std::string _key;
     const std::string _sig;
-    
-    zmq::socket_t subscribe_to(const std::string& inproc_topic) {
-      // connect to the inproc signaller
-      zmq::socket_t sub(*_ctx, zmq::socket_type::sub);
-      // for option ZMQ_SUBSCRIBE, no need to set before connect (but we do anyways)
-      // see: http://api.zeromq.org/4-1:zmq-setsockopt
-      sub.setsockopt(ZMQ_SUBSCRIBE, "" /*no filter*/, 0);
-      sub.connect(inproc_topic);
-      return sub;
-    }
-
-    void init_socket(zmq::socket_t* socket, std::string endpoint) {
-      socket->setsockopt(ZMQ_LINGER, LINGER);
-      socket->bind(endpoint);
-    }
 };
 
 // [[Rcpp::export]]
@@ -198,11 +149,10 @@ SEXP init_kernel(const std::string connection_file) {
 }
 
 // [[Rcpp::export]]
-SEXP boot_kernel(SEXP kernel) {
+void boot_kernel(SEXP kernel) {
   JuniperKernel* jp = reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(kernel));
   jp->start_bg_threads();
-  while( 1 ) {
-  }
+  jp->run();
 }
 
 

@@ -1,6 +1,7 @@
 #include <string>
+#include <Rcpp.h>
 
-#define LINGER 1000
+#define LINGER 1000 // number of millis to linger for
 
 #ifndef FINALIZERS_H
 #define FINALIZERS_H

@@ -35,3 +35,4 @@ clean:
 	rm -rf man
 	rm -rf JuniperKernel.Rcheck
 	rm -rf R/RcppExports.R src/RcppExports.cpp
+	rm -rf src/*o
