@@ -13,8 +13,11 @@ JuniperKernel.Rcheck/
 NAMESPACE
 man/
 *RcppExports*
-inst/include
-inst/zmq
 .Rproj.user
 *.Rproj
 .Rhistory
+inst/include/zmq*
+inst/include/zmq.h
+inst/zmq
+foo
+inst/include/json.hpp

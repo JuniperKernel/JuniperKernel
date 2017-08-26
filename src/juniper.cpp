@@ -4,10 +4,10 @@
 #include <zmq.hpp>
 #include <fstream>
 #include <json.hpp>
-#include <juniper.hpp>
 #include <zmq_addon.hpp>
-#include <sockets.hpp>
-#include <background.hpp>
+#include <juniper/juniper.h>
+#include <juniper/sockets.h>
+#include <juniper/background.h>
 
 class JuniperKernel {
   public:

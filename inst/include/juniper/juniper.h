@@ -1,3 +1,6 @@
+#ifndef juniper_juniper_juniper_H
+#define juniper_juniper_juniper_H
+
 #include <string>
 #include <Rcpp.h>
 
@@ -39,3 +42,5 @@ struct config {
   std::string stdin_port;
   std::string transport;
 };
+
+#endif // ifndef juniper_juniper_juniper_H
