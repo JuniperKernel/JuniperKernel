@@ -1,11 +1,10 @@
 #' Juniper Kernel Booter
 #' @title Boot the Juniper Kernel
 #' @details
-#' This method is invoked progmatically by a Jupyter
-#' client. In fact, it's this method that appears in the
-#' \code{kernels.json} file at the install location of the
-#' Juniper kernel. This kernel expects that a Jupyter client
-#' will pass the connection file via the command line.
+#' This method is invoked programatically by a Jupyter client. In fact,
+#' it's this method that appears in the \code{kernels.json} file at the
+#' install location of the Juniper kernel. This kernel expects that a
+#' Jupyter client will pass the connection file via the command line.
 #' A connection file contains json that is similar to:
 #'  \preformatted{
 #'    \{
@@ -38,15 +37,6 @@ bootKernel <- function() {
     warning("Multiple arguments passed; all but the first will be ignored.")
 
   userConnFile <- argv[1L]
-  bootJuniper(userConnFile)
-}
-
-## Load A Connection File
-##
-## Validate and load a connection file
-.loadConn <- function(conFile) {
-  validKeys <- c("stdin_port", "transport", "ip", "iopub_port",
-                "hb_port", "key", "shell_port", "control_port")
-
-  connectionInfo <- jsonlite::fromJSON(conFile)
+  juniper <- init_kernel(userConnFile)
+  boot_kernel(juniper)
 }

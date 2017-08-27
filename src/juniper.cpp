@@ -8,6 +8,29 @@
 #include <juniper/juniper.h>
 #include <juniper/sockets.h>
 #include <juniper/background.h>
+#include <unistd.h>
+
+
+
+#include <stdio.h>
+#include <execinfo.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
+void handler(int sig) {
+  void *array[10];
+  size_t size;
+  
+  // get void*'s for all entries on the stack
+  size = backtrace(array, 10);
+  
+  // print out all the frames to stderr
+  fprintf(stderr, "Error: signal %d:\n", sig);
+  backtrace_symbols_fd(array, size, STDERR_FILENO);
+  exit(1);
+}
+
+
 
 class JuniperKernel {
   public:
@@ -15,16 +38,17 @@ class JuniperKernel {
       std::ifstream ifs(connection_file);
       nlohmann::json connection_info = nlohmann::json::parse(ifs);
       config conf = {
-        connection_info["control_port"    ].get<std::string>(),
-        connection_info["hb_port"         ].get<std::string>(),
-        connection_info["iopub_port"      ].get<std::string>(),
-        connection_info["ip"              ].get<std::string>(),
-        connection_info["key"             ].get<std::string>(),
-        connection_info["shell_port"      ].get<std::string>(),
-        connection_info["signature_scheme"].get<std::string>(),
-        connection_info["stdin_port"      ].get<std::string>(),
-        connection_info["transport"       ].get<std::string>(),
+        std::to_string(connection_info["control_port"    ].get<int   >()),
+        std::to_string(connection_info["hb_port"         ].get<int   >()),
+        std::to_string(connection_info["iopub_port"      ].get<int   >()),
+                       connection_info["ip"              ].get<std::string>(),
+                       connection_info["key"             ].get<std::string>(),
+        std::to_string(connection_info["shell_port"      ].get<int   >()),
+                       connection_info["signature_scheme"].get<std::string>(),
+        std::to_string(connection_info["stdin_port"      ].get<int   >()),
+                       connection_info["transport"       ].get<std::string>(),
       };
+      print_conf(conf);
       return new JuniperKernel(conf);
     }
 
@@ -65,13 +89,17 @@ class JuniperKernel {
     // start the background threads
     // called as part of the kernel boot sequence
     void start_bg_threads() {
-      start_hb_thread(*_ctx, _endpoint + _hbport, inproc_sig);
-      start_io_thread(*_ctx, _endpoint + _ioport, inproc_sig, inproc_pub);
+      Rcpp::Rcout << "_hbport = " << _hbport << std::endl;
+      Rcpp::Rcout << "endpoint = " << _endpoint + _hbport << std::endl;
+      hb_thread = start_hb_thread(*_ctx, _endpoint + _hbport, inproc_sig);
+//      io_thread = start_io_thread(*_ctx, _endpoint + _ioport, inproc_sig, inproc_pub);
     }
 
     // runs in the main the thread, polls shell and controller
     void run() {
       zmq::socket_t sigsub = subscribe_to(*_ctx, inproc_sig);
+      Rcpp::Rcout << "CRINK1" << std::endl;
+
       zmq::pollitem_t items[] = {
         {sigsub,  0, ZMQ_POLLIN, 0},
         {*_cntrl, 0, ZMQ_POLLIN, 0},
@@ -107,14 +135,24 @@ class JuniperKernel {
     }
 
     ~JuniperKernel() {
+          Rcpp::Rcout << "CRUNK6" << std::endl;
       // set linger to 0 on all sockets
       // destroy sockets
       // destoy ctx
       if( _ctx ) {
-        _cntrl->setsockopt(ZMQ_LINGER, 0); delete _cntrl;
+        _stdin->setsockopt(ZMQ_LINGER, 0); delete _stdin;
         delete _ctx;
       }
     }
+  
+  void signal() {
+    Rcpp::Rcout << "CRUNK99" << std::endl;
+    
+     zmq::message_t request(4);
+     memcpy (request.data (), "kill", 4);
+     Rcpp::Rcout << "Sending kill " << std::endl;
+     _inproc_sig->send (request);
+  }
 
   private:
     // context is shared by all threads, cause there 
@@ -140,6 +178,9 @@ class JuniperKernel {
     
     const std::string _key;
     const std::string _sig;
+
+    std::thread hb_thread;
+    std::thread io_thread;
 };
 
 // [[Rcpp::export]]
@@ -150,9 +191,16 @@ SEXP init_kernel(const std::string connection_file) {
 
 // [[Rcpp::export]]
 void boot_kernel(SEXP kernel) {
+  signal(SIGSEGV, handler);
   JuniperKernel* jp = reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(kernel));
   jp->start_bg_threads();
-  jp->run();
+  // jp->run();
+  Rcpp::Rcout << "polling forever" << std::endl;
+  while( 1 ) {
+    sleep(1);
+    // break;
+    jp->signal();
+  }
 }
 
 

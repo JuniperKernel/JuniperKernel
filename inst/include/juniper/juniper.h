@@ -43,4 +43,18 @@ struct config {
   std::string transport;
 };
 
+
+void print_conf(const config& conf) {
+  Rcpp::Rcout << "{" << std::endl;
+  Rcpp::Rcout << "  control_port: " << conf.control_port << "," << std::endl;
+  Rcpp::Rcout << "  hb_port: " << conf.hb_port << "," << std::endl;
+  Rcpp::Rcout << "  ip: " << conf.ip << "," << std::endl;
+  Rcpp::Rcout << "  key: " << conf.key << "," << std::endl;
+  Rcpp::Rcout << "  shell_port: " << conf.shell_port << "," << std::endl;
+  Rcpp::Rcout << "  signature_scheme: " << conf.signature_scheme << "," << std::endl;
+  Rcpp::Rcout << "  stdin_port: " << conf.stdin_port << "," << std::endl;
+  Rcpp::Rcout << "  transport: " << conf.transport << std::endl;
+  Rcpp::Rcout << "}" << std::endl;
+}
+
 #endif // ifndef juniper_juniper_juniper_H
