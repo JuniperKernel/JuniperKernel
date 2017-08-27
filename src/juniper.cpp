@@ -89,10 +89,8 @@ class JuniperKernel {
     // start the background threads
     // called as part of the kernel boot sequence
     void start_bg_threads() {
-      Rcpp::Rcout << "_hbport = " << _hbport << std::endl;
-      Rcpp::Rcout << "endpoint = " << _endpoint + _hbport << std::endl;
-      hb_thread = start_hb_thread(*_ctx, _endpoint + _hbport, inproc_sig);
-//      io_thread = start_io_thread(*_ctx, _endpoint + _ioport, inproc_sig, inproc_pub);
+      start_hb_thread(*_ctx, _endpoint + _hbport, inproc_sig);
+      start_io_thread(*_ctx, _endpoint + _ioport, inproc_sig, inproc_pub);
     }
 
     // runs in the main the thread, polls shell and controller
@@ -178,9 +176,6 @@ class JuniperKernel {
     
     const std::string _key;
     const std::string _sig;
-
-    std::thread hb_thread;
-    std::thread io_thread;
 };
 
 // [[Rcpp::export]]

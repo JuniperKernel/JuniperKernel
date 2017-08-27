@@ -7,7 +7,7 @@
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
 
-std::thread start_hb_thread(zmq::context_t& ctx, const std::string endpoint, const std::string inproc_sig) {
+void start_hb_thread(zmq::context_t& ctx, const std::string endpoint, const std::string inproc_sig) {
   std::thread hb([&ctx, endpoint, inproc_sig]() {
     // bind to the heartbeat endpoint
     zmq::socket_t hb(ctx, zmq::socket_type::rep);
@@ -44,10 +44,10 @@ std::thread start_hb_thread(zmq::context_t& ctx, const std::string endpoint, con
     poller(items, handlers, 2);
               Rcpp::Rcout << "CRUNK_HB_DEAD" << std::endl;
   });
-  return hb;
+  hb.detach();
 }
 
-std::thread start_io_thread(zmq::context_t& ctx, const std::string endpoint, const std::string inproc_sig, const std::string inproc_pub) {
+void start_io_thread(zmq::context_t& ctx, const std::string endpoint, const std::string inproc_sig, const std::string inproc_pub) {
   std::thread io([&ctx, endpoint, inproc_sig, inproc_pub]() {
 
     // bind to the iopub endpoint
@@ -83,7 +83,7 @@ std::thread start_io_thread(zmq::context_t& ctx, const std::string endpoint, con
     poller(items, handlers, 2);
     Rcpp::Rcout << "CRUNK_IO_DEAD" << std::endl;
   });
-  return io;
+  io.detach();
 }
 
 #endif // #ifndef juniper_juniper_background_H
