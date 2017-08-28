@@ -30,38 +30,38 @@ class JuniperKernel {
       return new JuniperKernel(conf);
     }
 
-    JuniperKernel(const config& conf)
-      : _ctx(new zmq::context_t(1)),
-        
-        // these are the 3 incoming Jupyter channels
-        _shell(new zmq::socket_t(*_ctx, zmq::socket_type::router)),
-        _stdin(new zmq::socket_t(*_ctx, zmq::socket_type::router)),
-        _cntrl(new zmq::socket_t(*_ctx, zmq::socket_type::router)),
-    
-        // these are internal routing sockets that push messages (e.g. 
-        // poison pills, results, etc.) to the heartbeat thread and 
-        // iopub thread.
-        _inproc_pub(new zmq::socket_t(*_ctx, zmq::socket_type::pub)),
-        _inproc_sig(new zmq::socket_t(*_ctx, zmq::socket_type::pub)),
+    JuniperKernel(const config& conf):
+      _ctx(new zmq::context_t(1)),
 
-        _hbport(conf.hb_port),
-        _ioport(conf.iopub_port),
-        _key(conf.key),
-        _sig(conf.signature_scheme)
-    {
-      char sep = (conf.transport=="tcp") ? ':' : '-';
-      _endpoint = conf.transport + "://" + conf.ip + sep;
+      // these are the 3 incoming Jupyter channels
+      _shell(new zmq::socket_t(*_ctx, zmq::socket_type::router)),
+      _stdin(new zmq::socket_t(*_ctx, zmq::socket_type::router)),
+      _cntrl(new zmq::socket_t(*_ctx, zmq::socket_type::router)),
 
-      // socket setup
-      init_socket(_shell, _endpoint + conf.shell_port);
-      init_socket(_stdin, _endpoint + conf.stdin_port);
-      init_socket(_cntrl, _endpoint + conf.control_port);
+      // these are internal routing sockets that push messages (e.g.
+      // poison pills, results, etc.) to the heartbeat thread and
+      // iopub thread.
+      _inproc_pub(new zmq::socket_t(*_ctx, zmq::socket_type::pub)),
+      _inproc_sig(new zmq::socket_t(*_ctx, zmq::socket_type::pub)),
 
-      // iopub and hbeat get their own threads and we
-      // communicate via the inproc topics sig/sub
-      // these get bound in the main thread
-      init_socket(_inproc_pub, INPROC_PUB);
-      init_socket(_inproc_sig, INPROC_SIG);
+      _hbport(conf.hb_port),
+      _ioport(conf.iopub_port),
+      _key(conf.key),
+      _sig(conf.signature_scheme) {
+        char sep = (conf.transport=="tcp") ? ':' : '-';
+        _endpoint = conf.transport + "://" + conf.ip + sep;
+
+        // socket setup
+        init_socket(_shell, _endpoint + conf.shell_port);
+        init_socket(_stdin, _endpoint + conf.stdin_port);
+        init_socket(_cntrl, _endpoint + conf.control_port);
+
+        // iopub and hbeat get their own threads and we communicate
+        // via the inproc topics sig/sub
+        //
+        // these get bound and cleaned by THIS thread
+        init_socket(_inproc_pub, INPROC_PUB);
+        init_socket(_inproc_sig, INPROC_SIG);
     }
 
     // start the background threads
@@ -111,7 +111,6 @@ class JuniperKernel {
     }
 
     ~JuniperKernel() {
-          Rcpp::Rcout << "CRUNK6" << std::endl;
       // set linger to 0 on all sockets
       // destroy sockets
       // destoy ctx
@@ -121,12 +120,12 @@ class JuniperKernel {
       }
     }
   
-  void signal() {
-     zmq::message_t request(0);
-     memcpy (request.data (), "", 0);
-     Rcpp::Rcout << "Sending kill " << std::endl;
-     _inproc_sig->send(request);
-  }
+    void signal() {
+       zmq::message_t request(0);
+       memcpy (request.data (), "", 0);
+       Rcpp::Rcout << "Sending kill " << std::endl;
+       _inproc_sig->send(request);
+    }
 
   private:
     // context is shared by all threads, cause there 
@@ -156,7 +155,6 @@ void boot_kernel(const std::string& connection_file) {
   JuniperKernel* jk = JuniperKernel::make(connection_file);
   jk->start_bg_threads();
   // jp->run();
-  Rcpp::Rcout << "polling forever" << std::endl;
   while( 1 ) {
     sleep(1);
     // break;
