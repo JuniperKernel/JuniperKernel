@@ -39,20 +39,17 @@ zmq::socket_t* listen_on(zmq::context_t& context, const std::string& endpoint, z
 // if a handler returns false, it signals to stop polling
 // also handles all thread-local socket teardown logic
 void poll(zmq::context_t& context, zmq::socket_t* sockets[], std::function<bool()> handlers[], int n) {
-  zmq::socket_t* sp = *sockets;
 
   zmq::pollitem_t items[n + 1 /* one more for the inproc signaller*/];
   zmq::socket_t* signaller = subscribe_to(context, INPROC_SIG);
   items[0] = {*signaller, 0, ZMQ_POLLIN, 0 };
   for(int i=1; i<=n; i++)
-    items[i] = {*sp++, 0, ZMQ_POLLIN, 0};
-  
+    items[i] = {*sockets[i-1], 0, ZMQ_POLLIN, 0};
+
   bool dead=false;
   while( !dead ) {
     zmq::poll(items, n+1, -1);
-
     std::function<bool()>* hp = handlers;
-
     // check if we got a kill signal
     if( items[0].revents & ZMQ_POLLIN ) {
       Rcpp::Rcout << "suicide" << std::endl;
@@ -60,12 +57,14 @@ void poll(zmq::context_t& context, zmq::socket_t* sockets[], std::function<bool(
       break; // breaks the while
     }
 
-    for(int i=1; i<=n; i++)
-      if( items[i].revents & ZMQ_POLLIN )
-        if( !(*hp++)() ) {
+    for(int i=1; i<=n; i++) {
+      if( items[i].revents & ZMQ_POLLIN ) {
+        if( !hp[i-1]() ) {
           dead=true;
           break;  // breaks the for
         }
+      }
+    }
   }
 
   assert(dead);
@@ -76,8 +75,9 @@ void poll(zmq::context_t& context, zmq::socket_t* sockets[], std::function<bool(
   delete signaller;
 
   for(int i=0; i<n; i++) {
-    sockets[i]->setsockopt(ZMQ_LINGER, 0);
-    delete sockets[i];
+    zmq::socket_t* sock = sockets[i];
+    sock->setsockopt(ZMQ_LINGER, 0);
+    delete sock;
   }
 }
 

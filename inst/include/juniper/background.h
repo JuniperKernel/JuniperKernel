@@ -8,8 +8,8 @@
 #include "sockets.h"
 
 
-void start_hb_thread(zmq::context_t& ctx, const std::string& endpoint) {
-  std::thread hb([&ctx, endpoint]() {
+std::thread start_hb_thread(zmq::context_t& ctx, const std::string& endpoint) {
+  std::thread hbthread([&ctx, endpoint]() {
     zmq::socket_t* hbSock = listen_on(ctx, endpoint, zmq::socket_type::rep);  // bind to the heartbeat endpoint
     std::function<bool()> handlers[] = {
       // ping-pong the message on heartbeat
@@ -22,11 +22,11 @@ void start_hb_thread(zmq::context_t& ctx, const std::string& endpoint) {
     };
     poll(ctx, (zmq::socket_t*[]){hbSock}, handlers, 1);
   });
-  hb.detach();
+  return hbthread;
 }
 
-void start_io_thread(zmq::context_t& ctx, const std::string& endpoint) {
-  std::thread io([&ctx, endpoint]() {
+std::thread start_io_thread(zmq::context_t& ctx, const std::string& endpoint) {
+  std::thread iothread([&ctx, endpoint]() {
     zmq::socket_t* io = listen_on(ctx, endpoint, zmq::socket_type::pub);  // bind to the iopub endpoint
     zmq::socket_t* pubsub = subscribe_to(ctx, INPROC_PUB); // subscription to internal publisher
     std::function<bool()> handlers[] = {
@@ -46,7 +46,7 @@ void start_io_thread(zmq::context_t& ctx, const std::string& endpoint) {
     io->setsockopt(ZMQ_LINGER, 0);
     delete io;
   });
-  io.detach();
+  return iothread;
 }
 
 #endif // #ifndef juniper_juniper_background_H
