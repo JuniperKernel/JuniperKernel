@@ -5,6 +5,8 @@
 #include <Rcpp.h>
 
 #define LINGER 1000 // number of millis to linger for
+#define INPROC_PUB "inproc://pub"
+#define INPROC_SIG "inproc://sig"
 
 #ifndef FINALIZERS_H
 #define FINALIZERS_H
@@ -17,7 +19,6 @@ SEXP make_externalptr(T* p, finalizerT finalizer, const char* pname) {
   return kernel;
 }
 #endif // FINALIZERS_H
-
 
 // sample config:
 //    {
@@ -41,20 +42,20 @@ struct config {
   std::string signature_scheme;
   std::string stdin_port;
   std::string transport;
+
+  void print_conf() {
+    Rcpp::Rcout << "{"                                                << std::endl;
+    Rcpp::Rcout << "  control_port: "     << control_port      << "," << std::endl;
+    Rcpp::Rcout << "  hb_port: "          << hb_port           << "," << std::endl;
+    Rcpp::Rcout << "  iopub_port: "       << iopub_port        << "," << std::endl;
+    Rcpp::Rcout << "  ip: "               << ip                << "," << std::endl;
+    Rcpp::Rcout << "  key: "              << key               << "," << std::endl;
+    Rcpp::Rcout << "  shell_port: "       << shell_port        << "," << std::endl;
+    Rcpp::Rcout << "  signature_scheme: " << signature_scheme  << "," << std::endl;
+    Rcpp::Rcout << "  stdin_port: "       << stdin_port        << "," << std::endl;
+    Rcpp::Rcout << "  transport: "        << transport                << std::endl;
+    Rcpp::Rcout << "}"                                                << std::endl;
+  }
 };
-
-
-void print_conf(const config& conf) {
-  Rcpp::Rcout << "{" << std::endl;
-  Rcpp::Rcout << "  control_port: " << conf.control_port << "," << std::endl;
-  Rcpp::Rcout << "  hb_port: " << conf.hb_port << "," << std::endl;
-  Rcpp::Rcout << "  ip: " << conf.ip << "," << std::endl;
-  Rcpp::Rcout << "  key: " << conf.key << "," << std::endl;
-  Rcpp::Rcout << "  shell_port: " << conf.shell_port << "," << std::endl;
-  Rcpp::Rcout << "  signature_scheme: " << conf.signature_scheme << "," << std::endl;
-  Rcpp::Rcout << "  stdin_port: " << conf.stdin_port << "," << std::endl;
-  Rcpp::Rcout << "  transport: " << conf.transport << std::endl;
-  Rcpp::Rcout << "}" << std::endl;
-}
 
 #endif // ifndef juniper_juniper_juniper_H

@@ -10,45 +10,23 @@
 #include <juniper/background.h>
 #include <unistd.h>
 
-
-
-#include <stdio.h>
-#include <execinfo.h>
-#include <signal.h>
-#include <stdlib.h>
-#include <unistd.h>
-void handler(int sig) {
-  void *array[10];
-  size_t size;
-  
-  // get void*'s for all entries on the stack
-  size = backtrace(array, 10);
-  
-  // print out all the frames to stderr
-  fprintf(stderr, "Error: signal %d:\n", sig);
-  backtrace_symbols_fd(array, size, STDERR_FILENO);
-  exit(1);
-}
-
-
-
 class JuniperKernel {
   public:
-    static JuniperKernel* make(const std::string connection_file) {
+    static JuniperKernel* make(const std::string& connection_file) {
       std::ifstream ifs(connection_file);
       nlohmann::json connection_info = nlohmann::json::parse(ifs);
       config conf = {
-        std::to_string(connection_info["control_port"    ].get<int   >()),
-        std::to_string(connection_info["hb_port"         ].get<int   >()),
-        std::to_string(connection_info["iopub_port"      ].get<int   >()),
+        std::to_string(connection_info["control_port"    ].get<int        >()),
+        std::to_string(connection_info["hb_port"         ].get<int        >()),
+        std::to_string(connection_info["iopub_port"      ].get<int        >()),
                        connection_info["ip"              ].get<std::string>(),
                        connection_info["key"             ].get<std::string>(),
-        std::to_string(connection_info["shell_port"      ].get<int   >()),
+        std::to_string(connection_info["shell_port"      ].get<int        >()),
                        connection_info["signature_scheme"].get<std::string>(),
-        std::to_string(connection_info["stdin_port"      ].get<int   >()),
+        std::to_string(connection_info["stdin_port"      ].get<int        >()),
                        connection_info["transport"       ].get<std::string>(),
       };
-      print_conf(conf);
+      conf.print_conf();
       return new JuniperKernel(conf);
     }
 
@@ -82,47 +60,47 @@ class JuniperKernel {
       // iopub and hbeat get their own threads and we
       // communicate via the inproc topics sig/sub
       // these get bound in the main thread
-      init_socket(_inproc_pub, inproc_pub);
-      init_socket(_inproc_sig, inproc_sig);
+      init_socket(_inproc_pub, INPROC_PUB);
+      init_socket(_inproc_sig, INPROC_SIG);
     }
-    
+
     // start the background threads
     // called as part of the kernel boot sequence
     void start_bg_threads() {
-      start_hb_thread(*_ctx, _endpoint + _hbport, inproc_sig);
-      start_io_thread(*_ctx, _endpoint + _ioport, inproc_sig, inproc_pub);
+      start_hb_thread(*_ctx, _endpoint + _hbport);
+      start_io_thread(*_ctx, _endpoint + _ioport);
     }
 
     // runs in the main the thread, polls shell and controller
-    void run() {
-      zmq::socket_t sigsub = subscribe_to(*_ctx, inproc_sig);
-      Rcpp::Rcout << "CRINK1" << std::endl;
-
-      zmq::pollitem_t items[] = {
-        {sigsub,  0, ZMQ_POLLIN, 0},
-        {*_cntrl, 0, ZMQ_POLLIN, 0},
-        {*_shell, 0, ZMQ_POLLIN, 0}
-      };
-
-      std::function<bool()> handlers[] = {
-        [&sigsub]() {
-          return false;
-        },
-        [this]() {
-          zmq::multipart_t msg;
-          msg.recv(*_cntrl);
-          // special handling of control messages
-          return true;
-        },
-        [this]() {
-          zmq::multipart_t msg;
-          msg.recv(*_shell);
-          // special handling of shell messages
-          return true;
-        }
-      };
-      poller(items, handlers, 3);
-    }
+    // void run() {
+    //   zmq::socket_t sigsub = subscribe_to(*_ctx, inproc_sig);
+    //   Rcpp::Rcout << "CRINK1" << std::endl;
+    // 
+    //   zmq::pollitem_t items[] = {
+    //     {sigsub,  0, ZMQ_POLLIN, 0},
+    //     {*_cntrl, 0, ZMQ_POLLIN, 0},
+    //     {*_shell, 0, ZMQ_POLLIN, 0}
+    //   };
+    // 
+    //   std::function<bool()> handlers[] = {
+    //     [&sigsub]() {
+    //       return false;
+    //     },
+    //     [this]() {
+    //       zmq::multipart_t msg;
+    //       msg.recv(*_cntrl);
+    //       // special handling of control messages
+    //       return true;
+    //     },
+    //     [this]() {
+    //       zmq::multipart_t msg;
+    //       msg.recv(*_shell);
+    //       // special handling of shell messages
+    //       return true;
+    //     }
+    //   };
+    //   poller(items, handlers, 3);
+    // }
 
     static void finalizer(SEXP jpro) {
       JuniperKernel* jp = reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(jpro));
@@ -144,20 +122,17 @@ class JuniperKernel {
     }
   
   void signal() {
-    Rcpp::Rcout << "CRUNK99" << std::endl;
-    
-     zmq::message_t request(4);
-     memcpy (request.data (), "kill", 4);
+     zmq::message_t request(0);
+     memcpy (request.data (), "", 0);
      Rcpp::Rcout << "Sending kill " << std::endl;
-     _inproc_sig->send (request);
+     _inproc_sig->send(request);
   }
 
   private:
     // context is shared by all threads, cause there 
     // ain't no GIL to stop us now! ...we can build this thing together!
     zmq::context_t* const _ctx;
-    
-    
+
     // jupyter/zmq routers
     zmq::socket_t*  const _shell;
     zmq::socket_t*  const _stdin;
@@ -166,8 +141,6 @@ class JuniperKernel {
     // inproc sockets
     zmq::socket_t* const _inproc_pub;
     zmq::socket_t* const _inproc_sig;
-    const std::string inproc_pub = "inproc://pub";
-    const std::string inproc_sig = "inproc://sig";
 
     //misc
     std::string _endpoint;
@@ -179,25 +152,19 @@ class JuniperKernel {
 };
 
 // [[Rcpp::export]]
-SEXP init_kernel(const std::string connection_file) {
-  JuniperKernel* jpro = JuniperKernel::make(connection_file);
-  return make_externalptr<JuniperKernel>(jpro, JuniperKernel::finalizer, "JuniperKernel*");
-}
-
-// [[Rcpp::export]]
-void boot_kernel(SEXP kernel) {
-  signal(SIGSEGV, handler);
-  JuniperKernel* jp = reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(kernel));
-  jp->start_bg_threads();
+void boot_kernel(const std::string& connection_file) {
+  JuniperKernel* jk = JuniperKernel::make(connection_file);
+  jk->start_bg_threads();
   // jp->run();
   Rcpp::Rcout << "polling forever" << std::endl;
   while( 1 ) {
     sleep(1);
     // break;
-    jp->signal();
+    jk->signal();
+    break;
   }
+  delete jk;
 }
-
 
 // http://zguide.zeromq.org/page:all#Handling-Interrupt-Signals
 // http://zguide.zeromq.org/page:all#Multithreading-with-ZeroMQ

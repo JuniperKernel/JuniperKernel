@@ -149,3 +149,6 @@ The #ifndef names would be
 
     juniper/juniper.h        -> juniper_juniper_juniper_H
     juniper/sockets/socket.h -> juniper_sockets_socket_H
+
+It is fine to mix definition and implementation in header files
+for Rcpp projects.

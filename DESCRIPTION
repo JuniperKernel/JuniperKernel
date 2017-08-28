@@ -12,7 +12,6 @@ Collate: 'juniper.R'
          'booter.R'
          'kernelspec.R'
          'RcppExports.R'
-         'utils.R'
          'zzz.R'
 LinkingTo: Rcpp
 Description: A native R kernel for Jupyter.
