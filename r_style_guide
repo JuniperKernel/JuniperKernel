@@ -1,0 +1,113 @@
+R STYLE GUIDE
+-------------
+
+GENERAL
+-------
+
+Use 2-space indentation.
+
+Prefer the S3 object system.
+
+Avoid shadowing.
+
+When overloading, do not "fake" the dispatch by calling into a different
+package:
+
+  # do NOT do this
+  apply <- function(X, MARGIN, FUN, ...) {
+    if( !is(X, "MyObj") ) {
+      return(base::apply(X, MARGIN, FUN, ...))  # calls into another package (base)
+    }
+  }
+
+Use left-arrow assignment:
+
+  x <- 5
+
+Instead of
+
+  x = 5
+
+Use typically trailing braces everywhere (if, else, functions,
+structures, typedefs, class definitions, etc.)
+  if( x ) {
+  }
+
+The else statement starts on the same line as the last closing brace.
+
+  if( x ) {
+  } else {
+  }
+
+Connect opening parenthesis to control statements (if, while, switch,
+for, etc.) and pad parenthesized expressions with spaces
+
+  if( x ) {
+  }
+
+Instead of
+  if (x) {
+  }
+
+Function names are lower case:
+
+  void foo();
+
+Use camelCase for multi-word function names:
+
+  void doThis();
+
+Instead of
+
+  void dont_do_this();
+
+Use a '.' to hide functions:
+
+  .myHiddenFun <- function() {
+  }
+
+Avoid creating functions that rely on the ellipsis argument.
+Function arguments and variables start lower case:
+
+  x
+
+Use camel-case for multi-word variables:
+
+  int myVariable;
+
+Supply sensible defaults for function arguments; use match.arg
+when a function can take on a variety of constants:
+
+  x <- function(arg1=c("foo", "bar", "baz")) {
+    arg1 <- match.arg(arg1)
+  }
+
+Class names start with an upper case character and are in camel case:
+
+  s <- structure(new.env(parent = emptyenv()), class="Foo")
+
+Use reserved words for logical values:
+
+  TRUE, FALSE
+
+Do not use
+
+  T, F
+
+Use precise specification for integer values:
+
+  if( length(x) == 0L ) {
+  }
+
+Instead of
+
+  if( length(x) == 0 ) {
+  }
+
+And
+
+  x[[1L]]
+
+Instead of
+
+  x[[1]]

@@ -1,0 +1,151 @@
+CPP STYLE GUIDE
+---------------
+
+GENERAL
+-------
+
+Use 2-space indentation.
+
+Use typically trailing braces everywhere (if, else, functions,
+structures, typedefs, class definitions, etc.)
+  if( x ) {
+  }
+
+The else statement starts on the same line as the last closing brace.
+
+  if( x ) {
+  } else {
+  }
+
+Connect opening parenthesis to control statements (if, while, switch,
+for, etc.) and pad parenthesized expressions with spaces
+
+  if( x ) {
+  }
+
+Instead of
+  if (x) {
+  }
+
+Function names are lower case:
+
+  void foo();
+
+Use snake_case for multi-word function names:
+
+  void do_this();
+
+Instead of
+
+  void dontDoThis();
+
+Class names start upper case:
+
+  class Foo {
+  }
+
+Function arguments and local variables start lower case:
+
+  float x;
+
+Member variables start with a '_' followed by a lower case character:
+
+  class Foo {
+    public:
+      int _bar;
+  }
+
+
+Use camel-case for multi-word variables:
+
+  int myVariable;
+
+Typedef and names follow the same convention as
+function names, however they always end with "_t":
+
+  struct config_t {
+    int x;
+    int z;
+  };
+
+Note that struct variables have the same naming convention as function
+arguments and local variables;
+
+Enum declarations are strongly typed and have all upper case names and
+constants. Multi-word names are in upper snake case:
+
+  enum class MY_ENUM {
+    A,
+    B,
+    C_BAR_BAZ
+  };
+
+Names of recursive functions end with "_r"
+
+  void visit_node_r( int node );
+
+Defined names use all upper case characters. Multiple words are
+separated with an underscore.
+
+  #define SIDE_FRONT 0
+
+Use ‘const’ as much as possible.
+Use:
+  const int *p; // pointer to const int
+  int * const p; // const pointer to int
+  const int * const p; // const pointer to const int
+
+Don’t use:
+
+  int const *p;
+
+CLASSES
+-------
+
+Each class should be a separate source file unless it makes sense
+to group several smaller classes.
+
+The file name should be the same name of the class and the
+companion header file uses prefix ".h" and not ".hpp"; for example,
+class Foo will have files:
+
+  Foo.cpp
+  Foo.h
+
+Ordering of class variables and methods should be as follows:
+
+  1. list of friend classes
+  2. public variables
+  3. public methods
+  4. protected variables
+  5. protected methods
+  6. private variables
+  7. private methods
+
+This allows the public interface to be easily found at the beginning
+of the class.
+
+Always make class methods ‘const’ when they do not modify any class
+variables.
+
+
+
+HEADER FILES
+------------
+
+Header begin with a #ifndef name composed of the project
+name followed by the fully-qualified relative path of the file
+from the include directory and ended by the character H. Names
+should be in lower snake case. For example, for a project named
+Juniper having an include directory structure like
+
+  include/
+    juniper/
+      juniper.h
+      sockets/
+        socket.h
+
+The #ifndef names would be
+
+    juniper/juniper.h        -> juniper_juniper_juniper_H
+    juniper/sockets/socket.h -> juniper_sockets_socket_H
