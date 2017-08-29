@@ -1,10 +1,10 @@
 #include <string>
 #include <thread>
+#include <fstream>
 #include <Rcpp.h>
 #include <zmq.hpp>
-#include <fstream>
-#include <json.hpp>
 #include <zmq_addon.hpp>
+#include <json.hpp>
 #include <juniper/juniper.h>
 #include <juniper/sockets.h>
 #include <juniper/background.h>

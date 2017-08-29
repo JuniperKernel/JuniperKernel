@@ -7,7 +7,7 @@ endif
 
 CXX_STD = CXX11
 PKG_CPPFLAGS = -I../inst/include -I.
-PKG_LIBS = -lliblibzmq-${ZMQ_VERSION}-${FLV} -L${FLV}
+PKG_LIBS = -lyajl_s -lliblibzmq-${ZMQ_VERSION}-${FLV} -L${FLV}
 
 ZMQ_VERSION = 4.2.2
 ZMQ_TAR_FILE= libzmq-${ZMQ_VERSION}-${FLV}.tar.gz
@@ -17,10 +17,17 @@ ZMQ_HEADERS_URL = https://github.com/foobarOrg/zmq/raw/master/headers/${ZMQ_HEAD
 ZMQ_CPP_HEADER_URL = https://github.com/zeromq/cppzmq/raw/master/zmq.hpp
 ZMQ_CPPADDON_HEADER_URL = https://raw.githubusercontent.com/zeromq/cppzmq/master/zmq_addon.hpp
 
-all:    	libzmq $(SHLIB)
+YAJL_VERSION = 2.1.0
+YAJL_TAR_FILE = libyajl_s-${YAJL_VERSION}.tar.gz
+YAJL_TAR_URL = https://github.com/foobarOrg/yajl/raw/master/${SYS}${ARCH}/${YAJL_TAR_FILE}
+YAJL_HEADER_TAR_FILE = yajl-${YAJL_VERSION}-headers.tar.gz
+YAJL_HEADER_URL = https://github.com/foobarOrg/yajl/raw/master/headers/${YAJL_HEADER_TAR_FILE}
 
-.Phony:		libzmq
-libzmq: ../inst/include
+all: deps $(SHLIB)
+deps: zmq yajl headers
+
+.Phony:		zmq yajl headers
+zmq:
 		@[ -d ../zmq/win/${FLV} ] || mkdir -p ../zmq/win/${FLV}
 		@[ -f ../zmq/win/${FLV}/${ZMQ_TAR_FILE} ] || curl -skLO ${ZMQ_TAR_URL} && mv ${ZMQ_TAR_FILE} ../zmq/win/${FLV} && tar xfz ../zmq/win/${FLV}/${ZMQ_TAR_FILE} -C ../inst
 		@[ -d ${FLV} ] || mkdir -p ${FLV}
@@ -28,11 +35,21 @@ libzmq: ../inst/include
 		@[ -d ../inst/libs/${FLV} ] || mkdir -p ../inst/libs/${FLV}
 		@cp libzmq-${ZMQ_VERSION}-${FLV}.lib ../inst/libs/${FLV}
 
-../inst/include:
+yajl:
+		@[ -d ../yajl/win/${FLV} ] || mkdir -p ../yajl/win/${FLV}
+		@[ -f ../yajl/win/${FLV}/${YAJL_TAR_FILE} ] || curl -skLO ${YAJL_TAR_URL} && mv ${YAJL_TAR_FILE} ../yajl/win/${FLV} && tar xfz ../yajl/win/${FLV}/${YAJL_TAR_FILE} -C ../inst
+		@[ -d ${FLV} ] || mkdir -p ${FLV}
+		@cp libyajl_s-${YAJL_VERSION}-${FLV}.a ${FLV}
+		@cp libyajl_s-${YAJL_VERSION}-${FLV}.a ../inst/libs/${FLV}
+
+headers:
 	@echo "Downloading ZMQ header files"
 	@[ -d ../inst/include ] || mkdir -p ../inst/include
 	@curl -skLO ${ZMQ_CPP_HEADER_URL}
 	@mv zmq.hpp ../inst/include
 	@curl -skLO ${ZMQ_CPPADDON_HEADER_URL}
 	@mv zmq_addon.hpp ../inst/include
-	@curl -skLO ${ZMQ_HEADERS_URL} && tar -xzf ${ZMQ_HEADER_TAR_FILE} && mv include/*h ../inst/include && rm -rf ${ZMQ_HEADER_TAR_FILE}
+	@curl -skLO ${ZMQ_HEADERS_URL} && tar -xzf ${ZMQ_HEADER_TAR_FILE} && mv include/*h ../inst/include && rm -rf ${ZMQ_HEADER_TAR_FILE} include
+
+	@echo "Downloading yajl header files"
+	@curl -skLO ${YAJL_HEADER_URL} && tar -xzf ${YAJL_HEADER_TAR_FILE} && mv yajl/*h ../inst/include && rm -rf ${YAJL_HEADER_TAR_FILE} yajl

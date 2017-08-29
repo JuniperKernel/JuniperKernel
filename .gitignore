@@ -19,5 +19,7 @@ man/
 inst/include/zmq*
 inst/include/zmq.h
 inst/zmq
+inst/yajl
+inst/include/yajl*
 foo
 inst/include/json.hpp
