@@ -40,11 +40,13 @@ std::thread start_io_thread(zmq::context_t& ctx, const std::string& endpoint) {
         msg.recv(*pubsub);
         msg.send(*io);
         return true;
+      },
+      [] {
+        assert(false);  // we should never be run...
+        return true;
       }
     };
-    poll(ctx, (zmq::socket_t*[]){pubsub}, handlers, 1);
-    io->setsockopt(ZMQ_LINGER, 0);
-    delete io;
+    poll(ctx, (zmq::socket_t*[]){pubsub, io}, handlers, 2);
   });
   return iothread;
 }

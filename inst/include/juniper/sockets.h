@@ -37,7 +37,7 @@ zmq::socket_t* listen_on(zmq::context_t& context, const std::string& endpoint, z
 
 // Functional style polling with custom message handling
 // if a handler returns false, it signals to stop polling
-// also handles all thread-local socket teardown logic
+// also handles socket teardown logic
 void poll(zmq::context_t& context, zmq::socket_t* sockets[], std::function<bool()> handlers[], int n) {
 
   zmq::pollitem_t items[n + 1 /* one more for the inproc signaller*/];

@@ -30,28 +30,8 @@ void handler(int sig) {
   exit(1);
 }
 
-
-
 class JuniperKernel {
   public:
-    static JuniperKernel* make(const std::string& connection_file) {
-      std::ifstream ifs(connection_file);
-      nlohmann::json connection_info = nlohmann::json::parse(ifs);
-      config conf = {
-        std::to_string(connection_info["control_port"    ].get<int        >()),
-        std::to_string(connection_info["hb_port"         ].get<int        >()),
-        std::to_string(connection_info["iopub_port"      ].get<int        >()),
-                       connection_info["ip"              ].get<std::string>(),
-                       connection_info["key"             ].get<std::string>(),
-        std::to_string(connection_info["shell_port"      ].get<int        >()),
-                       connection_info["signature_scheme"].get<std::string>(),
-        std::to_string(connection_info["stdin_port"      ].get<int        >()),
-                       connection_info["transport"       ].get<std::string>(),
-      };
-      conf.print_conf();
-      return new JuniperKernel(conf);
-    }
-
     JuniperKernel(const config& conf):
       _ctx(new zmq::context_t(1)),
 
@@ -84,6 +64,24 @@ class JuniperKernel {
         init_socket(_inproc_sig, INPROC_SIG);
     }
 
+    static JuniperKernel* make(const std::string& connection_file) {
+      std::ifstream ifs(connection_file);
+      nlohmann::json connection_info = nlohmann::json::parse(ifs);
+      config conf = {
+        std::to_string(connection_info["control_port"    ].get<int        >()),
+        std::to_string(connection_info["hb_port"         ].get<int        >()),
+        std::to_string(connection_info["iopub_port"      ].get<int        >()),
+                       connection_info["ip"              ].get<std::string>(),
+                       connection_info["key"             ].get<std::string>(),
+        std::to_string(connection_info["shell_port"      ].get<int        >()),
+                       connection_info["signature_scheme"].get<std::string>(),
+        std::to_string(connection_info["stdin_port"      ].get<int        >()),
+                       connection_info["transport"       ].get<std::string>(),
+      };
+      conf.print_conf();
+      return new JuniperKernel(conf);
+    }
+
     // start the background threads
     // called as part of the kernel boot sequence
     void start_bg_threads() {
@@ -92,7 +90,7 @@ class JuniperKernel {
     }
 
     // runs in the main the thread, polls shell and controller
-     void run() {
+     void run() const {
 
        zmq::socket_t* cntrl = new zmq::socket_t(*_ctx, zmq::socket_type::router);
        zmq::socket_t* shell = new zmq::socket_t(*_ctx, zmq::socket_type::router);
@@ -109,7 +107,7 @@ class JuniperKernel {
            // special handling of control messages
            return true;
          },
-         [&shell]() { 
+         [&shell]() {
            zmq::multipart_t msg;
            msg.recv(*shell);
            Rcpp::Rcout << "got shell msg" << std::endl;
@@ -129,7 +127,7 @@ class JuniperKernel {
       _iothread.join();
 
       if( _ctx ) {
-        _stdin->setsockopt(ZMQ_LINGER, 0); delete _stdin;
+        _stdin     ->setsockopt(ZMQ_LINGER, 0); delete _stdin;
         _inproc_sig->setsockopt(ZMQ_LINGER, 0); delete _inproc_sig;
         _inproc_pub->setsockopt(ZMQ_LINGER, 0); delete _inproc_pub;
         delete _ctx;
