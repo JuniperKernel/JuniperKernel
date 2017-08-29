@@ -8,18 +8,12 @@
 #include "juniper.h"
 
 zmq::socket_t* init_socket(zmq::socket_t* socket, const std::string& endpoint) {
-
-  Rcpp::Rcout << " init socket endpoint: " << endpoint << std::endl;
-
   socket->setsockopt(ZMQ_LINGER, LINGER);
   socket->bind(endpoint);
   return socket;
 }
 
 zmq::socket_t* subscribe_to(zmq::context_t& context, const std::string& topic) {
-
-  Rcpp::Rcout << "sub to topic: " << topic << std::endl;
-
   // connect to the topic signaller
   zmq::socket_t* sub = new zmq::socket_t(context, zmq::socket_type::sub);
   // for option ZMQ_SUBSCRIBE, no need to set before connect (but we do anyways)
@@ -31,7 +25,6 @@ zmq::socket_t* subscribe_to(zmq::context_t& context, const std::string& topic) {
 
 zmq::socket_t* listen_on(zmq::context_t& context, const std::string& endpoint, zmq::socket_type type) {
   zmq::socket_t* sock = new zmq::socket_t(context, type);
-  sock->setsockopt(ZMQ_LINGER, LINGER);
   return init_socket(sock, endpoint);
 }
 

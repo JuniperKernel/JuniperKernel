@@ -92,11 +92,8 @@ class JuniperKernel {
     // runs in the main the thread, polls shell and controller
      void run() const {
 
-       zmq::socket_t* cntrl = new zmq::socket_t(*_ctx, zmq::socket_type::router);
-       zmq::socket_t* shell = new zmq::socket_t(*_ctx, zmq::socket_type::router);
-
-       init_socket(cntrl, _endpoint + _cntrlport);
-       init_socket(shell, _endpoint + _shellport);
+       zmq::socket_t* cntrl = listen_on(*_ctx, _endpoint + _cntrlport, zmq::socket_type::router);
+       zmq::socket_t* shell = listen_on(*_ctx, _endpoint + _shellport, zmq::socket_type::router);
 
        std::function<bool()> handlers[] = {
          [&cntrl]() {
