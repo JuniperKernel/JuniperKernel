@@ -1,6 +1,7 @@
 #include <string>
 #include <thread>
 #include <fstream>
+#include <unistd.h>
 #include <Rcpp.h>
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
@@ -8,9 +9,7 @@
 #include <juniper/juniper.h>
 #include <juniper/sockets.h>
 #include <juniper/background.h>
-#include <unistd.h>
-
-
+#include <juniper/jupyter.h>
 
 #include <stdio.h>
 #include <execinfo.h>
@@ -65,19 +64,7 @@ class JuniperKernel {
     }
 
     static JuniperKernel* make(const std::string& connection_file) {
-      std::ifstream ifs(connection_file);
-      nlohmann::json connection_info = nlohmann::json::parse(ifs);
-      config conf = {
-        std::to_string(connection_info["control_port"    ].get<int        >()),
-        std::to_string(connection_info["hb_port"         ].get<int        >()),
-        std::to_string(connection_info["iopub_port"      ].get<int        >()),
-                       connection_info["ip"              ].get<std::string>(),
-                       connection_info["key"             ].get<std::string>(),
-        std::to_string(connection_info["shell_port"      ].get<int        >()),
-                       connection_info["signature_scheme"].get<std::string>(),
-        std::to_string(connection_info["stdin_port"      ].get<int        >()),
-                       connection_info["transport"       ].get<std::string>(),
-      };
+      config conf = config::read_connection_file(connection_file);
       conf.print_conf();
       return new JuniperKernel(conf);
     }
@@ -100,15 +87,14 @@ class JuniperKernel {
            zmq::multipart_t msg;
            msg.recv(*cntrl);
            Rcpp::Rcout << "got cntrl msg" << std::endl;
-
-           // special handling of control messages
+           RequestServer::serve(msg, *cntrl);
            return true;
          },
          [&shell]() {
            zmq::multipart_t msg;
            msg.recv(*shell);
            Rcpp::Rcout << "got shell msg" << std::endl;
-           // special handling of shell messages
+           RequestServer::serve(msg, *shell);
            return true;
          }
        };
@@ -170,12 +156,6 @@ void boot_kernel(const std::string& connection_file) {
   JuniperKernel* jk = JuniperKernel::make(connection_file);
   jk->start_bg_threads();
   jk->run();
-  while( 1 ) {
-    sleep(1);
-    // break;
-    jk->signal();
-    break;
-  }
   delete jk;
 }
 

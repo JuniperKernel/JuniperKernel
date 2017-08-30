@@ -49,7 +49,7 @@ CXX_STD      = CXX11
 PKG_CPPFLAGS = -I../inst/include/ -I.
 PKG_LIBS     = -lyajl_s -L../inst/yajl -Wl,-rpath,$(R_LIB)/JuniperKernel/yajl -lzmq -L../inst/zmq -Wl,-rpath,$(R_LIB)/JuniperKernel/zmq
 
-all: deps $(SHLIB)
+all: $(SHLIB)
 
 
 deps: zmq yajl headers
