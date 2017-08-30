@@ -48,7 +48,7 @@ class JuniperKernel {
       _shellport(conf.shell_port),
       _cntrlport(conf.control_port),
       _key(conf.key),
-      _sig(conf.signature_scheme) {
+      _sig_scheme(conf.signature_scheme) {
         char sep = (conf.transport=="tcp") ? ':' : '-';
         _endpoint = conf.transport + "://" + conf.ip + sep;
 
@@ -81,20 +81,20 @@ class JuniperKernel {
 
        zmq::socket_t* cntrl = listen_on(*_ctx, _endpoint + _cntrlport, zmq::socket_type::router);
        zmq::socket_t* shell = listen_on(*_ctx, _endpoint + _shellport, zmq::socket_type::router);
-
+       const std::string key = _key;
        std::function<bool()> handlers[] = {
-         [&cntrl]() {
+         [&cntrl, &key]() {
            zmq::multipart_t msg;
            msg.recv(*cntrl);
            Rcpp::Rcout << "got cntrl msg" << std::endl;
-           RequestServer::serve(msg, *cntrl);
+           RequestServer::serve(msg, *cntrl, key);
            return true;
          },
-         [&shell]() {
+         [&shell, &key]() {
            zmq::multipart_t msg;
            msg.recv(*shell);
            Rcpp::Rcout << "got shell msg" << std::endl;
-           RequestServer::serve(msg, *shell);
+           RequestServer::serve(msg, *shell, key);
            return true;
          }
        };
@@ -143,7 +143,7 @@ class JuniperKernel {
     const std::string _shellport;
     const std::string _cntrlport;
     const std::string _key;
-    const std::string _sig;
+    const std::string _sig_scheme;
 
     std::thread _hbthread;
     std::thread _iothread;

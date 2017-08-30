@@ -35,29 +35,21 @@ ZMQ_HEADERS_URL = https://github.com/foobarOrg/zmq/raw/master/headers/${ZMQ_HEAD
 ZMQ_CPP_HEADER_URL = https://github.com/zeromq/cppzmq/raw/master/zmq.hpp
 ZMQ_CPPADDON_HEADER_URL = https://raw.githubusercontent.com/zeromq/cppzmq/master/zmq_addon.hpp
 
-# yajl bacon bits
-YAJL_VERSION = 2.1.0
-YAJL_TAR_FILE = libyajl_s-${YAJL_VERSION}.tar.gz
-YAJL_TAR_URL = https://github.com/foobarOrg/yajl/raw/master/${SYS}${ARCH}/${YAJL_TAR_FILE}
-YAJL_HEADER_TAR_FILE = yajl-${YAJL_VERSION}-headers.tar.gz
-YAJL_HEADER_URL = https://github.com/foobarOrg/yajl/raw/master/headers/${YAJL_HEADER_TAR_FILE}
-
 ## use C++11
 CXX_STD      = CXX11
 
 # set include and linker options
 PKG_CPPFLAGS = -I../inst/include/ -I.
-PKG_LIBS     = -lyajl_s -L../inst/yajl -Wl,-rpath,$(R_LIB)/JuniperKernel/yajl -lzmq -L../inst/zmq -Wl,-rpath,$(R_LIB)/JuniperKernel/zmq
+PKG_LIBS     = -lzmq -L../inst/zmq -Wl,-rpath,$(R_LIB)/JuniperKernel/zmq
 
 all: $(SHLIB)
 
 
-deps: zmq yajl headers
+deps: zmq headers
 
-.PHONY: zmq, yajl, headers
+.PHONY: zmq, headers
 
 zmq: ../inst/zmq/libzmq.a
-yajl: ../inst/yajl/libyajl_s.a
 
 
 ../inst/zmq/libzmq.a:
@@ -73,13 +65,3 @@ headers:
 	@curl -skLO ${ZMQ_CPPADDON_HEADER_URL}
 	@mv zmq_addon.hpp ../inst/include
 	@curl -skLO ${ZMQ_HEADERS_URL} && tar -xzf ${ZMQ_HEADER_TAR_FILE} && mv include/*h ../inst/include && rm -rf ${ZMQ_HEADER_TAR_FILE} include
-
-	@echo "Downloading yajl header files"
-	@[ -d ../inst/include ] || mkdir -p ../inst/include
-	@curl -skLO ${YAJL_HEADER_URL}
-	@tar -xzf ${YAJL_HEADER_TAR_FILE} && mv yajl/*h ../inst/include/ && rm -rf ${YAJL_HEADER_TAR_FILE} yajl
-
-../inst/yajl/libyajl_s.a:
-	@echo "Downloading yajl prebuild"
-	@[ -d ../inst/yajl ] || mkdir -p ../inst/yajl
-	@curl -skLO ${YAJL_TAR_URL} && tar -xzf ${YAJL_TAR_FILE} -C ../inst/yajl && rm -rf ${YAJL_TAR_FILE}
