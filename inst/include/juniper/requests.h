@@ -1,5 +1,5 @@
-#ifndef juniper_juniper_jupyter_H
-#define juniper_juniper_jupyter_H
+#ifndef juniper_juniper_requests_H
+#define juniper_juniper_requests_H
 
 #include <string>
 #include <zmq.hpp>
@@ -33,6 +33,7 @@ class RequestServer {
       JMessage jm = JMessage::read(request, _key);
       busy(jm);
       // handle message
+      info_request();
       idle(jm);
     }
 
@@ -47,8 +48,22 @@ class RequestServer {
     using const_zmulti_t = const zmq::multipart_t&;
     typedef std::map<std::string, void(*)(const_zmulti_t msg)> request_map_t;
     request_map_t _handlers = {
-      {"kernel_request_info", [](const_zmulti_t msg){}}
+      {"kernel_info_request", [](const_zmulti_t msg){}}
     };
+
+    void info_request() {
+      Rcpp::Rcout << "Attempting to get the JuniperKernel env" << std::endl;
+      Rcpp::Environment jk("package:JuniperKernel");
+            Rcpp::Rcout << "CRUNK1" << std::endl;
+
+      Rcpp::Function kernel_request_info = jk["kernel_info_request"];
+            Rcpp::Rcout << "CRUNK2" << std::endl;
+
+      Rcpp::List res = kernel_request_info();
+      Rcpp::Rcout << "CRUNK3" << std::endl;
+      json j = JMessage::from_list_r(res);
+      Rcpp::Rcout << "res: " << j.dump() <<  std::endl;
+    }
 
     void iopub(const JMessage& parent, const std::string& msg_type, const json& content) {
       JMessage::reply(parent, msg_type, content).send(*_inproc_pub);
@@ -57,4 +72,4 @@ class RequestServer {
     void idle(const JMessage& parent) { iopub(parent, "status", {{"execution_state", "idle"}}); }
 };
 
-#endif // ifndef juniper_juniper_jupyter_H
+#endif // ifndef juniper_juniper_requests_H

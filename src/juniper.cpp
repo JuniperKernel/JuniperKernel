@@ -9,7 +9,7 @@
 #include <juniper/juniper.h>
 #include <juniper/sockets.h>
 #include <juniper/background.h>
-#include <juniper/jupyter.h>
+#include <juniper/requests.h>
 
 #include <stdio.h>
 #include <execinfo.h>

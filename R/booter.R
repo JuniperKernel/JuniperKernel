@@ -28,6 +28,7 @@
 #' for more details.
 #' @export
 bootKernel <- function() {
+  require(JuniperKernel)  # attach the package to the search path so we can call methods from Rcpp
   argv <- commandArgs(trailingOnly=TRUE)
 
   if( length(argv)==0L ) {
