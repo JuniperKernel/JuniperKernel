@@ -254,6 +254,45 @@ struct external_constructor<value_t::boolean>
 };
 
 template<>
+struct external_constructor<value_t::array>
+{
+    template<typename BasicJsonType>
+    static void construct(BasicJsonType& j, const typename BasicJsonType::array_t& arr)
+    {
+        j.m_type = value_t::array;
+        j.m_value = arr;
+        j.assert_invariant();
+    }
+
+    template<typename BasicJsonType, typename CompatibleArrayType,
+             enable_if_t<not std::is_same<CompatibleArrayType,
+                                          typename BasicJsonType::array_t>::value,
+                         int> = 0>
+    static void construct(BasicJsonType& j, const CompatibleArrayType& arr)
+    {
+        using std::begin;
+        using std::end;
+        j.m_type = value_t::array;
+        j.m_value.array = j.template create<typename BasicJsonType::array_t>(begin(arr), end(arr));
+        j.assert_invariant();
+    }
+
+    template<typename BasicJsonType>
+    static void construct(BasicJsonType& j, const std::vector<bool>& arr)
+    {
+        j.m_type = value_t::array;
+        j.m_value = value_t::array;
+        j.m_value.array->reserve(arr.size());
+        for (bool x : arr)
+        {
+            j.m_value.array->push_back(x);
+        }
+        j.assert_invariant();
+    }
+};
+
+
+template<>
 struct external_constructor<value_t::string>
 {
     template<typename BasicJsonType>
@@ -309,30 +348,30 @@ struct external_constructor<value_t::number_integer>
     }
 };
 
-template<>
-struct external_constructor<value_t::array>
-{
-    template<typename BasicJsonType>
-    static void construct(BasicJsonType& j, const typename BasicJsonType::array_t& arr)
-    {
-        j.m_type = value_t::array;
-        j.m_value = arr;
-        j.assert_invariant();
-    }
-
-    template<typename BasicJsonType, typename CompatibleArrayType,
-             enable_if_t<not std::is_same<CompatibleArrayType,
-                                          typename BasicJsonType::array_t>::value,
-                         int> = 0>
-    static void construct(BasicJsonType& j, const CompatibleArrayType& arr)
-    {
-        using std::begin;
-        using std::end;
-        j.m_type = value_t::array;
-        j.m_value.array = j.template create<typename BasicJsonType::array_t>(begin(arr), end(arr));
-        j.assert_invariant();
-    }
-};
+//template<>
+//struct external_constructor<value_t::array>
+//{
+//    template<typename BasicJsonType>
+//    static void construct(BasicJsonType& j, const typename BasicJsonType::array_t& arr)
+//    {
+//        j.m_type = value_t::array;
+//        j.m_value = arr;
+//        j.assert_invariant();
+//    }
+//
+//    template<typename BasicJsonType, typename CompatibleArrayType,
+//             enable_if_t<not std::is_same<CompatibleArrayType,
+//                                          typename BasicJsonType::array_t>::value,
+//                         int> = 0>
+//    static void construct(BasicJsonType& j, const CompatibleArrayType& arr)
+//    {
+//        using std::begin;
+//        using std::end;
+//        j.m_type = value_t::array;
+//        j.m_value.array = j.template create<typename BasicJsonType::array_t>(begin(arr), end(arr));
+//        j.assert_invariant();
+//    }
+//};
 
 template<>
 struct external_constructor<value_t::object>
@@ -561,6 +600,12 @@ template <
 void to_json(BasicJsonType& j, CompatibleNumberIntegerType val) noexcept
 {
     external_constructor<value_t::number_integer>::construct(j, static_cast<typename BasicJsonType::number_integer_t>(val));
+}
+
+template<typename BasicJsonType>
+void to_json(BasicJsonType& j, const std::vector<bool>& e)
+{
+    external_constructor<value_t::array>::construct(j, e);
 }
 
 template<typename BasicJsonType, typename UnscopedEnumType,
