@@ -31,7 +31,6 @@ void handler(int sig) {
 
 class JuniperKernel {
   public:
-    RequestServer* _request_server;
     JuniperKernel(const config& conf):
       _ctx(new zmq::context_t(1)),
 
@@ -93,8 +92,11 @@ class JuniperKernel {
       // set linger to 0 on all sockets
       // destroy sockets
       // destoy ctx
+      Rcpp::Rcout << "kernel shutdown..." << std::endl;
       _hbthread.join();
       _iothread.join();
+      if( _request_server )
+        delete _request_server;
 
       if( _ctx ) {
         _stdin     ->setsockopt(ZMQ_LINGER, 0); delete _stdin;
@@ -106,6 +108,7 @@ class JuniperKernel {
     // context is shared by all threads, cause there 
     // ain't no GIL to stop us now! ...we can build this thing together!
     zmq::context_t* const _ctx;
+    RequestServer* _request_server;
 
     // jupyter stdin
     zmq::socket_t*  const _stdin;

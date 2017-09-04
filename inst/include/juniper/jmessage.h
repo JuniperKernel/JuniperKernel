@@ -33,6 +33,7 @@ public:
 
   static zmq::multipart_t reply(const JMessage& parent, const std::string& msg_type, const json& content) {
     JMessage jm;
+    jm._key = parent._key;
     // construct header
     jm._msg["header"]["msg_id"] = uuid();
     jm._msg["header"]["username"] = parent._msg["header"]["username"];
@@ -81,7 +82,7 @@ private:
     _msg["parent_header"] = read_json(msg.pop(), data);
     _msg["metadata"]      = read_json(msg.pop(), data);
     _msg["content"]       = read_json(msg.pop(), data);
-    
+
     // validate
     std::string hmac2dig = hmac<SHA256>(data.str(), _key);
     Rcpp::Rcout << "hmac2dig: " << hmac2dig << "; actual: " << _hmac << std::endl;
