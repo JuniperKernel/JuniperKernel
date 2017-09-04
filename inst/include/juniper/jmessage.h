@@ -49,16 +49,9 @@ public:
     return jm.to_multipart_t();
   }
 
-  template<int SXP, class CTYPE>
-  static void from_vec(const Rcpp::Vector<SXP>& rvec, std::vector<CTYPE>& cvec, json& j, const std::string& name) {
-    for(std::size_t i=0; i<rvec.size(); ++i)
-      cvec[i] = rvec[i];
-    if( cvec.size()==1 ) 
-      j[name] = cvec[0];
-    else
-      j[name] = cvec;
-  }
-
+  // recursive parse a List into a json
+  // logical and string vectors need special handling so it
+  // defeats the purpose of templating the unpack from List->json
   static json from_list_r(Rcpp::List lst) {
     std::vector<std::string> names = lst.names();
     json j;
@@ -70,30 +63,51 @@ public:
         break;
       }
       case INTSXP: {
-        std::vector<int> cvec;
-        from_vec(Rcpp::as<Rcpp::IntegerVector>(*it), cvec, j, names.at(i++));
+        Rcpp::IntegerVector tmp = Rcpp::as<Rcpp::IntegerVector>(*it);
+        if( tmp.size()==1 ) {
+          j[names.at(i++)] = tmp.at(0);
+        } else {
+          std::vector<int> ints;
+          for( Rcpp::IntegerVector::iterator ii=tmp.begin(); ii!=tmp.end(); ++ii )
+            ints.emplace_back(*ii);
+          j[names.at(i++)] = ints;
+        }
         break;
       }
       case REALSXP: {
-        std::vector<double> cvec;
-        from_vec(Rcpp::as<Rcpp::NumericVector>(*it), cvec, j, names.at(i++));
+        Rcpp::NumericVector tmp = Rcpp::as<Rcpp::NumericVector>(*it);
+        if( tmp.size()==1 ) {
+          j[names.at(i++)] = (tmp.at(0));
+        } else {
+          std::vector<double> dbls;
+          for( Rcpp::NumericVector::iterator ii=tmp.begin(); ii!=tmp.end(); ++ii )
+            dbls.emplace_back(*ii);
+          j[names.at(i++)] = dbls;
+        }
         break;
       }
       case LGLSXP: {
-        std::vector<bool> cvec;
-        std::string name = names.at(i++);
-        Rcpp::LogicalVector rvec = Rcpp::as<Rcpp::LogicalVector>(*it);
-        for(std::size_t j=0; j<rvec.size(); ++j)
-          cvec[j] = rvec[j];
-        if( cvec.size()==1 ) 
-          j[name] = (bool)cvec[0];
-        else
-          j[name] = cvec;
+        Rcpp::LogicalVector tmp = Rcpp::as<Rcpp::LogicalVector>(*it);
+        if( tmp.size()==1 ) {
+          j[names.at(i++)] = (bool)tmp.at(0);
+        } else {
+          std::vector<bool> bools;
+          for( Rcpp::LogicalVector::iterator ii=tmp.begin(); ii!=tmp.end(); ++ii )
+            bools.push_back(*ii);
+          j[names.at(i++)] = bools;
+        }
         break;
       }
       case STRSXP: {
-        std::vector<std::string> cvec;
-        from_vec(Rcpp::as<Rcpp::StringVector>(*it), cvec, j, names.at(i++));
+        Rcpp::CharacterVector tmp = Rcpp::as<Rcpp::CharacterVector>(*it);
+        if( tmp.size()==1 ) {
+          j[names.at(i++)] = Rcpp::as<std::string>(*it);
+        } else {
+          std::vector<std::string> chars;
+          for( Rcpp::CharacterVector::iterator ii=tmp.begin(); ii!=tmp.end(); ++ii )
+            chars.emplace_back(*ii);
+          j[names.at(i++)] = chars;
+        }
         break;
       }
       default:
