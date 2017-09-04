@@ -13,7 +13,7 @@ Collate: 'juniper.R'
          'kernelspec.R'
          'RcppExports.R'
          'zzz.R'
-LinkingTo: Rcpp
+LinkingTo: Rcpp, BH
 Description: A native R kernel for Jupyter.
 URL: https://github.com/spennihana/JuniperKernel
 License: MIT + file LICENSE

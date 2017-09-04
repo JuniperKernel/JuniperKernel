@@ -5,7 +5,7 @@
 #include <string>
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
-#include "juniper.h"
+#include <juniper/juniper.h>
 
 zmq::socket_t* init_socket(zmq::socket_t* socket, const std::string& endpoint) {
   socket->setsockopt(ZMQ_LINGER, LINGER);

@@ -1,76 +1,48 @@
 #ifndef juniper_juniper_jupyter_H
 #define juniper_juniper_jupyter_H
 
-#include <fstream>
 #include <string>
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
 #include <Rcpp.h>
-#include <json.hpp>
-#include <hmac.h>
-#include <sha256.h>
+#include <juniper/sockets.h>
+#include <juniper/juniper.h>
+#include <juniper/jmessage.h>
 
-using nlohmann::json;
 
-// Here's where we read and write messages using the jupyter protocol.
-// Since the protocol is actually serialized python dicts (a.k.a. JSON),
-// we can just parse the message data with our favorite json parser!
-// The message contains all of the routing information, use it to invoke
-// callbacks in R to handle the actual processing of the request.
+// Every incoming message has a type, which tells the server which handler
+// the message should be passed to for further execution.
 class RequestServer {
-  const static int IDS     =0;
-  const static int DELIM   =1;
-  const static int HMAC_SIG=2;
-  const static int HEADER  =3;
-  const static int PHEADER =4;
-  const static int METADATA=5;
-  const static int CONTENT =6;
 
   public:
-    static void serve(const zmq::multipart_t& request, const zmq::socket_t& channel, const std::string& key) {
-      msg_t msg;
-//      msg.ids = msg_t::read_str(request.at(IDS));
-      msg.hmac = msg_t::read_str(request.at(HMAC_SIG));
-      std::stringstream data;
-      msg.header   = msg_t::read_json(request.at(HEADER  ), data);
-      msg.pheader  = msg_t::read_json(request.at(PHEADER ), data);
-      msg.metadata = msg_t::read_json(request.at(METADATA), data);
-      msg.content  = msg_t::read_json(request.at(CONTENT ), data);
+    RequestServer(zmq::context_t& ctx, const std::string& key) {
+      _key=key;
+      // these are internal routing sockets that push messages (e.g.
+      // poison pills, results, etc.) to the heartbeat thread and
+      // iopub thread.
+      _inproc_pub = listen_on(ctx, INPROC_PUB, zmq::socket_type::pub);
+      _inproc_sig = listen_on(ctx, INPROC_SIG, zmq::socket_type::pub);
+    }
 
-      std::string hmac2dig = hmac<SHA256>(data.str(), key);
-      
-      Rcpp::Rcout << "hmac2dig: " << hmac2dig << "; actual: " << msg.hmac << std::endl;
-      Rcpp::Rcout << "hmac2dig.compare(actual)= " << hmac2dig.compare(msg.hmac) << std::endl;
-      if( hmac2dig!=msg.hmac )
-        throw("bad hmac digest");
+    ~RequestServer() {
+        _inproc_sig->setsockopt(ZMQ_LINGER, 0); delete _inproc_sig;
+        _inproc_pub->setsockopt(ZMQ_LINGER, 0); delete _inproc_pub;
+    }
+
+    void serve(zmq::multipart_t& request) {
+      JMessage jm = JMessage::read(request, _key);
+      busy(jm);
+      // handle message
+      idle(jm);
     }
 
   private:
-    struct msg_t {
-      json header;
-      json pheader;
-      json metadata;
-      json content;
-      
-      std::string hmac;
-      std::string ids;
-      
-      static json read_json(const zmq::message_t& msg, std::stringstream& data) {
-        std::string s = read_str(msg);
-        data << read_str(msg);
-        return json::parse(s);
-      }
-      
-      static std::string read_str(const zmq::message_t& msg) {
-        std::stringstream ss;
-        const char* buf = msg.data<const char>();
-        size_t buflen = msg.size();
-        for(size_t i=0; i<buflen; ++i)
-          ss << static_cast<char>(buf[i]);
-        return ss.str();
-      }
-    };
+    // hmac key
+    std::string _key;
 
+    // inproc sockets
+    zmq::socket_t* _inproc_pub;
+    zmq::socket_t* _inproc_sig;
 
     // Keep a hash-table for routing requests
     using const_zmulti_t = const zmq::multipart_t&;
@@ -78,6 +50,12 @@ class RequestServer {
     request_map_t _handlers = {
       {"kernel_request_info", [](const_zmulti_t msg){}}
     };
+
+    void iopub(const JMessage& parent, const std::string& msg_type, const json& content) {
+      JMessage::reply(parent, msg_type, content).send(*_inproc_pub);
+    }
+    void busy(const JMessage& parent) { iopub(parent, "status", {"execution_state", "busy"}); }
+    void idle(const JMessage& parent) { iopub(parent, "status", {"execution_state", "idle"}); }
 };
 
 #endif // ifndef juniper_juniper_jupyter_H

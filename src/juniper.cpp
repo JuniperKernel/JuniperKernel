@@ -31,36 +31,24 @@ void handler(int sig) {
 
 class JuniperKernel {
   public:
+    RequestServer* _request_server;
     JuniperKernel(const config& conf):
       _ctx(new zmq::context_t(1)),
 
       // these are the 3 incoming Jupyter channels
       _stdin(new zmq::socket_t(*_ctx, zmq::socket_type::router)),
-
-      // these are internal routing sockets that push messages (e.g.
-      // poison pills, results, etc.) to the heartbeat thread and
-      // iopub thread.
-      _inproc_pub(new zmq::socket_t(*_ctx, zmq::socket_type::pub)),
-      _inproc_sig(new zmq::socket_t(*_ctx, zmq::socket_type::pub)),
-
       _hbport(conf.hb_port),
       _ioport(conf.iopub_port),
       _shellport(conf.shell_port),
       _cntrlport(conf.control_port),
       _key(conf.key),
       _sig_scheme(conf.signature_scheme) {
+        _request_server = new RequestServer(*_ctx, _key);
         char sep = (conf.transport=="tcp") ? ':' : '-';
         _endpoint = conf.transport + "://" + conf.ip + sep;
 
         // socket setup
         init_socket(_stdin, _endpoint + conf.stdin_port);
-
-        // iopub and hbeat get their own threads and we communicate
-        // via the inproc topics sig/sub
-        //
-        // these get bound and cleaned by THIS thread
-        init_socket(_inproc_pub, INPROC_PUB);
-        init_socket(_inproc_sig, INPROC_SIG);
     }
 
     static JuniperKernel* make(const std::string& connection_file) {
@@ -78,23 +66,23 @@ class JuniperKernel {
 
     // runs in the main the thread, polls shell and controller
      void run() const {
-
        zmq::socket_t* cntrl = listen_on(*_ctx, _endpoint + _cntrlport, zmq::socket_type::router);
        zmq::socket_t* shell = listen_on(*_ctx, _endpoint + _shellport, zmq::socket_type::router);
+       RequestServer server = *_request_server;
        const std::string key = _key;
        std::function<bool()> handlers[] = {
-         [&cntrl, &key]() {
+         [&cntrl, &key, &server]() {
            zmq::multipart_t msg;
            msg.recv(*cntrl);
            Rcpp::Rcout << "got cntrl msg" << std::endl;
-           RequestServer::serve(msg, *cntrl, key);
+           server.serve(msg);
            return true;
          },
-         [&shell, &key]() {
+         [&shell, &key, &server]() {
            zmq::multipart_t msg;
            msg.recv(*shell);
            Rcpp::Rcout << "got shell msg" << std::endl;
-           RequestServer::serve(msg, *shell, key);
+           server.serve(msg);
            return true;
          }
        };
@@ -105,23 +93,13 @@ class JuniperKernel {
       // set linger to 0 on all sockets
       // destroy sockets
       // destoy ctx
-      signal();
       _hbthread.join();
       _iothread.join();
 
       if( _ctx ) {
         _stdin     ->setsockopt(ZMQ_LINGER, 0); delete _stdin;
-        _inproc_sig->setsockopt(ZMQ_LINGER, 0); delete _inproc_sig;
-        _inproc_pub->setsockopt(ZMQ_LINGER, 0); delete _inproc_pub;
         delete _ctx;
       }
-    }
-  
-    void signal() {
-       zmq::message_t request(0);
-       memcpy (request.data (), "", 0);
-       Rcpp::Rcout << "Sending kill " << std::endl;
-       _inproc_sig->send(request);
     }
 
   private:
@@ -131,10 +109,6 @@ class JuniperKernel {
 
     // jupyter stdin
     zmq::socket_t*  const _stdin;
-
-    // inproc sockets
-    zmq::socket_t* const _inproc_pub;
-    zmq::socket_t* const _inproc_sig;
 
     //misc
     std::string _endpoint;
