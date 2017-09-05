@@ -55,43 +55,4 @@ struct config {
   }
 };
 
-void read_zmq(const zmq::multipart_t& msg) {
-  std::stringstream ss;
-  
-  std::map<std::string, void(*)()> _map;
-  _map["foo"] = [](){};
-  for (size_t i = 0; i < msg.size(); i++) {
-    const zmq::message_t& part = msg.at(i);
-    
-    const unsigned char* data = part.data<unsigned char>();
-    size_t size = part.size();
-    
-    // Dump the message as text or binary
-    bool isText = true;
-    for (size_t j = 0; j < size; j++)
-    {
-      if (data[j] < 32 || data[j] > 127)
-      {
-        isText = false;
-        break;
-      }
-    }
-    ss << "\n[" << std::dec << std::setw(3) << std::setfill('0') << size << "] ";
-    if (size >= 1000)
-    {
-      ss << "... (to big to print)";
-      continue;
-    }
-    for (size_t j = 0; j < size; j++)
-    {
-      if (isText)
-        ss << static_cast<char>(data[j]);
-      else
-        ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<short>(data[j]);
-    }
-    Rcpp::Rcout << " part " << i << ": " << ss.str() << std::endl;
-    ss.str(std::string());
-  }
-}
-
 #endif // ifndef juniper_juniper_juniper_H
