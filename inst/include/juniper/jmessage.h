@@ -63,7 +63,7 @@ private:
     return id.compare(DELIMITER)!=0;
   }
 
-  JMessage read_ids(zmq::multipart_t& msg) {
+  JMessage& read_ids(zmq::multipart_t& msg) {
     zmq::message_t fr = msg.pop();
     std::string id;
     while( fr.size()!=0 && not_delimiter(fr, id) ) {
@@ -73,12 +73,12 @@ private:
     return *this;
   }
   
-  JMessage read_hmac(zmq::multipart_t& msg) {
+  JMessage& read_hmac(zmq::multipart_t& msg) {
     _hmac = read_str(msg.pop());
     return *this;
   }
   
-  JMessage read_body(zmq::multipart_t& msg) {
+  JMessage& read_body(zmq::multipart_t& msg) {
     std::stringstream data;
     _msg["header"]        = read_json(msg.pop(), data);
     _msg["parent_header"] = read_json(msg.pop(), data);

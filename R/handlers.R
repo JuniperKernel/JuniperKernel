@@ -15,6 +15,7 @@ kernel_info_request <- function(request_msg) {
                                              , version = paste(version$major, version$minor, sep=".")
                                              )
                       , banner = version$version.string
+    , foo = TRUE, bazboo = c(TRUE, FALSE, FALSE, TRUE), kazoo=343.12312, kazoo2=c(314.1231, 341.231,123.2321, pi)
                       )
       )
 }

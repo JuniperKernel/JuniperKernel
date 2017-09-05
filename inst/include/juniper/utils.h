@@ -4,6 +4,22 @@
 
 using nlohmann::json;
 
+
+template<int SXP, class CTYPE>
+static json from_sexp(SEXP s) {
+  Rcpp::Vector<SXP> rvec = Rcpp::as<Rcpp::Vector<SXP>>(s);
+
+  if( rvec.size()==1 ) {
+    if( SXP==LGLSXP ) return (bool)rvec[0];
+    return rvec[0];
+  }
+
+  std::vector<CTYPE> cvec;
+  for(int i=0; i<rvec.size(); ++i)
+    cvec.push_back(rvec[i]);
+  return cvec;
+}
+
 // recursive parse a List into a json
 // logical and string vectors need special handling so it
 // defeats the purpose of templating the unpack from List->json
@@ -13,50 +29,11 @@ static json from_list_r(Rcpp::List lst) {
   int i=0;
   for( Rcpp::List::iterator it = lst.begin(); it!=lst.end(); ++it ) {
     switch( TYPEOF(*it) ) {
-    case VECSXP: {
-      j[names.at(i++)] = from_list_r(*it);
-      break;
-    }
-    case NILSXP: {
-      j[names.at(i++)] = nullptr;
-      break;
-    }
-    case INTSXP: {
-      Rcpp::IntegerVector tmp = Rcpp::as<Rcpp::IntegerVector>(*it);
-      if( tmp.size()==1 ) {
-        j[names.at(i++)] = tmp[0];
-      } else {
-        std::vector<int> ints;
-        for( Rcpp::IntegerVector::iterator ii=tmp.begin(); ii!=tmp.end(); ++ii )
-          ints.emplace_back(*ii);
-        j[names.at(i++)] = ints;
-      }
-      break;
-    }
-    case REALSXP: {
-      Rcpp::NumericVector tmp = Rcpp::as<Rcpp::NumericVector>(*it);
-      if( tmp.size()==1 ) {
-        j[names.at(i++)] = tmp[0];
-      } else {
-        std::vector<double> dbls;
-        for( Rcpp::NumericVector::iterator ii=tmp.begin(); ii!=tmp.end(); ++ii )
-          dbls.emplace_back(*ii);
-        j[names.at(i++)] = dbls;
-      }
-      break;
-    }
-    case LGLSXP: {
-      Rcpp::LogicalVector tmp = Rcpp::as<Rcpp::LogicalVector>(*it);
-      if( tmp.size()==1 ) {
-        j[names.at(i++)] = (bool)tmp[0];
-      } else {
-        std::vector<bool> bools;
-        for( Rcpp::LogicalVector::iterator ii=tmp.begin(); ii!=tmp.end(); ++ii )
-          bools.push_back(*ii);
-        j[names.at(i++)] = bools;
-      }
-      break;
-    }
+    case NILSXP:  { j[names.at(i++)] = nullptr;                         break; }
+    case INTSXP:  { j[names.at(i++)] = from_sexp<INTSXP,  int>(*it);    break; }
+    case REALSXP: { j[names.at(i++)] = from_sexp<REALSXP, double>(*it); break; }
+    case LGLSXP:  { j[names.at(i++)] = from_sexp<LGLSXP,  bool>(*it);   break; }
+    case VECSXP:  { j[names.at(i++)] = from_list_r(*it);                break; }
     case STRSXP: {
       Rcpp::StringVector tmp = Rcpp::as<Rcpp::StringVector>(*it);
       if( tmp.size()==1 ) {

@@ -65,6 +65,9 @@ class RequestServer {
       Rcpp::Function handler = _jk[req["header"]["msg_type"]];
       Rcpp::List res = handler(from_json_r(req));
       json jres = from_list_r(res);
+      Rcpp::Rcout << "===============================" << std::endl;
+      Rcpp::Rcout << jres << std::endl;
+      Rcpp::Rcout << "===============================" << std::endl;
       JMessage::reply(_cur_msg, jres["msg_type"], jres["content"]).send(sock);
       return *this;
     }
