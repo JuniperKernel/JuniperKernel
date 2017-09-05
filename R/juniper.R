@@ -7,3 +7,5 @@ NULL
 
 # global package environment
 .JUNIPER <- new.env(parent=emptyenv())
+
+.kernel <- function() get("kernel", .JUNIPER)

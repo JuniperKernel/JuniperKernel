@@ -15,6 +15,7 @@ std::thread start_hb_thread(zmq::context_t& ctx, const std::string& endpoint) {
     std::function<bool()> handlers[] = {
       // ping-pong the message on heartbeat
       [&hbSock]() {
+        Rcpp::Rcout << "heartbeat received" << std::endl;
         zmq::multipart_t msg;
         msg.recv(*hbSock);
         msg.send(*hbSock);
@@ -39,6 +40,7 @@ std::thread start_io_thread(zmq::context_t& ctx, const std::string& endpoint) {
         // topic, and we forward them to the client here.
         zmq::multipart_t msg;
         msg.recv(*pubsub);
+        Rcpp::Rcout << "iopub msg: " << msg.str() << std::endl;
         msg.send(*io);
         return true;
       },

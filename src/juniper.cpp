@@ -31,6 +31,7 @@ void handler(int sig) {
 
 class JuniperKernel {
   public:
+    RequestServer* _request_server;
     JuniperKernel(const config& conf):
       _ctx(new zmq::context_t(1)),
 
@@ -74,14 +75,16 @@ class JuniperKernel {
            zmq::multipart_t msg;
            msg.recv(*cntrl);
            Rcpp::Rcout << "got cntrl msg" << std::endl;
-           server.serve(msg);
+           server.serve(msg, *cntrl);
+           Rcpp::Rcout << "finished ctrl msg" << std::endl;
            return true;
          },
          [&shell, &key, &server]() {
            zmq::multipart_t msg;
            msg.recv(*shell);
            Rcpp::Rcout << "got shell msg" << std::endl;
-           server.serve(msg);
+           server.serve(msg, *shell);
+           Rcpp::Rcout << "finished shell msg" << std::endl;
            return true;
          }
        };
@@ -108,7 +111,6 @@ class JuniperKernel {
     // context is shared by all threads, cause there 
     // ain't no GIL to stop us now! ...we can build this thing together!
     zmq::context_t* const _ctx;
-    RequestServer* _request_server;
 
     // jupyter stdin
     zmq::socket_t*  const _stdin;
@@ -126,14 +128,51 @@ class JuniperKernel {
     std::thread _iothread;
 };
 
-// [[Rcpp::export]]
-void boot_kernel(const std::string& connection_file) {
-  signal(SIGSEGV, handler);
+#ifndef FINALIZERS_H
+#define FINALIZERS_H
+typedef void(*finalizerT)(SEXP);
+template<typename T>
+SEXP createExternalPointer(T* jk, finalizerT finalizer, const char* pname) {
+  SEXP jk_ptr;
+  jk_ptr = Rcpp::Shield<SEXP>(R_MakeExternalPtr(reinterpret_cast<void*>(jk),Rf_install(pname),R_NilValue));
+  R_RegisterCFinalizerEx(jk_ptr, finalizer, TRUE);
+  return jk_ptr;
+}
+#endif // FINALIZERS_H
 
+static void kernelFinalizer(SEXP jk) {
+  JuniperKernel* jkernel = reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(jk));
+  if( jkernel ) {
+    delete jkernel;
+    R_ClearExternalPtr(jk);
+  }
+}
+
+// [[Rcpp::export]]
+SEXP init_kernel(const std::string& connection_file) {
   JuniperKernel* jk = JuniperKernel::make(connection_file);
+  return createExternalPointer<JuniperKernel>(jk, kernelFinalizer, "JuniperKernel*");
+}
+
+// [[Rcpp::export]]
+void boot_kernel(SEXP kernel) {
+  signal(SIGSEGV, handler);
+  JuniperKernel* jk = reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(kernel));
   jk->start_bg_threads();
   jk->run();
   delete jk;
+}
+
+// [[Rcpp::export]]
+void stream_stdout(SEXP kernel, const std::string& output) {
+  JuniperKernel* jk = reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(kernel));
+  jk->_request_server->stream_stdout(output);
+}
+
+// [[Rcpp::export]]
+void stream_stderr(SEXP kernel, const std::string& err) {
+  JuniperKernel* jk = reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(kernel));
+  jk->_request_server->stream_stdout(err);
 }
 
 // http://zguide.zeromq.org/page:all#Handling-Interrupt-Signals

@@ -48,74 +48,8 @@ public:
     jm._msg["content"] = content;
     return jm.to_multipart_t();
   }
-
-  // recursive parse a List into a json
-  // logical and string vectors need special handling so it
-  // defeats the purpose of templating the unpack from List->json
-  static json from_list_r(Rcpp::List lst) {
-    std::vector<std::string> names = lst.names();
-    json j;
-    int i=0;
-    for( Rcpp::List::iterator it = lst.begin(); it!=lst.end(); ++it ) {
-      switch( TYPEOF(*it) ) {
-      case VECSXP: {
-        j[names.at(i++)] = from_list_r(*it);
-        break;
-      }
-      case INTSXP: {
-        Rcpp::IntegerVector tmp = Rcpp::as<Rcpp::IntegerVector>(*it);
-        if( tmp.size()==1 ) {
-          j[names.at(i++)] = tmp.at(0);
-        } else {
-          std::vector<int> ints;
-          for( Rcpp::IntegerVector::iterator ii=tmp.begin(); ii!=tmp.end(); ++ii )
-            ints.emplace_back(*ii);
-          j[names.at(i++)] = ints;
-        }
-        break;
-      }
-      case REALSXP: {
-        Rcpp::NumericVector tmp = Rcpp::as<Rcpp::NumericVector>(*it);
-        if( tmp.size()==1 ) {
-          j[names.at(i++)] = (tmp.at(0));
-        } else {
-          std::vector<double> dbls;
-          for( Rcpp::NumericVector::iterator ii=tmp.begin(); ii!=tmp.end(); ++ii )
-            dbls.emplace_back(*ii);
-          j[names.at(i++)] = dbls;
-        }
-        break;
-      }
-      case LGLSXP: {
-        Rcpp::LogicalVector tmp = Rcpp::as<Rcpp::LogicalVector>(*it);
-        if( tmp.size()==1 ) {
-          j[names.at(i++)] = (bool)tmp.at(0);
-        } else {
-          std::vector<bool> bools;
-          for( Rcpp::LogicalVector::iterator ii=tmp.begin(); ii!=tmp.end(); ++ii )
-            bools.push_back(*ii);
-          j[names.at(i++)] = bools;
-        }
-        break;
-      }
-      case STRSXP: {
-        Rcpp::CharacterVector tmp = Rcpp::as<Rcpp::CharacterVector>(*it);
-        if( tmp.size()==1 ) {
-          j[names.at(i++)] = Rcpp::as<std::string>(*it);
-        } else {
-          std::vector<std::string> chars;
-          for( Rcpp::CharacterVector::iterator ii=tmp.begin(); ii!=tmp.end(); ++ii )
-            chars.emplace_back(*ii);
-          j[names.at(i++)] = chars;
-        }
-        break;
-      }
-      default:
-        Rcpp::stop("incompatible SEXP encountered");
-      }
-    }
-    return j;
-  }
+  
+  json get() const { return _msg; }
 
 private:
   std::string _key; // used for creating the hmac signature
