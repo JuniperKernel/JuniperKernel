@@ -21,8 +21,6 @@ static json from_sexp(SEXP s) {
 }
 
 // recursive parse a List into a json
-// logical and string vectors need special handling so it
-// defeats the purpose of templating the unpack from List->json
 static json from_list_r(Rcpp::List lst) {
   std::vector<std::string> names = lst.names();
   json j;
@@ -71,6 +69,8 @@ static SEXP as_sexp(const json& j, bool is_val) {
   return Rcpp::wrap(res);
 }
 
+
+// recursive parse json into list
 static SEXP j_to_sexp(const json& j, bool is_val=false) {
   json::value_t type = is_val?j.type():j[0].type();
   switch( type ) {

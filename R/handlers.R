@@ -15,11 +15,25 @@ kernel_info_request <- function(request_msg) {
                                              , version = paste(version$major, version$minor, sep=".")
                                              )
                       , banner = version$version.string
-    , foo = TRUE, bazboo = c(TRUE, FALSE, FALSE, TRUE), kazoo=343.12312, kazoo2=c(314.1231, 341.231,123.2321, pi)
                       )
       )
 }
 
 execute_request <- function(request_msg) {
+  content <- request_msg$content
+  rebroadcast_input(.kernel(), content$code, .exeCnt())
+
+  exprs <- parse(text=content$code)
+
+  con <- socketConnection(server=TRUE, port=6011)
+
+  sink(con)
+  print("FOOOO BAAARRRRR")
+  print("aaaaa")
+  sink()
+
+  close(con)
+
+  "a"
 
 }

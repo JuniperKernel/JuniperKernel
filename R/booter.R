@@ -40,6 +40,5 @@ bootKernel <- function() {
   }
 
   userConnFile <- argv[1L]
-  assign("kernel", init_kernel(userConnFile), envir=.JUNIPER)
-  boot_kernel(.kernel())
+  boot_kernel(.JUNIPER$kernel <- init_kernel(userConnFile))
 }

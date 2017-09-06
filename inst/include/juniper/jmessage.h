@@ -14,6 +14,7 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <juniper/external.h>
 
 #define VERSION "5.2"
 static const std::string DELIMITER = "<IDS|MSG>";
@@ -25,10 +26,15 @@ using nlohmann::json;
 class JMessage {
   
 public:
+  std::string _key; // used for creating the hmac signature
   static JMessage read(zmq::multipart_t& request, const std::string& key) {
     JMessage jm;
     jm._key = key;
     return jm.read_ids(request).read_hmac(request).read_body(request);
+  }
+  
+  ~JMessage() {
+    Rcpp::Rcout << "msg dead: " << this <<  std::endl;
   }
 
   static zmq::multipart_t reply(const JMessage& parent, const std::string& msg_type, const json& content) {
@@ -48,11 +54,10 @@ public:
     jm._msg["content"] = content;
     return jm.to_multipart_t();
   }
-  
+
   json get() const { return _msg; }
 
 private:
-  std::string _key; // used for creating the hmac signature
 
   json _msg;
   std::string _hmac;

@@ -10,6 +10,7 @@
 #include <juniper/sockets.h>
 #include <juniper/background.h>
 #include <juniper/requests.h>
+#include <juniper/external.h>
 
 #include <stdio.h>
 #include <execinfo.h>
@@ -31,7 +32,7 @@ void handler(int sig) {
 
 class JuniperKernel {
   public:
-    RequestServer* _request_server;
+    const RequestServer* _request_server;
     JuniperKernel(const config& conf):
       _ctx(new zmq::context_t(1)),
 
@@ -62,13 +63,14 @@ class JuniperKernel {
     void start_bg_threads() {
       _hbthread = start_hb_thread(*_ctx, _endpoint + _hbport);
       _iothread = start_io_thread(*_ctx, _endpoint + _ioport);
+      _Tthread  = start_T_thread(*_ctx);
     }
 
     // runs in the main the thread, polls shell and controller
      void run() const {
        zmq::socket_t* cntrl = listen_on(*_ctx, _endpoint + _cntrlport, zmq::socket_type::router);
        zmq::socket_t* shell = listen_on(*_ctx, _endpoint + _shellport, zmq::socket_type::router);
-       RequestServer server = *_request_server;
+       const RequestServer& server = *_request_server;
        const std::string key = _key;
        std::function<bool()> handlers[] = {
          [&cntrl, &key, &server]() {
@@ -98,6 +100,7 @@ class JuniperKernel {
       Rcpp::Rcout << "kernel shutdown..." << std::endl;
       _hbthread.join();
       _iothread.join();
+      _Tthread.join();
       if( _request_server )
         delete _request_server;
 
@@ -126,19 +129,9 @@ class JuniperKernel {
 
     std::thread _hbthread;
     std::thread _iothread;
+    std::thread _Tthread;
 };
 
-#ifndef FINALIZERS_H
-#define FINALIZERS_H
-typedef void(*finalizerT)(SEXP);
-template<typename T>
-SEXP createExternalPointer(T* jk, finalizerT finalizer, const char* pname) {
-  SEXP jk_ptr;
-  jk_ptr = Rcpp::Shield<SEXP>(R_MakeExternalPtr(reinterpret_cast<void*>(jk),Rf_install(pname),R_NilValue));
-  R_RegisterCFinalizerEx(jk_ptr, finalizer, TRUE);
-  return jk_ptr;
-}
-#endif // FINALIZERS_H
 
 static void kernelFinalizer(SEXP jk) {
   JuniperKernel* jkernel = reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(jk));
@@ -146,6 +139,10 @@ static void kernelFinalizer(SEXP jk) {
     delete jkernel;
     R_ClearExternalPtr(jk);
   }
+}
+
+static JuniperKernel* get_kernel(SEXP kernel) {
+  return reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(kernel));
 }
 
 // [[Rcpp::export]]
@@ -157,7 +154,7 @@ SEXP init_kernel(const std::string& connection_file) {
 // [[Rcpp::export]]
 void boot_kernel(SEXP kernel) {
   signal(SIGSEGV, handler);
-  JuniperKernel* jk = reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(kernel));
+  JuniperKernel* jk = get_kernel(kernel);
   jk->start_bg_threads();
   jk->run();
   delete jk;
@@ -165,14 +162,17 @@ void boot_kernel(SEXP kernel) {
 
 // [[Rcpp::export]]
 void stream_stdout(SEXP kernel, const std::string& output) {
-  JuniperKernel* jk = reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(kernel));
-  jk->_request_server->stream_stdout(output);
+  get_kernel(kernel)->_request_server->stream_stdout(output);
 }
 
 // [[Rcpp::export]]
 void stream_stderr(SEXP kernel, const std::string& err) {
-  JuniperKernel* jk = reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(kernel));
-  jk->_request_server->stream_stdout(err);
+  get_kernel(kernel)->_request_server->stream_stderr(err);
+}
+
+// [[Rcpp::export]]
+void rebroadcast_input(SEXP kernel, const std::string& execution_input, const int execution_count) {
+  get_kernel(kernel)->_request_server->rebroadcast_input(execution_input, execution_count);
 }
 
 // http://zguide.zeromq.org/page:all#Handling-Interrupt-Signals
