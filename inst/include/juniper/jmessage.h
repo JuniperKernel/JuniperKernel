@@ -32,10 +32,6 @@ public:
     jm._key = key;
     return jm.read_ids(request).read_hmac(request).read_body(request);
   }
-  
-  ~JMessage() {
-    Rcpp::Rcout << "msg dead: " << this <<  std::endl;
-  }
 
   static zmq::multipart_t reply(const JMessage& parent, const std::string& msg_type, const json& content) {
     JMessage jm;
@@ -92,8 +88,8 @@ private:
 
     // validate
     std::string hmac2dig = hmac<SHA256>(data.str(), _key);
-    Rcpp::Rcout << "hmac2dig: " << hmac2dig << "; actual: " << _hmac << std::endl;
-    Rcpp::Rcout << "hmac2dig.compare(actual)= " << hmac2dig.compare(_hmac) << std::endl;
+    // Rcpp::Rcout << "hmac2dig: " << hmac2dig << "; actual: " << _hmac << std::endl;
+    // Rcpp::Rcout << "hmac2dig.compare(actual)= " << hmac2dig.compare(_hmac) << std::endl;
     if( hmac2dig!=_hmac )
       throw("bad hmac digest");
     return *this;

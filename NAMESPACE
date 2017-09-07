@@ -1,0 +1,13 @@
+useDynLib("JuniperKernel", .registration=TRUE)
+import("Rcpp")
+
+export(bootKernel)
+export(defaultDisplayName)
+export(defaultKernelName)
+export(installJuniper)
+export(listKernels)
+
+# jupyter message handlers
+export(doRequest)
+export(kernel_info_request)
+export(execute_request)

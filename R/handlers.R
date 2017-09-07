@@ -2,6 +2,19 @@
 # in the corresponding reply. The full reply is managed by the
 # c++ core kernel code.
 
+doRequest <- function(request_msg, handler) {
+  con <- socketConnection(server=TRUE, port=6011)
+  sink(con)
+  tryCatch(
+   return(handler(request_msg))
+  , finally={
+      sink()
+      close(con)
+    }
+  )
+}
+
+
 kernel_info_request <- function(request_msg) {
   list( msg_type = "kernel_info_reply"
       , content = list( protocol_version = "5.2"
@@ -11,7 +24,7 @@ kernel_info_request <- function(request_msg) {
                                              , codemirror_mode = "r"
                                              , pygments_lexer = "r"
                                              , mimetype = "text/x-r-source"
-                                             , file_extension = ".r"
+                                             , file_extension = ".R"
                                              , version = paste(version$major, version$minor, sep=".")
                                              )
                       , banner = version$version.string
@@ -21,19 +34,10 @@ kernel_info_request <- function(request_msg) {
 
 execute_request <- function(request_msg) {
   content <- request_msg$content
-  rebroadcast_input(.kernel(), content$code, .exeCnt())
+  rebroadcast_input(.kernel(), content$code, cnt <- .exeCnt())
 
   exprs <- parse(text=content$code)
-
-  con <- socketConnection(server=TRUE, port=6011)
-
-  sink(con)
-  print("FOOOO BAAARRRRR")
-  print("aaaaa")
-  sink()
-
-  close(con)
-
-  "a"
-
+  list( msg_type = "execute_reply"
+      , content = list(status="ok", execution_count = 1)
+  )
 }

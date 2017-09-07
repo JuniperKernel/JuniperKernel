@@ -63,7 +63,6 @@ class JuniperKernel {
     void start_bg_threads() {
       _hbthread = start_hb_thread(*_ctx, _endpoint + _hbport);
       _iothread = start_io_thread(*_ctx, _endpoint + _ioport);
-      _Tthread  = start_T_thread(*_ctx);
     }
 
     // runs in the main the thread, polls shell and controller
@@ -76,17 +75,13 @@ class JuniperKernel {
          [&cntrl, &key, &server]() {
            zmq::multipart_t msg;
            msg.recv(*cntrl);
-           Rcpp::Rcout << "got cntrl msg" << std::endl;
            server.serve(msg, *cntrl);
-           Rcpp::Rcout << "finished ctrl msg" << std::endl;
            return true;
          },
          [&shell, &key, &server]() {
            zmq::multipart_t msg;
            msg.recv(*shell);
-           Rcpp::Rcout << "got shell msg" << std::endl;
            server.serve(msg, *shell);
-           Rcpp::Rcout << "finished shell msg" << std::endl;
            return true;
          }
        };
@@ -94,10 +89,7 @@ class JuniperKernel {
      }
 
     ~JuniperKernel() {
-      // set linger to 0 on all sockets
-      // destroy sockets
-      // destoy ctx
-      Rcpp::Rcout << "kernel shutdown..." << std::endl;
+      // set linger to 0 on all sockets; destroy sockets; finally destoy ctx
       _hbthread.join();
       _iothread.join();
       _Tthread.join();

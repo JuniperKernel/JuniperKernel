@@ -10,15 +10,12 @@
 #include <juniper/juniper.h>
 
 
-// extern uintptr_t R_CStackLimit;
-
 std::thread start_hb_thread(zmq::context_t& ctx, const std::string& endpoint) {
   std::thread hbthread([&ctx, endpoint]() {
     zmq::socket_t* hbSock = listen_on(ctx, endpoint, zmq::socket_type::rep);  // bind to the heartbeat endpoint
     std::function<bool()> handlers[] = {
       // ping-pong the message on heartbeat
       [&hbSock]() {
-        std::cout << "heartbeat received" << std::endl;
         zmq::multipart_t msg;
         msg.recv(*hbSock);
         msg.send(*hbSock);
@@ -43,36 +40,15 @@ std::thread start_io_thread(zmq::context_t& ctx, const std::string& endpoint) {
         // topic, and we forward them to the client here.
         zmq::multipart_t msg;
         msg.recv(*pubsub);
-        std::cout << "iopub msg: " << msg.str() << std::endl;
+        // std::cout << "iopub msg: " << msg.str() << std::endl;
         msg.send(*io);
         return true;
       },
-      [] {
-        assert(false);  // we should never be run...
-        return true;
-      }
+      [] { assert(false); return false; /* only here to keep handler same shape as sockets*/ }
     };
     poll(ctx, (zmq::socket_t*[]){pubsub, io}, handlers, 2);
   });
   return iothread;
-}
-
-std::thread start_T_thread(zmq::context_t& ctx) {
-  // R_CStackLimit = (uintptr_t)-1;
-  std::thread Tthread([&ctx]() {
-    zmq::socket_t* sock = new zmq::socket_t(ctx, zmq::socket_type::stream);
-    sock->connect("tcp://localhost:6011");
-    std::function<bool()> handlers[] = {
-      [&sock]() {
-        zmq::multipart_t msg;
-        msg.recv(*sock);
-        std::cout << "T thread msg: " << msg.str() << std::endl;
-        return true;
-      }
-    };
-    poll(ctx, (zmq::socket_t* []){sock}, handlers, 1);
-  });
-  return Tthread;
 }
 
 #endif // #ifndef juniper_juniper_background_H

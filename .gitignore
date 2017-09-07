@@ -10,7 +10,6 @@ out/
 .DS_Store
 .DS_Store?
 JuniperKernel.Rcheck/
-NAMESPACE
 man/
 *RcppExports*
 .Rproj.user

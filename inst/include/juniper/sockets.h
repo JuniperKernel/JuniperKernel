@@ -45,19 +45,16 @@ void poll(zmq::context_t& context, zmq::socket_t* sockets[], std::function<bool(
     std::function<bool()>* hp = handlers;
     // check if we got a kill signal
     if( items[0].revents & ZMQ_POLLIN ) {
-      Rcpp::Rcout << "suicide" << std::endl;
-      dead=true; // our loop invariant
-      break; // breaks the while
+      dead=true;
+      break;
     }
 
-    for(int i=1; i<=n; i++) {
-      if( items[i].revents & ZMQ_POLLIN ) {
+    for(int i=1; i<=n; i++)
+      if( items[i].revents & ZMQ_POLLIN )
         if( !hp[i-1]() ) {
           dead=true;
-          break;  // breaks the for
+          break;
         }
-      }
-    }
   }
 
   assert(dead);
