@@ -14,10 +14,7 @@ zmq::socket_t* init_socket(zmq::socket_t* socket, const std::string& endpoint) {
 }
 
 zmq::socket_t* subscribe_to(zmq::context_t& context, const std::string& topic) {
-  // connect to the topic signaller
   zmq::socket_t* sub = new zmq::socket_t(context, zmq::socket_type::sub);
-  // for option ZMQ_SUBSCRIBE, no need to set before connect (but we do anyways)
-  // see: http://api.zeromq.org/4-1:zmq-setsockopt
   sub->setsockopt(ZMQ_SUBSCRIBE, "" /*no filter*/, 0);
   sub->connect(topic);
   return sub;
@@ -28,9 +25,12 @@ zmq::socket_t* listen_on(zmq::context_t& context, const std::string& endpoint, z
   return init_socket(sock, endpoint);
 }
 
-// Functional style polling with custom message handling
-// if a handler returns false, it signals to stop polling
-// also handles socket teardown logic
+// Put all of the polling logic + teardown on signal in a
+// single place. Functional style polling with custom message
+// handling if a handler returns false, stop polling and teardown
+// Each thread polling items gets an additional listener
+// socket for the signaller. When a message comes through
+// on the listener socket, then teardown automatically.
 void poll(zmq::context_t& context, zmq::socket_t* sockets[], std::function<bool()> handlers[], int n) {
 
   zmq::pollitem_t items[n + 1 /* one more for the inproc signaller*/];
@@ -43,8 +43,7 @@ void poll(zmq::context_t& context, zmq::socket_t* sockets[], std::function<bool(
   while( !dead ) {
     zmq::poll(items, n+1, -1);
     std::function<bool()>* hp = handlers;
-    // check if we got a kill signal
-    if( items[0].revents & ZMQ_POLLIN ) {
+    if( items[0].revents & ZMQ_POLLIN ) {  // got a kill signal
       dead=true;
       break;
     }

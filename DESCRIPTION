@@ -9,7 +9,9 @@ Imports: utils,
          Rcpp (>= 0.11.0)
 Suggests: RUnit
 Collate: 'juniper.R'
-         'handlers.R'
+         'execute_request.R'
+         'kernel_info_request.R'
+         'request.R'
          'booter.R'
          'kernelspec.R'
          'RcppExports.R'

@@ -69,7 +69,7 @@ class RequestServer {
       json req = _cur_msg.get();
       Rcpp::Function handler = _jk[req["header"]["msg_type"]];
       Rcpp::Function do_request = _jk["doRequest"];
-      Rcpp::List res = do_request(from_json_r(req), Rcpp::wrap(handler));
+      Rcpp::List res = do_request(Rcpp::wrap(handler), from_json_r(req));
       sout.join();
       json jres = from_list_r(res);
       JMessage::reply(_cur_msg, jres["msg_type"], jres["content"]).send(sock);
@@ -87,9 +87,8 @@ class RequestServer {
             zmq::multipart_t msg;
             msg.recv(*sock);
             rs.stream_stdout(msg.str());
-            if( connected++>0 && msg[1].size()==0  ) {
-              return false;
-            }
+            if( connected++>0 && msg[1].size()==0 )
+              return false; // signal done
             return true;
           }
         };
