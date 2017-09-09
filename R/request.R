@@ -35,19 +35,22 @@
 #'   detoured to a \code{socketConnection} hosted in the current thread
 #'   and connected to by a separate thread polling on a ZMQ_STREAM socket.
 #'   These details are all handled by the \code{RequestServer}, and all
-#'   \code{doRequest} needs to do is \code{sink} messages to the socket
-#'   and clean it up after itself.
+#'   \code{doRequest} does is \code{sink} messages to the socket and perform
+#'   cleanup. The port is passed as part of the \code{request_msg}, and is
+#'   chosen randomly by the \code{RequestServer}.
 #'
 #' @author Spencer Aiello
 #' @export
 doRequest <- function(handler, request_msg) {
-  con <- socketConnection(server=TRUE, port=6011)
-  sink(con)
+  out <- socketConnection("localhost", port=request_msg$stream_out_port)
+  err <- socketConnection("localhost", port=request_msg$stream_err_port)
+  sink(out)
+  sink(err, type="message")
   tryCatch(
     return(handler(request_msg))
     , finally={
-        sink()
-        close(con)
+        sink(type="message"); close(err);
+        sink(); close(out);
       }
   )
 }

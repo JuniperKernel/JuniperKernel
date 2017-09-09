@@ -7,7 +7,7 @@
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
 #include <juniper/sockets.h>
-#include <juniper/juniper.h>
+#include <juniper/conf.h>
 
 
 std::thread start_hb_thread(zmq::context_t& ctx, const std::string& endpoint) {

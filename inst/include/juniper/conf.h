@@ -1,5 +1,5 @@
-#ifndef juniper_juniper_juniper_H
-#define juniper_juniper_juniper_H
+#ifndef juniper_juniper_conf_H
+#define juniper_juniper_conf_H
 
 #include <fstream>
 #include <string>
@@ -55,4 +55,4 @@ struct config {
   }
 };
 
-#endif // ifndef juniper_juniper_juniper_H
+#endif // ifndef juniper_juniper_conf_H

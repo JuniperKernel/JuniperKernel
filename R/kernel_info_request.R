@@ -30,5 +30,5 @@ kernel_info_request <- function(request_msg) {
   , banner = version$version.string
   )
 
-  list( msg_type = "kernel_info_reply", content = content)
+  list(msg_type = "kernel_info_reply", content = content)
 }

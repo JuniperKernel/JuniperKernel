@@ -7,7 +7,7 @@
 #include <zmq_addon.hpp>
 #include <Rcpp.h>
 #include <juniper/sockets.h>
-#include <juniper/juniper.h>
+#include <juniper/conf.h>
 #include <juniper/jmessage.h>
 #include <juniper/utils.h>
 
@@ -62,33 +62,66 @@ class RequestServer {
 
     // R functions are pulled out of the JuniperKernel package environment.
     // For each msg_type, there's a corresponding R function with that name.
-    // For example, for msg_type "kernel_info_request", there's an R method
+    // Example: for msg_type "kernel_info_request", there's an R method
     // called "kernel_info_request" that's exported in the JuniperKernel.
     const RequestServer& handle(zmq::socket_t& sock) const {
-      std::thread sout  = stdout_thread();
+      // R sinks stdout/stderr to socketConnection, which is being listened
+      // to on a ZMQ_STREAM socket. Polling of this connection happens in a
+      // separate thread so that stdout/stderr can be streamed to IOPub 
+      // asynchronously. This socket is created in the main thread and 
+      // migrated to a polling thread. Why? R needs to know the port--which
+      // is chosen by the OS--to form the socketConnection: because R is 
+      // executing in the main thread there is the option to block the main
+      // thread until it handshakes with the spawned thread via inproc 
+      // transports; or migrate a socket to a new thread. Option 2 is  
+      // simpler and totally legal according to the ZMQ docs since the socket
+      // creation and port scraping happens before the polling thread is spawned.
+      // zmq::socket_t stream(*_ctx, zmq::socket_type::stream);
+      // stream.setsockopt(ZMQ_LINGER, LINGER);
+      // stream.bind("tcp://*:*");
+      zmq::socket_t* stream_out = listen_on(*_ctx, "tcp://*:*", zmq::socket_type::stream);
+      zmq::socket_t* stream_err = listen_on(*_ctx, "tcp://*:*", zmq::socket_type::stream);
       json req = _cur_msg.get();
+      req["stream_out_port"] = read_port(stream_out);  // stitch the stdout port into the client request
+      req["stream_err_port"] = read_port(stream_err);  // stitch the stderr into the client request
       Rcpp::Function handler = _jk[req["header"]["msg_type"]];
       Rcpp::Function do_request = _jk["doRequest"];
+      // boot the listeners; execute request; join the listeners
+      std::thread sout = stream_thread(stream_out, true );  // stdout listener
+      std::thread serr = stream_thread(stream_err, false);  // stderr listener
       Rcpp::List res = do_request(Rcpp::wrap(handler), from_json_r(req));
-      sout.join();
+      serr.join();  // stream_err is now destroyed
+      sout.join();  // stream_out is now destroyed
       json jres = from_list_r(res);
       JMessage::reply(_cur_msg, jres["msg_type"], jres["content"]).send(sock);
       return *this;
     }
 
-    std::thread stdout_thread() const {
+    std::thread stream_thread(zmq::socket_t* sock, const bool out=true) const {
       const RequestServer& rs = *this;
-      std::thread out_thread([&rs]() {
-        zmq::socket_t* sock = new zmq::socket_t(*rs._ctx, zmq::socket_type::stream);
-        sock->connect("tcp://localhost:6011");
-        int connected=false;
+      std::thread out_thread([&rs, sock, &out]() {  // full fence membar
+        short connected=false;
         std::function<bool()> handlers[] = {
-          [&sock, &rs, &connected]() {
+          [sock, &rs, &out, &connected]() {
             zmq::multipart_t msg;
             msg.recv(*sock);
-            rs.stream_stdout(msg.str());
-            if( connected++>0 && msg[1].size()==0 )
-              return false; // signal done
+
+            // connect/disconnect logic
+            // in either case it's a two-frame multipart message:
+            //   frame 1: identity
+            //   frame 2: empty
+            // the first time getting these two frames means we're
+            // connected to by the socket having identity found in
+            // frame1. the second time means the socket having that
+            // identity disconnected. Our expectation is that we shall
+            // only have a single connection and when it dies, we also
+            // die (AKA signal death to the poller by returning false).
+            if( msg[1].size()==0 )
+              return !connected++;
+
+            // read the message and publish to stdout
+            if( out ) rs.stream_stdout(msg_t_to_string(msg[1]));
+            else      rs.stream_stderr(msg_t_to_string(msg[1]));
             return true;
           }
         };
@@ -102,6 +135,15 @@ class RequestServer {
     }
     const RequestServer& busy() const { iopub("status", {{"execution_state", "busy"}}); return *this; }
     const RequestServer& idle() const { iopub("status", {{"execution_state", "idle"}}); return *this; }
+    
+    static int read_port(zmq::socket_t* sock) {
+      char endpoint[32];
+      size_t sz = sizeof(endpoint); 
+      sock->getsockopt(ZMQ_LAST_ENDPOINT, &endpoint, &sz);
+      std::string ep(endpoint);
+      std::string port(ep.substr(ep.find(":", ep.find(":")+1)+1));
+      return stoi(port);
+    }
 };
 
 #endif // ifndef juniper_juniper_requests_H

@@ -1,6 +1,7 @@
 #include <string>
 #include <Rcpp.h>
 #include <json.hpp>
+#include <zmq.hpp>
 
 using nlohmann::json;
 
@@ -101,4 +102,13 @@ static SEXP from_json_r(json j) {
     return Rcpp::wrap(res);
   }
   return j_to_sexp(j, !j.is_array());
+}
+
+static std::string msg_t_to_string(const zmq::message_t& msg) {
+  std::stringstream ss;
+  const char* chars = msg.data<char>();
+  size_t sz = msg.size();
+  for(size_t i=0; i<sz; ++i)
+    ss << chars[i];
+  return ss.str();
 }

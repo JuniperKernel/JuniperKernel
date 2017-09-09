@@ -19,6 +19,8 @@ execute_request <- function(request_msg) {
   content <- request_msg$content
   rebroadcast_input(.kernel(), content$code, cnt <- .exeCnt())
 
+  message("EXEECUUUUUTEEEE")
+
   exprs <- parse(text=content$code)
   .incCnt()
   list( msg_type = "execute_reply"

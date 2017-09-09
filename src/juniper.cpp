@@ -6,7 +6,7 @@
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
 #include <json.hpp>
-#include <juniper/juniper.h>
+#include <juniper/conf.h>
 #include <juniper/sockets.h>
 #include <juniper/background.h>
 #include <juniper/requests.h>

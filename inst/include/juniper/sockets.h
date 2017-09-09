@@ -5,7 +5,7 @@
 #include <string>
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
-#include <juniper/juniper.h>
+#include <juniper/conf.h>
 
 zmq::socket_t* init_socket(zmq::socket_t* socket, const std::string& endpoint) {
   socket->setsockopt(ZMQ_LINGER, LINGER);
@@ -25,12 +25,10 @@ zmq::socket_t* listen_on(zmq::context_t& context, const std::string& endpoint, z
   return init_socket(sock, endpoint);
 }
 
-// Put all of the polling logic + teardown on signal in a
-// single place. Functional style polling with custom message
-// handling if a handler returns false, stop polling and teardown
-// Each thread polling items gets an additional listener
-// socket for the signaller. When a message comes through
-// on the listener socket, then teardown automatically.
+// Polling logic + teardown on signal in a single place. Functional
+// style polling with custom message handling if a handler returns
+// false, stop polling and teardown.
+// All callers get an additional signal listener.
 void poll(zmq::context_t& context, zmq::socket_t* sockets[], std::function<bool()> handlers[], int n) {
 
   zmq::pollitem_t items[n + 1 /* one more for the inproc signaller*/];

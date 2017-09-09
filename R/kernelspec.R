@@ -138,14 +138,12 @@ defaultDisplayName <- function() {
 installJuniper <- function (user = TRUE, kernelName = defaultKernelName(), displayName = defaultDisplayName(), prefix='') {
   .stopIfJupyterMissing()
 
-  if( regexpr("^[a-zA-Z_][a-zA-Z0-9_.-]*$", kernelName)[1L] == -1L ) {
+  if( regexpr("^[a-zA-Z_][a-zA-Z0-9_.-]*$", kernelName)[1L] == -1L )
     stop("`kernelName` must match the regex ^[a-zA-Z_][a-zA-Z0-9_.-]*$")
-  }
 
   name <- tolower(kernelName)
-  if( name!=kernelName ) {
+  if( name!=kernelName )
     warning("Mixed case characters are ignored: ", kernelName, " -> ", name)
-  }
 
   # write the kernels.json file
   tmpPath <- .writeSpec(displayName)
