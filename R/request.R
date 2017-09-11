@@ -44,13 +44,13 @@
 doRequest <- function(handler, request_msg) {
   out <- socketConnection("localhost", port=request_msg$stream_out_port)
   err <- socketConnection("localhost", port=request_msg$stream_err_port)
-  sink(out)
+  sink(out, type="output")
   sink(err, type="message")
   tryCatch(
     return(handler(request_msg))
     , finally={
         sink(type="message"); close(err);
-        sink(); close(out);
+        sink(type="output" ); close(out);
       }
   )
 }

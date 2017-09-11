@@ -52,6 +52,7 @@ class RequestServer {
     void rebroadcast_input(const std::string& input, const int count) const {
        iopub("execute_input", {{"code", input}, {"execution_count", count}});
     }
+    void send_execute_result(const json& data) const { iopub("execute_result", data); }
 
   private:
     zmq::context_t* const _ctx;
@@ -86,9 +87,9 @@ class RequestServer {
       req["stream_err_port"] = read_port(stream_err);  // stitch the stderr into the client request
       Rcpp::Function handler = _jk[req["header"]["msg_type"]];
       Rcpp::Function do_request = _jk["doRequest"];
-      // boot the listeners; execute request; join the listeners
-      std::thread sout = stream_thread(stream_out, true );  // stdout listener
-      std::thread serr = stream_thread(stream_err, false);  // stderr listener
+      // boot listener threads; execute request; join listeners
+      std::thread sout = stream_thread(stream_out, true );
+      std::thread serr = stream_thread(stream_err, false);
       Rcpp::List res = do_request(Rcpp::wrap(handler), from_json_r(req));
       serr.join();  // stream_err is now destroyed
       sout.join();  // stream_out is now destroyed
@@ -99,10 +100,10 @@ class RequestServer {
 
     std::thread stream_thread(zmq::socket_t* sock, const bool out=true) const {
       const RequestServer& rs = *this;
-      std::thread out_thread([&rs, sock, &out]() {  // full fence membar
+      std::thread out_thread([&rs, sock, out]() {  // full fence membar
         short connected=false;
         std::function<bool()> handlers[] = {
-          [sock, &rs, &out, &connected]() {
+          [sock, &rs, out, &connected]() {
             zmq::multipart_t msg;
             msg.recv(*sock);
 
@@ -111,10 +112,10 @@ class RequestServer {
             //   frame 1: identity
             //   frame 2: empty
             // the first time getting these two frames means we're
-            // connected to by the socket having identity found in
+            // getting connected to by a socket having identity found in
             // frame1. the second time means the socket having that
             // identity disconnected. Our expectation is that we shall
-            // only have a single connection and when it dies, we also
+            // only ever have a single connection; and when it dies, we also
             // die (AKA signal death to the poller by returning false).
             if( msg[1].size()==0 )
               return !connected++;

@@ -6,6 +6,7 @@ Maintainer: Spencer Aiello <spnrpa@gmail.com>
 Author: Spencer Aiello
 Imports: utils,
          jsonlite,
+         repr,
          Rcpp (>= 0.11.0)
 Suggests: RUnit
 Collate: 'juniper.R'

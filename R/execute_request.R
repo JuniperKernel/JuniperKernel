@@ -17,13 +17,42 @@
 #' @export
 execute_request <- function(request_msg) {
   content <- request_msg$content
-  rebroadcast_input(.kernel(), content$code, cnt <- .exeCnt())
+  rebroadcast_input(.kernel(), content$code, cnt <- .getAndIncCnt())  # increase count no matter what
+  status <- .tryEval(content$code, cnt)
+  content <- list(status=status, execution_count=cnt)
 
-  message("EXEECUUUUUTEEEE")
+  if( status=="ok" ) {
+    # content$payload = list()
+    # content$user_expressions=list()
+  }
 
-  exprs <- parse(text=content$code)
-  .incCnt()
-  list( msg_type = "execute_reply"
-  , content = list(status="ok", execution_count = cnt)
+  list(msg_type = "execute_reply", content = content)
+}
+
+.tryEval <- function(code, cnt) {
+  tryCatch(
+    {
+      res <- withVisible(eval(parse(text=code), envir=.GlobalEnv))
+      if( res$visible )
+        .execute_result(res$value, cnt)
+      return("ok")
+    }
+    , error=function(e) {
+        message(e, "\n")
+        return("error")
+      }
+    , interrupt = function(.) return("abort")
   )
+}
+
+.execute_result <- function(result, cnt) {
+  # from the docs (http://jupyter-client.readthedocs.io/en/latest/messaging.html#display-data):
+  #     "A single message should contain all possible representations
+  #     of the same information. Each representation should be a
+  #     JSON’able data structure, and should be a valid MIME type"
+  # loop over the available mimetypes using repr package
+  data <- lapply(repr::mime2repr, function(mimeFun) mimeFun(result))
+  # keep non-NULL results (NULL when no such mime repr exists)
+  content <- list(data=Filter(Negate(is.null), data), execution_count=cnt)
+  send_execute_result(.kernel(), content)
 }

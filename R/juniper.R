@@ -10,5 +10,8 @@ NULL
 .JUNIPER$execution_count <- 1L
 
 .kernel <- function() .JUNIPER$kernel
-.exeCnt <- function() .JUNIPER$execution_count
-.incCnt <- function() .JUNIPER$execution_count <- .JUNIPER$execution_count + 1L
+.getAndIncCnt <- function() {
+  cnt <- .JUNIPER$execution_count
+  .JUNIPER$execution_count <- cnt + 1L
+  cnt
+}
