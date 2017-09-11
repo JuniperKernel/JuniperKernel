@@ -11,6 +11,8 @@ Imports: utils,
 Suggests: RUnit
 Collate: 'juniper.R'
          'execute_request.R'
+         'inspect_request.R'
+         'complete_request.R'
          'kernel_info_request.R'
          'request.R'
          'booter.R'

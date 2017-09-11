@@ -52,7 +52,7 @@ class RequestServer {
     void rebroadcast_input(const std::string& input, const int count) const {
        iopub("execute_input", {{"code", input}, {"execution_count", count}});
     }
-    void send_execute_result(const json& data) const { iopub("execute_result", data); }
+    void execute_result(const json& data) const { iopub("execute_result", data); }
 
   private:
     zmq::context_t* const _ctx;
@@ -85,6 +85,7 @@ class RequestServer {
       json req = _cur_msg.get();
       req["stream_out_port"] = read_port(stream_out);  // stitch the stdout port into the client request
       req["stream_err_port"] = read_port(stream_err);  // stitch the stderr into the client request
+      std::cout << "Handling message type: " << req["header"]["msg_type"] << std::endl;
       Rcpp::Function handler = _jk[req["header"]["msg_type"]];
       Rcpp::Function do_request = _jk["doRequest"];
       // boot listener threads; execute request; join listeners

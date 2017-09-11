@@ -25,9 +25,9 @@ build/JuniperKernel_$(PKG_VERSION).tar.gz: $(wildcard R/*R) $(wildcard src/*cpp)
 	@[ -d build ] || mkdir build
 	@mv JuniperKernel_$(PKG_VERSION).tar.gz build/
 
-.PHONY: install
-install: clean build/JuniperKernel_$(PKG_VERSION).tar.gz
-	@cd build && R CMD INSTALL JuniperKernel_$(PKG_VERSION).tar.gz
+#.PHONY: install
+install:
+	R CMD INSTALL -- .
 
 check: build/JuniperKernel_$(PKG_VERSION).tar.gz
 	@echo "running R CMD check"

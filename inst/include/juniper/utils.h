@@ -10,10 +10,10 @@ template<int SXP, class CTYPE>
 static json from_sexp(SEXP s) {
   Rcpp::Vector<SXP> rvec = Rcpp::as<Rcpp::Vector<SXP>>(s);
 
-  if( rvec.size()==1 ) {
-    if( SXP==LGLSXP ) return (bool)rvec[0];
-    return rvec[0];
-  }
+//  if( rvec.size()==1 ) {
+//    if( SXP==LGLSXP ) return (bool)rvec[0];
+//    return rvec[0];
+//  }
 
   std::vector<CTYPE> cvec;
   for(int i=0; i<rvec.size(); ++i)

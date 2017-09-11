@@ -45,6 +45,8 @@ execute_request <- function(request_msg) {
   )
 }
 
+# build and send the content of an execute_result
+# iopub message.
 .execute_result <- function(result, cnt) {
   # from the docs (http://jupyter-client.readthedocs.io/en/latest/messaging.html#display-data):
   #     "A single message should contain all possible representations
@@ -54,5 +56,5 @@ execute_request <- function(request_msg) {
   data <- lapply(repr::mime2repr, function(mimeFun) mimeFun(result))
   # keep non-NULL results (NULL when no such mime repr exists)
   content <- list(data=Filter(Negate(is.null), data), execution_count=cnt)
-  send_execute_result(.kernel(), content)
+  execute_result(.kernel(), content)
 }

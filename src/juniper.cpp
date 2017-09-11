@@ -168,10 +168,6 @@ void rebroadcast_input(SEXP kernel, const std::string& execution_input, const in
 }
 
 // [[Rcpp::export]]
-void send_execute_result(SEXP kernel, Rcpp::List data) {
-  json j = from_list_r(data);
-  get_kernel(kernel)->_request_server->send_execute_result(j);
+void execute_result(SEXP kernel, Rcpp::List data) {
+  get_kernel(kernel)->_request_server->execute_result(from_list_r(data));
 }
-
-// http://zguide.zeromq.org/page:all#Handling-Interrupt-Signals
-// http://zguide.zeromq.org/page:all#Multithreading-with-ZeroMQ
