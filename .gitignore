@@ -17,3 +17,5 @@ man/
 .Rhistory
 inst/zmq
 foo
+src/*so
+src/*o

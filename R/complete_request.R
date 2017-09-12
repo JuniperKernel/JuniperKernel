@@ -26,7 +26,7 @@ complete_request <- function(request_msg) {
   utils:::.guessTokenFromLine()
   utils:::.completeToken()
 
-  completions <- c(utils:::.CompletionEnv$comps, "")
+  completions <- c(utils:::.CompletionEnv$comps, "__juniper_vec_ignore_hack__")  # hack to get single item vecs to parse as vecs and not scalars
   guess <- utils:::.guessTokenFromLine(update = FALSE)
   content <- list(status="ok", matches = completions, cursor_start=guess$start, cursor_end=guess$start + nchar(guess$token))
   list(msg_type = "complete_reply", content=content)

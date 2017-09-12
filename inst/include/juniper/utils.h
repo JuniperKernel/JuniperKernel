@@ -39,8 +39,11 @@ static json from_list_r(Rcpp::List lst) {
         j[names.at(i++)] = Rcpp::as<std::string>(*it);
       } else {
         std::vector<std::string> chars;
-        for( Rcpp::StringVector::iterator ii=tmp.begin(); ii!=tmp.end(); ++ii )
+        std::string skip = "__juniper_vec_ignore_hack__";
+        for( Rcpp::StringVector::iterator ii=tmp.begin(); ii!=tmp.end(); ++ii ) {
+          if( skip.compare(*ii)==0 ) continue; // skip these
           chars.emplace_back(*ii);
+        }
         j[names.at(i++)] = chars;
       }
       break;
