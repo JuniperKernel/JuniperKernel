@@ -137,7 +137,7 @@ class RequestServer {
     }
     const RequestServer& busy() const { iopub("status", {{"execution_state", "busy"}}); return *this; }
     const RequestServer& idle() const { iopub("status", {{"execution_state", "idle"}}); return *this; }
-    
+
     static int read_port(zmq::socket_t* sock) {
       char endpoint[32];
       size_t sz = sizeof(endpoint); 

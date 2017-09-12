@@ -31,13 +31,11 @@ bootKernel <- function() {
   require(JuniperKernel)  # attach the package to the search path so we can call methods from Rcpp
   argv <- commandArgs(trailingOnly=TRUE)
 
-  if( length(argv)==0L ) {
+  if( length(argv)==0L )
     stop("Missing command line arguments. Juniper kernel installation may be corrupt.")
-  }
 
-  if( length(argv)>1L ) {
+  if( length(argv)>1L )
     warning("Multiple arguments passed; all but the first will be ignored.")
-  }
 
   userConnFile <- argv[1L]
   boot_kernel(.JUNIPER$kernel <- init_kernel(userConnFile))

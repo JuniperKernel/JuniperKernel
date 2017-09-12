@@ -10,10 +10,10 @@ template<int SXP, class CTYPE>
 static json from_sexp(SEXP s) {
   Rcpp::Vector<SXP> rvec = Rcpp::as<Rcpp::Vector<SXP>>(s);
 
-//  if( rvec.size()==1 ) {
-//    if( SXP==LGLSXP ) return (bool)rvec[0];
-//    return rvec[0];
-//  }
+  if( rvec.size()==1 ) {
+    if( SXP==LGLSXP ) return (bool)rvec[0];
+    return rvec[0];
+  }
 
   std::vector<CTYPE> cvec;
   for(int i=0; i<rvec.size(); ++i)
@@ -41,7 +41,7 @@ static json from_list_r(Rcpp::List lst) {
         std::vector<std::string> chars;
         std::string skip = "__juniper_vec_ignore_hack__";
         for( Rcpp::StringVector::iterator ii=tmp.begin(); ii!=tmp.end(); ++ii ) {
-          if( skip.compare(*ii)==0 ) continue; // skip these
+          if( !skip.compare(*ii) ) continue;
           chars.emplace_back(*ii);
         }
         j[names.at(i++)] = chars;
