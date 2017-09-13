@@ -53,7 +53,7 @@ class RequestServer {
        iopub("execute_input", {{"code", input}, {"execution_count", count}});
     }
     void execute_result(const json& data) const { iopub("execute_result", data); }
-
+    void shutdown() const { zmq::message_t m(0); _inproc_sig->send(m); }
   private:
     zmq::context_t* const _ctx;
     const std::string _key;   // hmac key
@@ -86,7 +86,8 @@ class RequestServer {
       req["stream_out_port"] = read_port(stream_out);  // stitch the stdout port into the client request
       req["stream_err_port"] = read_port(stream_err);  // stitch the stderr into the client request
       std::cout << "Handling message type: " << req["header"]["msg_type"] << std::endl;
-      Rcpp::Function handler = _jk[req["header"]["msg_type"]];
+      std::string msg_type = req["header"]["msg_type"];
+      Rcpp::Function handler = _jk[msg_type];
       Rcpp::Function do_request = _jk["doRequest"];
       // boot listener threads; execute request; join listeners
       std::thread sout = stream_thread(stream_out, true );
@@ -96,6 +97,12 @@ class RequestServer {
       sout.join();  // stream_out is now destroyed
       json jres = from_list_r(res);
       JMessage::reply(_cur_msg, jres["msg_type"], jres["content"]).send(sock);
+      if( msg_type.compare("shutdown_request")==0 ) {
+        shutdown();
+        Rcpp::Environment base("package:base");
+        Rcpp::Function quit = base["quit"];
+        quit("no");
+      }
       return *this;
     }
 
@@ -131,7 +138,6 @@ class RequestServer {
       });
       return out_thread;
     }
-
     void iopub(const std::string& msg_type, const json& content) const {
       JMessage::reply(_cur_msg, msg_type, content).send(*_inproc_pub);
     }

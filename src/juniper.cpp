@@ -2,6 +2,10 @@
 #include <thread>
 #include <fstream>
 #include <unistd.h>
+#include <stdio.h>
+#include <execinfo.h>
+#include <signal.h>
+#include <stdlib.h>
 #include <Rcpp.h>
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
@@ -12,11 +16,6 @@
 #include <juniper/requests.h>
 #include <juniper/external.h>
 
-#include <stdio.h>
-#include <execinfo.h>
-#include <signal.h>
-#include <stdlib.h>
-#include <unistd.h>
 void handler(int sig) {
   void *array[10];
   size_t size;
@@ -90,9 +89,10 @@ class JuniperKernel {
 
     ~JuniperKernel() {
       // set linger to 0 on all sockets; destroy sockets; finally destoy ctx
+      _request_server->shutdown(); // try to send a signal out again
       _hbthread.join();
       _iothread.join();
-      _Tthread.join();
+
       if( _request_server )
         delete _request_server;
 
@@ -121,7 +121,6 @@ class JuniperKernel {
 
     std::thread _hbthread;
     std::thread _iothread;
-    std::thread _Tthread;
 };
 
 
@@ -140,6 +139,10 @@ static JuniperKernel* get_kernel(SEXP kernel) {
 // [[Rcpp::export]]
 SEXP init_kernel(const std::string& connection_file) {
   JuniperKernel* jk = JuniperKernel::make(connection_file);
+  // even if boot_kernel is exceptional and we don't run delete jk
+  // this finalizer will be run on R's exit and a cleanup will trigger then
+  // if the poller's never get a signal, then deletion will be blocked on join
+  // until a forced shutdown comes in from a jupyter client
   return createExternalPointer<JuniperKernel>(jk, kernelFinalizer, "JuniperKernel*");
 }
 
