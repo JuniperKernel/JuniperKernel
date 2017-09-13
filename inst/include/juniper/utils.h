@@ -23,6 +23,7 @@ static json from_sexp(SEXP s) {
 
 // recursive parse a List into a json
 static json from_list_r(Rcpp::List lst) {
+  if( lst.size()==0 ) return {};
   std::vector<std::string> names = lst.names();
   json j;
   int i=0;

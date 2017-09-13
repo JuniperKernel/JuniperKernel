@@ -22,8 +22,8 @@ execute_request <- function(request_msg) {
   content <- list(status=status, execution_count=cnt)
 
   if( status=="ok" ) {
-    # content$payload = list()
-    # content$user_expressions=list()
+    content$payload = list()
+    content$user_expressions=list()
   }
 
   list(msg_type = "execute_reply", content = content)

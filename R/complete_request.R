@@ -20,7 +20,7 @@ complete_request <- function(request_msg) {
   code <- gsub("\n", ";", code)
   cursor <- request_msg$content$cursor_pos
 
-  # see rcompgen Unexported API
+  # see ?rcompgen Unexported API
   utils:::.assignLinebuffer(code)
   utils:::.assignEnd(cursor)
   utils:::.guessTokenFromLine()
