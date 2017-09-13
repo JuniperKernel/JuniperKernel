@@ -635,8 +635,6 @@ namespace zmq
                 return (size_t) nbytes;
             if (zmq_errno () == EAGAIN)
                 return 0;
-            if (zmq_errno () == EHOSTUNREACH)
-                return 0;
             throw error_t ();
         }
 
@@ -646,8 +644,6 @@ namespace zmq
             if (nbytes >= 0)
                 return true;
             if (zmq_errno () == EAGAIN)
-                return false;
-            if (zmq_errno () == EHOSTUNREACH)
                 return false;
             throw error_t ();
         }
@@ -863,10 +859,16 @@ namespace zmq
                 on_event_disconnected(*event, address.c_str());
                 break;
 #ifdef ZMQ_BUILD_DRAFT_API
-            case ZMQ_EVENT_HANDSHAKE_FAILED:
+            case ZMQ_EVENT_HANDSHAKE_FAILED_NO_DETAIL:
                 on_event_handshake_failed(*event, address.c_str());
                 break;
-            case ZMQ_EVENT_HANDSHAKE_SUCCEED:
+            case ZMQ_EVENT_HANDSHAKE_FAILED_PROTOCOL:
+                on_event_handshake_failed(*event, address.c_str());
+                break;
+            case ZMQ_EVENT_HANDSHAKE_FAILED_AUTH:
+                on_event_handshake_failed(*event, address.c_str());
+                break;
+            case ZMQ_EVENT_HANDSHAKE_SUCCEEDED:
                 on_event_handshake_succeed(*event, address.c_str());
                 break;
 #endif
