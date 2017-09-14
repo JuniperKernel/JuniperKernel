@@ -6,16 +6,11 @@ GENERAL
 
 Use 2-space indentation.
 
-Use typically trailing braces everywhere (if, else, functions,
+Don't use trailing braces everywhere (if, else, functions,
 structures, typedefs, class definitions, etc.)
-  if( x ) {
-  }
 
-The else statement starts on the same line as the last closing brace.
-
-  if( x ) {
-  } else {
-  }
+  if( x )
+    foo
 
 Connect opening parenthesis to control statements (if, while, switch,
 for, etc.) and pad parenthesized expressions with spaces
