@@ -5,16 +5,16 @@
 #include <string>
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
-#include <Rcpp.h>
 #include <json.hpp>
 #include <hmac.h>
 #include <ctime>
 #include <iostream>
 #include <sha256.h>
 #include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/uuid_generators.hpp>
 #include <juniper/external.h>
+#include <Rcpp.h>
 
 #define VERSION "5.2"
 static const std::string DELIMITER = "<IDS|MSG>";

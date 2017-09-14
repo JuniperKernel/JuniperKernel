@@ -3,12 +3,11 @@
 #include <fstream>
 #include <unistd.h>
 #include <stdio.h>
-#include <execinfo.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <Rcpp.h>
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
+//#include <Rcpp.h>
 #include <json.hpp>
 #include <juniper/conf.h>
 #include <juniper/sockets.h>
@@ -16,6 +15,10 @@
 #include <juniper/requests.h>
 #include <juniper/external.h>
 
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+void handler(int sig){}
+#else
+#include <execinfo.h>
 void handler(int sig) {
   void *array[10];
   size_t size;
@@ -28,6 +31,7 @@ void handler(int sig) {
   backtrace_symbols_fd(array, size, STDERR_FILENO);
   exit(1);
 }
+#endif
 
 class JuniperKernel {
   public:
@@ -84,7 +88,7 @@ class JuniperKernel {
            return true;
          }
        };
-       poll(*_ctx, (zmq::socket_t* []){cntrl, shell}, handlers, 2);
+       poll(*_ctx, std::move((zmq::socket_t* []){cntrl, shell}), handlers, 2);
      }
 
     ~JuniperKernel() {

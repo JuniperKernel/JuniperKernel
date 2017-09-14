@@ -1,7 +1,6 @@
 #ifndef juniper_juniper_background_H
 #define juniper_juniper_background_H
 
-#include <Rcpp.h>
 #include <string>
 #include <thread>
 #include <zmq.hpp>
@@ -22,7 +21,7 @@ std::thread start_hb_thread(zmq::context_t& ctx, const std::string& endpoint) {
         return true;
       }
     };
-    poll(ctx, (zmq::socket_t*[]){hbSock}, handlers, 1);
+    poll(ctx, std::move((zmq::socket_t*[]){hbSock}), handlers, 1);
   });
   return hbthread;
 }
@@ -46,7 +45,7 @@ std::thread start_io_thread(zmq::context_t& ctx, const std::string& endpoint) {
       },
       [] { assert(false); return false; /* only here to keep handler same shape as sockets*/ }
     };
-    poll(ctx, (zmq::socket_t*[]){pubsub, io}, handlers, 2);
+    poll(ctx, std::move((zmq::socket_t*[]){pubsub, io}), handlers, 2);
   });
   return iothread;
 }

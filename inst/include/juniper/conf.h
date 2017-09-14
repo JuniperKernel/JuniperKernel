@@ -3,10 +3,10 @@
 
 #include <fstream>
 #include <string>
-#include <Rcpp.h>
 #include <json.hpp>
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
+#include <Rcpp.h>
 
 #define LINGER 1000 // number of millis to linger for
 #define INPROC_PUB "inproc://pub"

@@ -1,7 +1,7 @@
 #include <string>
-#include <Rcpp.h>
 #include <json.hpp>
 #include <zmq.hpp>
+#include <Rcpp.h>
 
 using nlohmann::json;
 

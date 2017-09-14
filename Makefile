@@ -1,4 +1,4 @@
-SHELL := /bin/bash
+#SHELL := /bin/bash
 .DELETE_ON_ERROR:
 
 # for printing variable values
