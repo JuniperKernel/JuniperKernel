@@ -46,11 +46,20 @@ doRequest <- function(handler, request_msg) {
   err <- socketConnection("localhost", port=request_msg$stream_err_port)
   sink(out, type="output")
   sink(err, type="message")
+  aliases <- list(system=list(sans="Arial", serif="Times", mono="Courier", symbol="Symbol"), user=list())
+  jk_device(.kernel(), "white", 10, 5, 12, FALSE, aliases)
+  dev <- dev.cur()
+  print(dev)
   tryCatch(
-    return(handler(request_msg))
+    {
+      res <- handler(request_msg)
+      dev.off(dev)
+      return(res)
+    }
     , finally={
         sink(type="message"); close(err);
         sink(type="output" ); close(out);
+        dev.off(dev)
       }
   )
 }

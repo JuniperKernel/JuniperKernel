@@ -1,5 +1,6 @@
 useDynLib("JuniperKernel", .registration=TRUE)
 import("Rcpp")
+import("gdtools")
 
 export(bootKernel)
 export(defaultDisplayName)

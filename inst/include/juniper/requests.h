@@ -52,7 +52,8 @@ class RequestServer {
     void rebroadcast_input(const std::string& input, const int count) const {
        iopub("execute_input", {{"code", input}, {"execution_count", count}});
     }
-    void execute_result(const json& data) const { iopub("execute_result", data); }
+    void execute_result(const json& data) const { iopub("execute_result", data); Rcpp::Rcout << data << std::endl;}
+    void display_data(const json& data) const   { iopub("display_data"  , data); Rcpp::Rcout << _cur_msg.get() << std::endl; }
     void shutdown() const { zmq::message_t m(0); _inproc_sig->send(m); }
   private:
     zmq::context_t* const _ctx;

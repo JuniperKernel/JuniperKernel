@@ -32,7 +32,7 @@ execute_request <- function(request_msg) {
 .tryEval <- function(code, cnt) {
   tryCatch(
     {
-      res <- withVisible(eval(parse(text=code), envir=.GlobalEnv))
+      res <- .chkDTVisible(withVisible(eval(parse(text=code), envir=.GlobalEnv)))
       if( res$visible )
         .execute_result(res$value, cnt)
       return("ok")
@@ -45,8 +45,7 @@ execute_request <- function(request_msg) {
   )
 }
 
-# build and send the content of an execute_result
-# iopub message.
+# build and send the content of an execute_result iopub message.
 .execute_result <- function(result, cnt) {
   # from the docs (http://jupyter-client.readthedocs.io/en/latest/messaging.html#display-data):
   #     "A single message should contain all possible representations
@@ -57,4 +56,11 @@ execute_request <- function(request_msg) {
   # keep non-NULL results (NULL when no such mime repr exists)
   content <- list(data=Filter(Negate(is.null), data), execution_count=cnt)
   execute_result(.kernel(), content)
+}
+
+
+.chkDTVisible <- function(result) {
+  if( "data.table" %in% oldClass(result$value) )
+    result$visible <- result$visible && data.table::shouldPrint(result$value)
+  result
 }

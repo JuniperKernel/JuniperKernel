@@ -7,7 +7,8 @@ Author: Spencer Aiello
 Imports: utils,
          jsonlite,
          repr,
-         Rcpp (>= 0.11.0)
+         Rcpp (>= 0.11.0),
+         gdtools (>= 0.1.6)
 Suggests: RUnit
 Collate: 'juniper.R'
          'execute_request.R'
@@ -15,12 +16,16 @@ Collate: 'juniper.R'
          'complete_request.R'
          'kernel_info_request.R'
          'shutdown_request.R'
+         'comm_close.R'
+         'comm_info_request.R'
+         'comm_msg.R'
+         'comm_open.R'
          'request.R'
          'booter.R'
          'kernelspec.R'
          'RcppExports.R'
          'zzz.R'
-LinkingTo: Rcpp, BH
+LinkingTo: Rcpp, gdtools, BH
 Description: A native R kernel for Jupyter.
 URL: https://github.com/spennihana/JuniperKernel
 License: MIT + file LICENSE
