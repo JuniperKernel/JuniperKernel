@@ -15,3 +15,10 @@ cmd /c mk.bat
 ```
 $ make && make install
 ```
+
+
+#### Juniper In Action
+
+Juniper Screenshot:
+
+![](./extras/jnote.png)
