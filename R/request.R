@@ -49,13 +49,8 @@ doRequest <- function(handler, request_msg) {
   aliases <- list(system=list(sans="Arial", serif="Times", mono="Courier", symbol="Symbol"), user=list())
   jk_device(.kernel(), "white", 10, 5, 12, FALSE, aliases)
   dev <- dev.cur()
-  print(dev)
   tryCatch(
-    {
-      res <- handler(request_msg)
-      dev.off(dev)
-      return(res)
-    }
+      return(handler(request_msg))
     , finally={
         sink(type="message"); close(err);
         sink(type="output" ); close(out);

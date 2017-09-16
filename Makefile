@@ -27,7 +27,7 @@ build/JuniperKernel_$(PKG_VERSION).tar.gz: $(wildcard R/*R) $(wildcard src/*cpp)
 
 #.PHONY: install
 install:
-	R CMD INSTALL -- .
+	R CMD INSTALL --build .
 
 check: build/JuniperKernel_$(PKG_VERSION).tar.gz
 	@echo "running R CMD check"
