@@ -1,6 +1,8 @@
 # JuniperKernel
 R Kernel for Jupyter
 
+#### Blog Post: https://spenai.org/bravepineapple/jupyter_kernel/
+
 
 ## Build Instructions
 
