@@ -48,10 +48,8 @@ void poll(zmq::context_t& context, zmq::socket_t* sockets[], std::function<bool(
 
     for(int i=1; i<=n; i++)
       if( items[i].revents & ZMQ_POLLIN )
-        if( !hp[i-1]() ) {
-          dead=true;
+        if( (dead=!hp[i-1]()) )
           break;
-        }
   }
 
   assert(dead);
