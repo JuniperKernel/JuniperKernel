@@ -26,5 +26,7 @@ Juniper Screenshot:
 ![](./extras/jnote.png)
 
 
+#### xwidgets demo:
+
 xwidgets integration screenshot:
 ![](./extras/xwidgets_demo.png)
