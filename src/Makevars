@@ -25,7 +25,6 @@ R_HOME=$(shell R RHOME)
 RSCRIPT=$(R_HOME)/bin/Rscript
 R_LIB = $(shell $(RSCRIPT) -e 'cat(.Library)')
 
-
 # zmq bacon bits
 ZMQ_VERSION = 4.2.2
 ZMQ_TAR_FILE= libzmq-${ZMQ_VERSION}.tar.gz
@@ -34,6 +33,16 @@ ZMQ_HEADER_TAR_FILE = zmq-${ZMQ_VERSION}-headers.tar.gz
 ZMQ_HEADERS_URL = https://github.com/JuniperKernel/zmq/raw/master/headers/${ZMQ_HEADER_TAR_FILE}
 ZMQ_CPP_HEADER_URL = https://github.com/zeromq/cppzmq/raw/master/zmq.hpp
 ZMQ_CPPADDON_HEADER_URL = https://raw.githubusercontent.com/zeromq/cppzmq/master/zmq_addon.hpp
+
+# qstack backon bits
+# xeus
+XEUS_VERSION = 0.6.0
+XEUS_TAR_FILE = ${XEUS_VERSION}.tar.gz
+XEUS_URL = https://github.com/QuantStack/xeus/archive/${XEUS_TAR_FILE}
+# xtl
+XTL_VERSION = 0.2.3
+XTL_TAR_FILE = ${XTL_VERSION}.tar.gz
+XTL_URL = https://github.com/QuantStack/xtl/archive/${XTL_TAR_FILE}
 
 ## use C++11
 CXX_STD      = CXX14
@@ -45,19 +54,19 @@ PKG_LIBS     = -lzmq -L../inst/zmq -Wl,-rpath,$(R_LIB)/JuniperKernel/zmq
 all: deps $(SHLIB)
 
 
-deps: zmq headers
+deps: zmq qstack
 
-.PHONY: zmq, headers
-
-zmq: ../inst/zmq/libzmq.a
-
+.PHONY: zmq
+zmq: ../inst/zmq/libzmq.a headers
 
 ../inst/zmq/libzmq.a:
 	@echo "Downloading libzmq prebuild"
 	@[ -d ../inst/zmq ] || mkdir -p ../inst/zmq
 	@curl -skLO ${ZMQ_TAR_URL} && tar -xzf ${ZMQ_TAR_FILE} -C ../inst/zmq && rm -rf ${ZMQ_TAR_FILE}
 
-headers:
+headers: ../inst/include/zmq.h
+
+../inst/include/zmq.h:
 	@echo "Downloading ZMQ header files"
 	@[ -d ../inst/include ] || mkdir -p ../inst/include
 	@curl -skLO ${ZMQ_CPP_HEADER_URL}
@@ -65,3 +74,21 @@ headers:
 	@curl -skLO ${ZMQ_CPPADDON_HEADER_URL}
 	@mv zmq_addon.hpp ../inst/include
 	@curl -skLO ${ZMQ_HEADERS_URL} && tar -xzf ${ZMQ_HEADER_TAR_FILE} && mv include/*h ../inst/include && rm -rf ${ZMQ_HEADER_TAR_FILE} include
+
+qstack: ../inst/include/xeus ../inst/include/xtl
+
+../inst/include/xeus:
+	@echo "Fetching xeus headers..."
+	@[ -d ../inst/include ] || mkdir -p ../inst/include
+	@curl -skLO ${XEUS_URL}
+	@tar -xzf ${XEUS_TAR_FILE}
+	@mv xeus-${XEUS_VERSION}/include/xeus ../inst/include
+	@rm -rf xeus-${XEUS_VERSION} ${XEUS_TAR_FILE}
+
+../inst/include/xtl:
+	@echo "Fetching xtl headers..."
+	@[ -d ../inst/include ] || mkdir -p ../inst/include
+	@curl -skLO ${XTL_URL}
+	@tar -xzf ${XTL_TAR_FILE}
+	@mv xtl-${XTL_VERSION}/include/xtl ../inst/include
+	@rm -rf xtl-${XTL_VERSION} ${XTL_TAR_FILE}

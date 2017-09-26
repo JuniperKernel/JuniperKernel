@@ -2,7 +2,7 @@
 #define juniper_juniper_xbridge_H
 
 #include <json.hpp>
-#include <xjson.hpp>
+#include <xeus/xjson.hpp>
 #include <xeus/xcomm.hpp>
 #include <xeus/xinterpreter.hpp>
 #include <juniper/juniper.h>
@@ -65,7 +65,7 @@ xjson xcomm_manager::get_metadata() const { return {{"started", JMessage::now()}
 void xcomm_manager::register_comm_target(const std::string& target_name, const target_function_type& callback){ 
   m_targets[target_name] = xtarget(target_name, callback, this);
 }
-void xcomm_manager::unregister_comm_target(const std::string& target_name) { 
+void xcomm_manager::unregister_comm_target(const std::string& target_name) {
   m_targets.erase(target_name); 
 }
 void xcomm_manager::register_comm(xguid id, xcomm* comm) {

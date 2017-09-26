@@ -18,7 +18,6 @@
 #include <juniper/juniper.h>
 #include <juniper/xbridge.h>
 
-#include <xwidgets/xslider.hpp>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 void handler(int sig){}
@@ -125,26 +124,4 @@ void comm_request(const std::string type) {
   if( type=="open" ) xm.comm_manager().comm_open( xmsg);
   if( type=="close") xm.comm_manager().comm_close(xmsg);
   if( type=="msg"  ) xm.comm_manager().comm_msg(  xmsg); 
-}
-
-static void sliderF(SEXP s) {
-  xw::slider<double>* slider = reinterpret_cast<xw::slider<double>*>(R_ExternalPtrAddr(s));
-  if( slider ) {
-    delete slider;
-    R_ClearExternalPtr(s);
-  }
-}
-
-
-// [[Rcpp::export]]
-SEXP slider() {
-  xw::slider<double>* slider = new xw::slider<double>();
-  return createExternalPointer<xw::slider<double>>(slider, sliderF, "slider<double>*");
-}
-
-// [[Rcpp::export]]
-void display_slider(SEXP s) {
-  xw::slider<double>* slider = reinterpret_cast<xw::slider<double>*>(R_ExternalPtrAddr(s));
-  slider->display();
-  slider->value = 20;
 }

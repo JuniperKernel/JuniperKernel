@@ -24,3 +24,6 @@ src/x64
 *zip
 *dll
 *gz
+inst/include/xtl
+inst/include/xeus
+inst/include/zmq*
