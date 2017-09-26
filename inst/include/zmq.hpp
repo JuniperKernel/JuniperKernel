@@ -149,11 +149,6 @@ namespace zmq
         return rc;
     }
 
-    inline int poll(zmq_pollitem_t const* items, size_t nitems)
-    {
-        return poll(items, nitems, -1);
-    }
-
     #ifdef ZMQ_CPP11
     inline int poll(zmq_pollitem_t const* items, size_t nitems, std::chrono::milliseconds timeout)
     {
@@ -859,6 +854,7 @@ namespace zmq
                 on_event_disconnected(*event, address.c_str());
                 break;
 #ifdef ZMQ_BUILD_DRAFT_API
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4, 2, 3)
             case ZMQ_EVENT_HANDSHAKE_FAILED_NO_DETAIL:
                 on_event_handshake_failed(*event, address.c_str());
                 break;
@@ -869,8 +865,16 @@ namespace zmq
                 on_event_handshake_failed(*event, address.c_str());
                 break;
             case ZMQ_EVENT_HANDSHAKE_SUCCEEDED:
-                on_event_handshake_succeed(*event, address.c_str());
+                on_event_handshake_succeeded(*event, address.c_str());
                 break;
+#elif ZMQ_VERSION >= ZMQ_MAKE_VERSION(4, 2, 1)
+            case ZMQ_EVENT_HANDSHAKE_FAILED:
+                on_event_handshake_failed(*event, address.c_str());
+                break;
+            case ZMQ_EVENT_HANDSHAKE_SUCCEED:
+                on_event_handshake_succeeded(*event, address.c_str());
+                break;
+#endif
 #endif
             default:
                 on_event_unknown(*event, address.c_str());
@@ -905,8 +909,15 @@ namespace zmq
         virtual void on_event_closed(const zmq_event_t &event_, const char* addr_) { (void)event_; (void)addr_; }
         virtual void on_event_close_failed(const zmq_event_t &event_, const char* addr_) { (void)event_; (void)addr_; }
         virtual void on_event_disconnected(const zmq_event_t &event_, const char* addr_) { (void)event_; (void)addr_; }
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4, 2, 3)
+        virtual void on_event_handshake_failed_no_detail(const zmq_event_t &event_, const char* addr_) { (void) event_; (void) addr_; }
+        virtual void on_event_handshake_failed_protocol(const zmq_event_t &event_, const char* addr_) { (void) event_; (void) addr_; }
+        virtual void on_event_handshake_failed_auth(const zmq_event_t &event_, const char* addr_) { (void) event_; (void) addr_; }
+        virtual void on_event_handshake_succeeded(const zmq_event_t &event_, const char* addr_) { (void) event_; (void) addr_; }
+#elif ZMQ_VERSION >= ZMQ_MAKE_VERSION(4, 2, 1)
         virtual void on_event_handshake_failed(const zmq_event_t &event_, const char* addr_) { (void) event_; (void) addr_; }
         virtual void on_event_handshake_succeed(const zmq_event_t &event_, const char* addr_) { (void) event_; (void) addr_; }
+#endif		
         virtual void on_event_unknown(const zmq_event_t &event_, const char* addr_) { (void)event_; (void)addr_; }
     private:
 
@@ -961,7 +972,11 @@ namespace zmq
                 return true;
             }
 
-            if (zmq_errno ()  == ETIMEDOUT)
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4, 2, 3)
+            if (zmq_errno () == EAGAIN)
+#else			
+            if (zmq_errno () == ETIMEDOUT)
+#endif			
                 return false;
 
             throw error_t ();

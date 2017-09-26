@@ -382,8 +382,6 @@ void svg_close(pDevDesc dd) {
     std::string result;
     std::remove_copy(svg.begin(), svg.end(), std::back_inserter(result), '\n');
     display_data["data"]["image/svg+xml"] = result;
-    // display_data["data"]["text/html"] = "fooooooobar";
-    // Rcpp::Rcout << display_data << std::endl;
     svgd->_jk->_request_server->display_data(display_data);
   }
   svgd->stream->clear();

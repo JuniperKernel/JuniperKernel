@@ -55,6 +55,12 @@ class RequestServer {
     void execute_result(const json& data) const { iopub("execute_result", data); }
     void display_data(const json& data) const   { iopub("display_data"  , data); }
     void shutdown() const { zmq::message_t m(0); _inproc_sig->send(m); }
+    void iopub(const std::string& msg_type, const json& content, const json& metadata=json({})) const {
+      JMessage::reply(_cur_msg, msg_type, content, metadata).send(*_inproc_pub);
+    }
+    const RequestServer& busy() const { iopub("status", {{"execution_state", "busy"}}); return *this; }
+    const RequestServer& idle() const { iopub("status", {{"execution_state", "idle"}}); return *this; }
+
   private:
     zmq::context_t* const _ctx;
     const std::string _key;   // hmac key
@@ -139,12 +145,6 @@ class RequestServer {
       });
       return out_thread;
     }
-    void iopub(const std::string& msg_type, const json& content) const {
-      JMessage::reply(_cur_msg, msg_type, content).send(*_inproc_pub);
-    }
-    const RequestServer& busy() const { iopub("status", {{"execution_state", "busy"}}); return *this; }
-    const RequestServer& idle() const { iopub("status", {{"execution_state", "idle"}}); return *this; }
-
     static int read_port(zmq::socket_t* sock) {
       char endpoint[32];
       size_t sz = sizeof(endpoint); 

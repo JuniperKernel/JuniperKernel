@@ -39,7 +39,7 @@ ZMQ_CPPADDON_HEADER_URL = https://raw.githubusercontent.com/zeromq/cppzmq/master
 CXX_STD      = CXX11
 
 # set include and linker options
-PKG_CPPFLAGS = -I../inst/include/ -I.
+PKG_CPPFLAGS = -I../inst/include/ -I../inst/include/xeus -I.
 PKG_LIBS     = -lzmq -L../inst/zmq -Wl,-rpath,$(R_LIB)/JuniperKernel/zmq
 
 all: deps $(SHLIB)

@@ -10,20 +10,22 @@ Imports: utils,
          Rcpp (>= 0.11.0),
          gdtools (>= 0.1.6)
 Suggests: RUnit
-Collate: 'juniper.R'
-         'execute_request.R'
-         'inspect_request.R'
-         'complete_request.R'
-         'kernel_info_request.R'
-         'shutdown_request.R'
+Collate: 'booter.R'
          'comm_close.R'
          'comm_info_request.R'
          'comm_msg.R'
          'comm_open.R'
-         'request.R'
-         'booter.R'
+         'complete_request.R'
+         'execute_request.R'
+         'history_request.R'
+         'inspect_request.R'
+         'is_complete_request.R'
+         'juniper.R'
+         'kernel_info_request.R'
          'kernelspec.R'
          'RcppExports.R'
+         'request.R'
+         'shutdown_request.R'
          'zzz.R'
 LinkingTo: Rcpp, gdtools, BH
 Description: A native R kernel for Jupyter.

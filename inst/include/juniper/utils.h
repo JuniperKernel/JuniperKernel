@@ -1,3 +1,5 @@
+#ifndef juniper_juniper_utils_H
+#define juniper_juniper_utils_H
 #include <string>
 #include <json.hpp>
 #include <zmq.hpp>
@@ -116,3 +118,4 @@ static std::string msg_t_to_string(const zmq::message_t& msg) {
     ss << chars[i];
   return ss.str();
 }
+#endif // #ifndef juniper_juniper_utils_H

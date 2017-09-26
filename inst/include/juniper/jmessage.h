@@ -33,7 +33,7 @@ public:
     return jm.read_ids(request).read_hmac(request).read_body(request);
   }
 
-  static zmq::multipart_t reply(const JMessage& parent, const std::string& msg_type, const json& content) {
+  static zmq::multipart_t reply(const JMessage& parent, const std::string& msg_type, const json& content, const json& metadata=json({})) {
     JMessage jm;
     jm._key = parent._key;
     // construct header
@@ -46,7 +46,7 @@ public:
 
     jm._msg["parent_header"] = parent._msg["header"];
     jm._ids = parent._ids;
-    jm._msg["metadata"] = json({});
+    jm._msg["metadata"] = metadata;
     jm._msg["content"] = content;
     return jm.to_multipart_t();
   }
