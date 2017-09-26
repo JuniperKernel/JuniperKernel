@@ -24,3 +24,7 @@ $ make && make install
 Juniper Screenshot:
 
 ![](./extras/jnote.png)
+
+
+xwidgets integration screenshot:
+![](./extras/xwidgets_demo.png)

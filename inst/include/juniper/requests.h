@@ -92,7 +92,7 @@ class RequestServer {
       zmq::socket_t* stream_err = listen_on(*_ctx, "tcp://*:*", zmq::socket_type::stream);
       req["stream_out_port"] = read_port(stream_out);  // stitch the stdout port into the client request
       req["stream_err_port"] = read_port(stream_err);  // stitch the stderr into the client request
-      std::cout << "Handling message type: " << req["header"]["msg_type"] << std::endl;
+//      std::cout << "Handling message type: " << req["header"]["msg_type"] << std::endl;
       Rcpp::Function handler = _jk[msg_type];
       Rcpp::Function do_request = _jk["doRequest"];
       // boot listener threads; execute request; join listeners

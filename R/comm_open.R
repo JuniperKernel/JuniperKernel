@@ -17,4 +17,5 @@
 #' @export
 comm_open <- function(request_msg) {
   comm_request("open")
+  list(a=0)
 }

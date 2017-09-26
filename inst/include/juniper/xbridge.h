@@ -38,9 +38,6 @@ private:
 xmock& get_xmock() { return static_cast<xmock&>(get_interpreter()); }
 
 void xinterpreter::display_data(xjson data, xjson metadata, xjson transient) {
-  Rcpp::Rcout << "display_data from xmock" << std::endl;
-  Rcpp::Rcout << "DATA: " << data << std::endl;
-  Rcpp::Rcout << "TRANSIENT: " << transient << std::endl;
   json content = {{"data", data}, {"metadata", metadata}, {"transient", transient}};
   get_xmock()._jk->_request_server->iopub("display_data", content);
 }
@@ -58,28 +55,23 @@ xmessage_base::xmessage_base(xjson header, xjson parent_header, xjson metadata, 
 const xjson& xmessage_base::content() const {return m_content; }
 
 xmessage::xmessage(const guid_list& zmq_id, xjson header, xjson parent_header, xjson metadata, xjson content):
-  xmessage_base(header,parent_header,metadata,content){}
+  xmessage_base(header,parent_header,metadata,content){ m_zmq_id=zmq_id;}
 
 // xcomm impl
 void xtarget::publish_message(const std::string& msg_type, xjson metadata, xjson content) const {
-  Rcpp::Rcout << "XCOMM TARGET PUBLISH: " << " TYPE: " << msg_type << " CONTENT: " << content << std::endl;
   get_xmock()._jk->_request_server->iopub(msg_type, content, metadata);
 }
-xjson xcomm_manager::get_metadata() const { Rcpp::Rcout << "get_metadata"<<std::endl; return {{"started", JMessage::now()}}; }
+xjson xcomm_manager::get_metadata() const { return {{"started", JMessage::now()}}; }
 void xcomm_manager::register_comm_target(const std::string& target_name, const target_function_type& callback){ 
-  Rcpp::Rcout << "register_comm_target"<<std::endl;
   m_targets[target_name] = xtarget(target_name, callback, this);
 }
 void xcomm_manager::unregister_comm_target(const std::string& target_name) { 
-  Rcpp::Rcout << "unregister_comm_target" << std::endl;
   m_targets.erase(target_name); 
 }
 void xcomm_manager::register_comm(xguid id, xcomm* comm) {
-  Rcpp::Rcout << "register_comm"<<std::endl;
   m_comms[id] = comm;
 }
 void xcomm_manager::unregister_comm(xguid id) { 
-  Rcpp::Rcout << "unregister_comm"<<std::endl;
   m_comms.erase(id);
 }
 
@@ -99,8 +91,6 @@ xmessage to_xmessage(const json& request, const xmessage::guid_list& zmq_id) {
 }
 
 void xcomm_manager::comm_open(const xmessage& request) {
-  Rcpp::Rcout << "comm_open" << std::endl;
-  
   const xjson& content = request.content();
   std::string target_name = content["target_name"];
   auto position = pos(m_targets, target_name, "target");
@@ -112,7 +102,6 @@ void xcomm_manager::comm_open(const xmessage& request) {
 }
 
 void xcomm_manager::comm_close(const xmessage& request) { 
-  Rcpp::Rcout << "comm_close" << std::endl;
   const xjson& content = request.content();
   xguid id = content["comm_id"];
   auto position = pos(m_comms, id, "comm");
@@ -121,8 +110,6 @@ void xcomm_manager::comm_close(const xmessage& request) {
 }
 
 void xcomm_manager::comm_msg(const xmessage& request) {
-  Rcpp::Rcout << "comm_msg" << std::endl;
-  
   const xjson& content = request.content();
   xguid id = content["comm_id"];
   auto position = pos(m_comms, id, "comm");

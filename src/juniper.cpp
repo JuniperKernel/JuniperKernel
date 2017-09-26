@@ -146,4 +146,5 @@ SEXP slider() {
 void display_slider(SEXP s) {
   xw::slider<double>* slider = reinterpret_cast<xw::slider<double>*>(R_ExternalPtrAddr(s));
   slider->display();
+  slider->value = 20;
 }
