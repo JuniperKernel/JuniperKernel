@@ -5,16 +5,9 @@
 #include <stdio.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <zmq.hpp>
-#include <zmq_addon.hpp>
 #include <json.hpp>
-#include <juniper/conf.h>
-#include <juniper/sockets.h>
-#include <juniper/background.h>
-#include <juniper/requests.h>
 #include <juniper/external.h>
 #include <juniper/gdevice.h>
-#include <juniper/utils.h>
 #include <juniper/juniper.h>
 #include <juniper/xbridge.h>
 

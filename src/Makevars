@@ -67,7 +67,7 @@ zmq: ../inst/zmq/libzmq.a headers
 headers: ../inst/include/zmq.h
 
 ../inst/include/zmq.h:
-	@echo "Downloading ZMQ header files"
+	@echo "Fetching zmq headers..."
 	@[ -d ../inst/include ] || mkdir -p ../inst/include
 	@curl -skLO ${ZMQ_CPP_HEADER_URL}
 	@mv zmq.hpp ../inst/include
