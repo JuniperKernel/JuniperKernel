@@ -16,6 +16,6 @@
 #' @references \url{http://jupyter-client.readthedocs.io/en/latest/messaging.html#comm-info}
 #' @export
 comm_info_request <- function(request_msg) {
-  message("unimpl")
-  list(msg_type = "comm_info_reply", content = list(status="ok", found=FALSE))
+  target <- ifelse(is.null(request_msg$target), "", request_msg$target_name)
+  list(msg_type = "comm_info_reply", content = filter_comms(target))
 }

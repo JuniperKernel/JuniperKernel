@@ -11,7 +11,6 @@
 #include <juniper/jmessage.h>
 #include <juniper/utils.h>
 
-
 // Every incoming message has a type, which tells the server which handler
 // the message should be passed to for further execution.
 class RequestServer {
@@ -73,6 +72,8 @@ class RequestServer {
     // Example: for msg_type "kernel_info_request", there's an R method
     // called "kernel_info_request" that's exported in the JuniperKernel.
     const RequestServer& handle(zmq::socket_t& sock) const {
+      json req = _cur_msg.get();
+      std::string msg_type = req["header"]["msg_type"];
       // R sinks stdout/stderr to socketConnection, which is being listened
       // to on a ZMQ_STREAM socket. Polling of this connection happens in a
       // separate thread so that stdout/stderr can be streamed to IOPub 
@@ -89,11 +90,9 @@ class RequestServer {
       // stream.bind("tcp://*:*");
       zmq::socket_t* stream_out = listen_on(*_ctx, "tcp://*:*", zmq::socket_type::stream);
       zmq::socket_t* stream_err = listen_on(*_ctx, "tcp://*:*", zmq::socket_type::stream);
-      json req = _cur_msg.get();
       req["stream_out_port"] = read_port(stream_out);  // stitch the stdout port into the client request
       req["stream_err_port"] = read_port(stream_err);  // stitch the stderr into the client request
       std::cout << "Handling message type: " << req["header"]["msg_type"] << std::endl;
-      std::string msg_type = req["header"]["msg_type"];
       Rcpp::Function handler = _jk[msg_type];
       Rcpp::Function do_request = _jk["doRequest"];
       // boot listener threads; execute request; join listeners
@@ -103,6 +102,9 @@ class RequestServer {
       serr.join();  // stream_err is now destroyed
       sout.join();  // stream_out is now destroyed
       json jres = from_list_r(res);
+      // comms don't reply (except for comm_info_request)
+      if( msg_type=="comm_open" || msg_type=="comm_close" || msg_type=="comm_msg" )
+        return *this;
       JMessage::reply(_cur_msg, jres["msg_type"], jres["content"]).send(sock);
       if( msg_type.compare("shutdown_request")==0 ) {
         shutdown();

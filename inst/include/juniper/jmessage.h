@@ -52,6 +52,7 @@ public:
   }
 
   json get() const { return _msg; }
+  std::vector<std::string> ids() { return _ids; }
   // from https://stackoverflow.com/questions/9527960/how-do-i-construct-an-iso-8601-datetime-in-c
   static std::string now() {
     time_t now;
@@ -62,6 +63,13 @@ public:
     //strftime(buf, sizeof buf, "%Y-%m-%dT%H:%M:%SZ", gmtime(&now));
     std::stringstream s;
     s << buf;
+    return s.str();
+  }
+  
+  // boost headers available from R package BH
+  static std::string uuid() {
+    boost::uuids::uuid uuid = boost::uuids::random_generator()();
+    std::stringstream s; s << uuid;
     return s.str();
   }
 
@@ -124,13 +132,6 @@ private:
     for(size_t i=0; i<buflen; ++i)
       ss << static_cast<char>(buf[i]);
     return ss.str();
-  }
-
-  // boost headers available from R package BH
-  static std::string uuid() {
-    boost::uuids::uuid uuid = boost::uuids::random_generator()();
-    std::stringstream s; s << uuid;
-    return s.str();
   }
   
   static zmq::message_t to_msg(const std::string& s) {

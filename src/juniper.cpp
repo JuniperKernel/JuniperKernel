@@ -14,8 +14,11 @@
 #include <juniper/requests.h>
 #include <juniper/external.h>
 #include <juniper/gdevice.h>
+#include <juniper/utils.h>
 #include <juniper/juniper.h>
 #include <juniper/xbridge.h>
+
+#include <xwidgets/xslider.hpp>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 void handler(int sig){}
@@ -54,6 +57,7 @@ xinterpreter& xeus::get_interpreter() { return *_xm; }
 // [[Rcpp::export]]
 SEXP init_kernel(const std::string& connection_file) {
   JuniperKernel* jk = JuniperKernel::make(connection_file);
+  _xm = new xmock();
   _xm->_jk=jk;  // mocked interpreter needs pointer to the kernel
 
   // even if boot_kernel is exceptional and we don't run delete jk
@@ -96,4 +100,50 @@ void execute_result(SEXP kernel, Rcpp::List data) {
 // [[Rcpp::export]]
 void jk_device(SEXP kernel, std::string bg, double width, double height, double pointsize, bool standalone, Rcpp::List aliases) {
   makeDevice(get_kernel(kernel), bg, width, height, pointsize, standalone, aliases);
+}
+
+// [[Rcpp::export]]
+SEXP filter_comms(std::string target_name) {
+  json comms;
+  const xmock& xm = get_xmock();
+  for (auto it = xm.comm_manager().comms().cbegin(); it != xm.comm_manager().comms().cend(); ++it) {
+    const std::string& name = it->second->target().name();
+    if (target_name.empty() || name == target_name) {
+      xjson info;
+      info["target_name"] = name;
+      comms[it->first] = std::move(info);
+    }
+  }
+  return j_to_sexp({{"status", "ok"}, {"comms", comms}});
+}
+
+// [[Rcpp::export]]
+void comm_request(const std::string type) {
+  xmock& xm = get_xmock();
+  JMessage jm = xm._jk->_request_server->_cur_msg;
+  xmessage xmsg = to_xmessage(jm.get(), jm.ids());
+  if( type=="open" ) xm.comm_manager().comm_open( xmsg);
+  if( type=="close") xm.comm_manager().comm_close(xmsg);
+  if( type=="msg"  ) xm.comm_manager().comm_msg(  xmsg); 
+}
+
+static void sliderF(SEXP s) {
+  xw::slider<double>* slider = reinterpret_cast<xw::slider<double>*>(R_ExternalPtrAddr(s));
+  if( slider ) {
+    delete slider;
+    R_ClearExternalPtr(s);
+  }
+}
+
+
+// [[Rcpp::export]]
+SEXP slider() {
+  xw::slider<double>* slider = new xw::slider<double>();
+  return createExternalPointer<xw::slider<double>>(slider, sliderF, "slider<double>*");
+}
+
+// [[Rcpp::export]]
+void display_slider(SEXP s) {
+  xw::slider<double>* slider = reinterpret_cast<xw::slider<double>*>(R_ExternalPtrAddr(s));
+  slider->display();
 }

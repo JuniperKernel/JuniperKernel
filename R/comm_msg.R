@@ -16,6 +16,5 @@
 #' @references \url{http://jupyter-client.readthedocs.io/en/latest/messaging.html#introspection}
 #' @export
 comm_msg <- function(request_msg) {
-  message("unimpl")
-  list(msg_type = "inspect_reply", content = list(status="ok", found=FALSE))
+  comm_request("msg")
 }
