@@ -11,7 +11,6 @@
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
 #include <json.hpp>
-#include <juniper/xbridge.h>
 #include <juniper/conf.h>
 #include <juniper/sockets.h>
 #include <juniper/background.h>
@@ -31,8 +30,7 @@ class JuniperKernel {
       _shellport(conf.shell_port),
       _cntrlport(conf.control_port),
       _key(conf.key),
-      _sig_scheme(conf.signature_scheme),
-      _xm(this) {
+      _sig_scheme(conf.signature_scheme) {
         _request_server = new RequestServer(*_ctx, _key);
         char sep = (conf.transport=="tcp") ? ':' : '-';
         _endpoint = conf.transport + "://" + conf.ip + sep;
@@ -44,7 +42,8 @@ class JuniperKernel {
     static JuniperKernel* make(const std::string& connection_file) {
       config conf = config::read_connection_file(connection_file);
       conf.print_conf();
-      return new JuniperKernel(conf);
+      JuniperKernel* jk = new JuniperKernel(conf);
+      return jk;
     }
 
     // start the background threads
@@ -111,17 +110,6 @@ class JuniperKernel {
 
     std::thread _hbthread;
     std::thread _iothread;
-    xmock _xm;
 };
-
-void xmock::display_data(xjson data, xjson metadata, xjson transient) {
-  Rcpp::Rcout << "display_data from xmock" << std::endl;
-  _jk->_request_server->iopub("display_data", {{"data", data}, {"metadata", metadata}, {"transient", transient}});
-}
-void xmock::update_display(xjson data, xjson metadata, xjson transient) { 
-  display_data(data,metadata,transient);
-}
-
-
 
 #endif // ifndef juniper_juniper_juniper_H

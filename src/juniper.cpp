@@ -15,6 +15,7 @@
 #include <juniper/external.h>
 #include <juniper/gdevice.h>
 #include <juniper/juniper.h>
+#include <juniper/xbridge.h>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 void handler(int sig){}
@@ -46,9 +47,15 @@ static JuniperKernel* get_kernel(SEXP kernel) {
   return reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(kernel));
 }
 
+// setup the mocked xeus interpreter
+static xmock* _xm;
+xinterpreter& xeus::get_interpreter() { return *_xm; }
+
 // [[Rcpp::export]]
 SEXP init_kernel(const std::string& connection_file) {
   JuniperKernel* jk = JuniperKernel::make(connection_file);
+  _xm->_jk=jk;  // mocked interpreter needs pointer to the kernel
+
   // even if boot_kernel is exceptional and we don't run delete jk
   // this finalizer will be run on R's exit and a cleanup will trigger then
   // if the poller's never get a signal, then deletion will be blocked on join
@@ -63,6 +70,7 @@ void boot_kernel(SEXP kernel) {
   jk->start_bg_threads();
   jk->run();
   delete jk;
+  delete _xm;
 }
 
 // [[Rcpp::export]]
