@@ -6,11 +6,14 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <json.hpp>
-#include <juniper/external.h>
+#include <zmq.h>
+#include <zmq.hpp>
+#include <juniper/conf.h>
 #include <juniper/gdevice.h>
 #include <juniper/juniper.h>
 #include <juniper/xbridge.h>
-
+#include <juniper/external.h>
+#include <Rcpp.h>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 void handler(int sig){}
@@ -48,10 +51,18 @@ xinterpreter& xeus::get_interpreter() { return *_xm; }
 
 // [[Rcpp::export]]
 SEXP init_kernel(const std::string& connection_file) {
+  std::cout << "HELLO WTF" << std::endl;
+  Rcpp::Rcout << "INIT KERNEL" << std::endl;
+  std::cout << "HELLO WTF" << std::endl;
   JuniperKernel* jk = JuniperKernel::make(connection_file);
+  std::cout << "HELLO WTF" << std::endl;
+  
+  Rcpp::Rcout << "CRUNK" << std::endl;
+  std::cout << "HELLO WTF" << std::endl;
   _xm = new xmock();
   _xm->_jk=jk;  // mocked interpreter needs pointer to the kernel
-
+  Rcpp::Rcout << "CRINK" << std::endl;
+  
   // even if boot_kernel is exceptional and we don't run delete jk
   // this finalizer will be run on R's exit and a cleanup will trigger then
   // if the poller's never get a signal, then deletion will be blocked on join
@@ -61,7 +72,7 @@ SEXP init_kernel(const std::string& connection_file) {
 
 // [[Rcpp::export]]
 void boot_kernel(SEXP kernel) {
-  signal(SIGSEGV, handler);
+  Rcpp::Rcout << "BOOTING KERNEL" << std::endl;
   JuniperKernel* jk = get_kernel(kernel);
   jk->start_bg_threads();
   jk->run();

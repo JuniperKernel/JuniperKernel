@@ -42,7 +42,9 @@ class JuniperKernel {
     static JuniperKernel* make(const std::string& connection_file) {
       config conf = config::read_connection_file(connection_file);
       conf.print_conf();
+      Rcpp::Rcout << "Making new JuniperKernel" << std::endl;
       JuniperKernel* jk = new JuniperKernel(conf);
+      Rcpp::Rcout << "JINK" << std::endl;
       return jk;
     }
 

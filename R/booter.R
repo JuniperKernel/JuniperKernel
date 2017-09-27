@@ -38,5 +38,11 @@ bootKernel <- function() {
     warning("Multiple arguments passed; all but the first will be ignored.")
 
   userConnFile <- argv[1L]
-  boot_kernel(.JUNIPER$kernel <- init_kernel(userConnFile))
+  print(userConnFile)
+  k <- init_kernel(userConnFile)
+  .JUNIPER$kernel <- k
+  print("CRUNK")
+  print("KERNEL")
+  print(k)
+  boot_kernel(k)
 }

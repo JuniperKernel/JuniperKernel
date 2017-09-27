@@ -1,6 +1,8 @@
 #ifndef juniper_juniper_xbridge_H
 #define juniper_juniper_xbridge_H
 
+#define XEUS_EXPORTS
+
 #include <json.hpp>
 #include <xeus/xjson.hpp>
 #include <xeus/xcomm.hpp>
