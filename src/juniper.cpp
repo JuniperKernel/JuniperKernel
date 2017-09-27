@@ -51,18 +51,11 @@ xinterpreter& xeus::get_interpreter() { return *_xm; }
 
 // [[Rcpp::export]]
 SEXP init_kernel(const std::string& connection_file) {
-  std::cout << "HELLO WTF" << std::endl;
-  Rcpp::Rcout << "INIT KERNEL" << std::endl;
-  std::cout << "HELLO WTF" << std::endl;
   JuniperKernel* jk = JuniperKernel::make(connection_file);
-  std::cout << "HELLO WTF" << std::endl;
-  
-  Rcpp::Rcout << "CRUNK" << std::endl;
-  std::cout << "HELLO WTF" << std::endl;
+
   _xm = new xmock();
   _xm->_jk=jk;  // mocked interpreter needs pointer to the kernel
-  Rcpp::Rcout << "CRINK" << std::endl;
-  
+
   // even if boot_kernel is exceptional and we don't run delete jk
   // this finalizer will be run on R's exit and a cleanup will trigger then
   // if the poller's never get a signal, then deletion will be blocked on join
@@ -72,7 +65,6 @@ SEXP init_kernel(const std::string& connection_file) {
 
 // [[Rcpp::export]]
 void boot_kernel(SEXP kernel) {
-  Rcpp::Rcout << "BOOTING KERNEL" << std::endl;
   JuniperKernel* jk = get_kernel(kernel);
   jk->start_bg_threads();
   jk->run();
@@ -109,21 +101,23 @@ void jk_device(SEXP kernel, std::string bg, double width, double height, double 
 SEXP filter_comms(std::string target_name) {
   json comms;
   const xmock& xm = get_xmock();
-  for (auto it = xm.comm_manager().comms().cbegin(); it != xm.comm_manager().comms().cend(); ++it) {
+  for( auto it = xm.comm_manager().comms().cbegin(); it != xm.comm_manager().comms().cend(); ++it ) {
     const std::string& name = it->second->target().name();
-    if (target_name.empty() || name == target_name) {
+    if( target_name.empty() || name == target_name ) {
       xjson info;
       info["target_name"] = name;
       comms[it->first] = std::move(info);
     }
   }
-  return j_to_sexp({{"status", "ok"}, {"comms", comms}});
+  if( comms.empty() ) comms = {};
+  return from_json_r({{"status", "ok"}, {"comms", comms}});
 }
 
 // [[Rcpp::export]]
 void comm_request(const std::string type) {
   xmock& xm = get_xmock();
   JMessage jm = xm._jk->_request_server->_cur_msg;
+
   xmessage xmsg = to_xmessage(jm.get(), jm.ids());
   if( type=="open" ) xm.comm_manager().comm_open( xmsg);
   if( type=="close") xm.comm_manager().comm_close(xmsg);

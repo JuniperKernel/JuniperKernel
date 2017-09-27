@@ -74,6 +74,7 @@ class RequestServer {
     const RequestServer& handle(zmq::socket_t& sock) const {
       json req = _cur_msg.get();
       std::string msg_type = req["header"]["msg_type"];
+      std::cout << "Handling message type: " << msg_type << std::endl;
       // R sinks stdout/stderr to socketConnection, which is being listened
       // to on a ZMQ_STREAM socket. Polling of this connection happens in a
       // separate thread so that stdout/stderr can be streamed to IOPub 
@@ -92,7 +93,6 @@ class RequestServer {
       zmq::socket_t* stream_err = listen_on(*_ctx, "tcp://*:*", zmq::socket_type::stream);
       req["stream_out_port"] = read_port(stream_out);  // stitch the stdout port into the client request
       req["stream_err_port"] = read_port(stream_err);  // stitch the stderr into the client request
-//      std::cout << "Handling message type: " << req["header"]["msg_type"] << std::endl;
       Rcpp::Function handler = _jk[msg_type];
       Rcpp::Function do_request = _jk["doRequest"];
       // boot listener threads; execute request; join listeners

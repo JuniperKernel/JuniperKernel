@@ -83,6 +83,7 @@ typename std::map<K,T>::iterator pos(std::map<K, T> m, K key, std::string type) 
   if( position==m.end() ) {
     std::stringstream ss;
     ss << "No such " << type << " registered: " << key;
+    Rcpp::Rcout << ss.str() << std::endl;
     throw std::runtime_error(ss.str());
   }
   return position;

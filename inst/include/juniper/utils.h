@@ -79,7 +79,7 @@ static SEXP as_sexp(const json& j, bool is_val) {
 
 // recursive parse json into list
 static SEXP j_to_sexp(const json& j, bool is_val=false) {
-  if( !is_val && j.size()==0 ) return R_NilValue;
+  if( j.is_null() || (!is_val && j.size()==0) ) return R_NilValue;
   json::value_t type = is_val?j.type():j[0].type();
   switch( type ) {
   case json::value_t::null:            return R_NilValue;
@@ -95,6 +95,7 @@ static SEXP j_to_sexp(const json& j, bool is_val=false) {
     Rcpp::stop(s.str());
   }
 }
+
 
 static SEXP from_json_r(json j) {
   if( j.is_object() ) {
