@@ -6,14 +6,15 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <json.hpp>
+#include <juniper/conf.h>
 #include <zmq.h>
 #include <zmq.hpp>
-#include <juniper/conf.h>
 #include <juniper/gdevice.h>
 #include <juniper/juniper.h>
 #include <juniper/xbridge.h>
 #include <juniper/external.h>
 #include <Rcpp.h>
+
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 void handler(int sig){}
