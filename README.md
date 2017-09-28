@@ -1,4 +1,4 @@
-# <img src="./extras/juniper_logo.png" width=65><sub>uniperKernel</sub>
+# <img src="./extras/juniper_logo.png" width=65>JuniperKernel
 
 An [R](https://cran.r-project.org/) kernel for [Jupyter](https://jupyter.org) based on [Xeus](https://github.com/QuantStack/xeus) and built with [Rcpp](http://www.rcpp.org/).
 
