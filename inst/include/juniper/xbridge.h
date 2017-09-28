@@ -13,7 +13,7 @@
 // mock interpreter
 using namespace xeus;
 xinterpreter::xinterpreter() {}
-xcomm_manager::xcomm_manager(xkernel_core* kernel) {}
+xcomm_manager::xcomm_manager(xkernel_core* kernel) {(void)p_kernel;} // void out; unused private var compiler warning
 class xmock: public xinterpreter {
 public:
   JuniperKernel* _jk;

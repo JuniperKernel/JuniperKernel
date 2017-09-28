@@ -4,13 +4,13 @@ Version: 0.0.0.1
 Date: 2017-07-01
 Maintainer: Spencer Aiello <spnrpa@gmail.com>
 Author: Spencer Aiello
-Depends: R (>= 3.4.0)
+Depends: R (>= 3.2.0)
 Imports: utils,
          jsonlite,
          repr,
          Rcpp (>= 0.11.0),
          gdtools (>= 0.1.6)
-Suggests: RUnit
+Suggests: RUnit, roxygen2
 Collate: 'booter.R'
          'comm_close.R'
          'comm_info_request.R'

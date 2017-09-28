@@ -5,7 +5,7 @@ ifeq ($(OS),Windows_NT)
 else
   # *nix
   UNAME = $(shell uname)
-  SYS=unix
+  SYS=linux
   ifeq ($(UNAME),Darwin)
     SYS = osx
   endif
@@ -17,7 +17,7 @@ else
   endif
 
   ifeq ($(UNAME),Linux)
-    ARCH=''
+    ARCH = 64
   endif
 endif
 
@@ -45,7 +45,7 @@ XTL_TAR_FILE = ${XTL_VERSION}.tar.gz
 XTL_URL = https://github.com/QuantStack/xtl/archive/${XTL_TAR_FILE}
 
 ## use C++11
-CXX_STD      = CXX14
+CXX_STD      = CXX11
 
 # set include and linker options
 PKG_CPPFLAGS = -I../inst/include/ -I../inst/include/xeus -I.
@@ -53,11 +53,22 @@ PKG_LIBS     = -lzmq -L../inst/zmq -Wl,-rpath,$(R_LIB)/JuniperKernel/zmq
 
 all: deps $(SHLIB)
 
-
+ifeq ($(SYS),linux)
+deps: lzmq qstack headers
+else
 deps: zmq qstack
+endif
 
-.PHONY: zmq
+
+
+.PHONY: zmq, lzmq
 zmq: ../inst/zmq/libzmq.a headers
+
+lzmq:
+	@echo "Installing zmq for linux"
+	@[ -d ../inst/zmq ] || mkdir -p ../inst/zmq
+	@curl -skLO ${ZMQ_TAR_URL} && tar -xzf ${ZMQ_TAR_FILE}
+	@(cd zeromq-${ZMQ_VERSION}/ && ./configure && sudo make install && sudo ldconfig)
 
 ../inst/zmq/libzmq.a:
 	@echo "Downloading libzmq prebuild"
