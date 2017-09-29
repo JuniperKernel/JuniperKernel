@@ -68,9 +68,9 @@ public:
   
   // boost headers available from R package BH
   static std::string uuid() {
-    boost::uuids::uuid uuid = boost::uuids::random_generator()();
-    std::stringstream s; s << uuid;
-    return s.str();
+   boost::uuids::uuid uuid = boost::uuids::uuid();
+   std::stringstream s; s << uuid;
+   return s.str();
   }
 
 private:

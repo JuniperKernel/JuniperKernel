@@ -564,7 +564,6 @@ void svg_raster(unsigned int *raster, int w, int h, double x, double y, double w
   (*stream) << "/>";
   if (svgd->clipid.size()) (*stream) << "</g>";
   stream->write('\n');
-  std::cout << "RASTERED" << std::endl;
 }
 
 pDevDesc svg_driver_new(JuniperKernel* jk, int bg, double width, double height, double pointsize, bool standalone, Rcpp::List& aliases) {

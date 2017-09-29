@@ -4,6 +4,7 @@
 .travis.yml
 .Rhistory
 scripts
+extras
 Makefile$
 ^\.idea
 ^.*\.iml$
@@ -11,3 +12,7 @@ README\.md$
 ^\.git
 ^\.gitignore
 ^\.\.Rcheck
+r_style_guide
+cpp_style_guide
+^.*\.yml$
+^.*\.bat$

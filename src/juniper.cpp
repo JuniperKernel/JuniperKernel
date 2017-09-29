@@ -75,12 +75,12 @@ void boot_kernel(SEXP kernel) {
 
 // [[Rcpp::export]]
 void stream_stdout(SEXP kernel, const std::string& output) {
-  get_kernel(kernel)->_request_server->stream_stdout(output);
+  get_kernel(kernel)->_request_server->stream_out(output);
 }
 
 // [[Rcpp::export]]
 void stream_stderr(SEXP kernel, const std::string& err) {
-  get_kernel(kernel)->_request_server->stream_stderr(err);
+  get_kernel(kernel)->_request_server->stream_err(err);
 }
 
 // [[Rcpp::export]]

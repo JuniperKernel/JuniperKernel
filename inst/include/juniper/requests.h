@@ -46,8 +46,8 @@ class RequestServer {
       busy().handle(sock).idle();
     }
 
-    void stream_stdout(const std::string& o) const { iopub("stream", {{"name", "stdout"}, {"text", o}}); }
-    void stream_stderr(const std::string& e) const { iopub("stream", {{"name", "stderr"}, {"text", e}}); }
+    void stream_out(const std::string& o) const { iopub("stream", {{"name", "stdout"}, {"text", o}}); }
+    void stream_err(const std::string& e) const { iopub("stream", {{"name", "stderr"}, {"text", e}}); }
     void rebroadcast_input(const std::string& input, const int count) const {
        iopub("execute_input", {{"code", input}, {"execution_count", count}});
     }
@@ -74,7 +74,7 @@ class RequestServer {
     const RequestServer& handle(zmq::socket_t& sock) const {
       json req = _cur_msg.get();
       std::string msg_type = req["header"]["msg_type"];
-      std::cout << "Handling message type: " << msg_type << std::endl;
+      Rcpp::Rcout << "Handling message type: " << msg_type << std::endl;
       // R sinks stdout/stderr to socketConnection, which is being listened
       // to on a ZMQ_STREAM socket. Polling of this connection happens in a
       // separate thread so that stdout/stderr can be streamed to IOPub 
@@ -138,8 +138,8 @@ class RequestServer {
               return !connected++;
 
             // read the message and publish to stdout
-            if( out ) rs.stream_stdout(msg_t_to_string(msg[1]));
-            else      rs.stream_stderr(msg_t_to_string(msg[1]));
+            if( out ) rs.stream_out(msg_t_to_string(msg[1]));
+            else      rs.stream_err(msg_t_to_string(msg[1]));
             return true;
           }
         };

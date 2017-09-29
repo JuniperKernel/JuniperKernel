@@ -25,7 +25,7 @@ kernel_info_request <- function(request_msg) {
   )
   content <- list( protocol_version = "5.2"
   , implementation   = "JuniperKernel"
-  , implementation_version = as.character(packageVersion("JuniperKernel"))
+  , implementation_version = as.character(utils::packageVersion("JuniperKernel"))
   , language_info = linfo
   , banner = version$version.string
   )

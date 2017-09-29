@@ -20,15 +20,16 @@ complete_request <- function(request_msg) {
   code <- gsub("\n", ";", code)
   cursor <- request_msg$content$cursor_pos
 
+  cc <- getNamespace("utils")
   # see ?rcompgen Unexported API
-  utils:::.assignLinebuffer(code)
-  utils:::.assignEnd(cursor)
-  utils:::.guessTokenFromLine()
-  utils:::.completeToken()
+  cc$.assignLinebuffer(code)
+  cc$.assignEnd(cursor)
+  cc$.guessTokenFromLine()
+  cc$.completeToken()
 
-  completions <- utils:::.CompletionEnv$comps
+  completions <- cc$.CompletionEnv$comps
   if( length(completions) > 0L ) completions <- c(completions, "__juniper_vec_ignore_hack__")  # hack to get single item vecs to parse as vecs and not scalars
-  guess <- utils:::.guessTokenFromLine(update = FALSE)
+  guess <- cc$.guessTokenFromLine(update = FALSE)
   content <- list(status="ok", matches = completions, cursor_start=guess$start, cursor_end=guess$start + nchar(guess$token))
   list(msg_type = "complete_reply", content=content)
 }

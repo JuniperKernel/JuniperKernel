@@ -1,29 +1,8 @@
-# Decide OS
-# Essentially switch between osx and Linux; fail if windows
-ifeq ($(OS),Windows_NT)
-  $(error Makevars was run, but OS is windows. Makevars.win should be run instead.)
-else
-  # *nix
-  UNAME = $(shell uname)
-  SYS=linux
-  ifeq ($(UNAME),Darwin)
-    SYS = osx
-  endif
 
-  MACH = $(shell uname -m)
-  ARCH = 32
-  ifeq ($(MACH),x86_64)
-    ARCH = 64
-  endif
+ARCH=@arch@
+SYS=@sys@
+R_LIB=@rlib@
 
-  ifeq ($(UNAME),Linux)
-    ARCH = 64
-  endif
-endif
-
-R_HOME=$(shell R RHOME)
-RSCRIPT=$(R_HOME)/bin/Rscript
-R_LIB = $(shell $(RSCRIPT) -e 'cat(.Library)')
 
 # zmq bacon bits
 ZMQ_VERSION = 4.2.2
@@ -53,13 +32,7 @@ PKG_LIBS     = -lzmq -L../inst/zmq -Wl,-rpath,$(R_LIB)/JuniperKernel/zmq
 
 all: deps $(SHLIB)
 
-ifeq ($(SYS),linux)
-deps: lzmq qstack headers
-else
-deps: zmq qstack
-endif
-
-
+@deps@
 
 .PHONY: zmq, lzmq
 zmq: ../inst/zmq/libzmq.a headers

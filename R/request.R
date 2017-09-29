@@ -15,15 +15,14 @@
 #'   A list passed in from \code{RequestServer} representing the
 #'   deserialized message JSON.
 #'
-#' @return
-#'   A list having names \code{msg_type} and \code{content}. The
+#' @return A list having names \code{msg_type} and \code{content}. The
 #'   \code{msg_type} is the reply type corresponding to the
 #'   \code{request_msg}'s message type. For example, a
 #'   \code{kernel_info_request} message produces a list with
 #'   \code{msg_type=kernel_info_reply}. The \code{content} field
 #'   of this list is dictated by the Jupyter wire message protocol.
 #'   Note that the full reply to a Jupyter client is managed by the
-#'   \{RequestServer}.
+#'   RequestServer.
 #'
 #' @details
 #'   All client requests are eventually funneled through this
@@ -48,13 +47,13 @@ doRequest <- function(handler, request_msg) {
   sink(err, type="message")
   aliases <- list(system=list(sans="Arial", serif="Times", mono="Courier", symbol="Symbol"), user=list())
   jk_device(.kernel(), "white", 10, 5, 12, FALSE, aliases)
-  dev <- dev.cur()
+  dev <- grDevices::dev.cur()
   tryCatch(
       return(handler(request_msg))
     , finally={
         sink(type="message"); close(err);
         sink(type="output" ); close(out);
-        dev.off(dev)
+        grDevices::dev.off(dev)
       }
   )
 }

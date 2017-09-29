@@ -9,7 +9,8 @@ Imports: utils,
          jsonlite,
          repr,
          Rcpp (>= 0.11.0),
-         gdtools (>= 0.1.6)
+         gdtools (>= 0.1.6),
+         data.table
 Suggests: RUnit, roxygen2
 Collate: 'booter.R'
          'comm_close.R'

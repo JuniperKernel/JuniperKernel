@@ -40,3 +40,5 @@ clean:
 	rm -rf JuniperKernel.Rcheck
 	rm -rf R/RcppExports.R src/RcppExports.cpp
 	rm -rf src/*o
+	rm -rf *gz *zip
+	rm -rf src/Makevars
