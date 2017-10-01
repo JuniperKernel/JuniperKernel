@@ -74,7 +74,7 @@ class RequestServer {
     const RequestServer& handle(zmq::socket_t& sock) const {
       json req = _cur_msg.get();
       std::string msg_type = req["header"]["msg_type"];
-      Rcpp::Rcout << "Handling message type: " << msg_type << std::endl;
+//      Rcpp::Rcout << "Handling message type: " << msg_type << std::endl;
       // R sinks stdout/stderr to socketConnection, which is being listened
       // to on a ZMQ_STREAM socket. Polling of this connection happens in a
       // separate thread so that stdout/stderr can be streamed to IOPub 
@@ -86,9 +86,6 @@ class RequestServer {
       // transports; or migrate a socket to a new thread. Option 2 is  
       // simpler and totally legal according to the ZMQ docs since the socket
       // creation and port scraping happens before the polling thread is spawned.
-      // zmq::socket_t stream(*_ctx, zmq::socket_type::stream);
-      // stream.setsockopt(ZMQ_LINGER, LINGER);
-      // stream.bind("tcp://*:*");
       zmq::socket_t* stream_out = listen_on(*_ctx, "tcp://*:*", zmq::socket_type::stream);
       zmq::socket_t* stream_err = listen_on(*_ctx, "tcp://*:*", zmq::socket_type::stream);
       req["stream_out_port"] = read_port(stream_out);  // stitch the stdout port into the client request
