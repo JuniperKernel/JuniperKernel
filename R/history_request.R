@@ -16,6 +16,6 @@
 #' @references \url{http://jupyter-client.readthedocs.io/en/latest/messaging.html#history}
 #' @export
 history_request <- function(request_msg) {
-  # history is effectively unimpl'd
+  message("unimpl")
   list(msg_type = "history_reply", content = list())
 }

@@ -17,5 +17,5 @@
 #' @export
 comm_close <- function(request_msg) {
   comm_request("close")
-  list(a=0)
+  NULL
 }
