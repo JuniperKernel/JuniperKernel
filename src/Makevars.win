@@ -36,25 +36,26 @@ deps: zmq qstack
 zmq: inst/libs/${FLV}/libzmq.dll headers
 inst/libs/${FLV}/libzmq.dll:
 	@[ -d ../zmq/win/${FLV} ] || mkdir -p ../zmq/win/${FLV}
-	@[ -f ../zmq/win/${FLV}/${ZMQ_TAR_FILE} ] || R -e 'download.file(\"${ZMQ_TAR_URL}\", \"${ZMQ_TAR_FILE}\")'  # curl -skLO ${ZMQ_TAR_URL}
+	@[ -f ../zmq/win/${FLV}/${ZMQ_TAR_FILE} ] || R -e 'download.file(\"${ZMQ_TAR_URL}\", \"${ZMQ_TAR_FILE}\")'
 	@cp ${ZMQ_TAR_FILE} ../zmq/win/${FLV}
 	@tar xfz ../zmq/win/${FLV}/${ZMQ_TAR_FILE} -C ../inst
 	@rm -rf ../zmq
 	@[ -d ${FLV} ] || mkdir -p ${FLV}
 	@cp ../inst/libzmq.dll* ${FLV}
-	@[ -d ../inst/libs/${FLV} ] || mkdir -p ../inst/libs/${FLV}
-	@cp ${FLV}/libzmq.dll* ../inst/libs/${FLV}
+	@cp ../inst/libzmq.dll .
+	#@[ -d ../inst/libs/${FLV} ] || mkdir -p ../inst/libs/${FLV}
+	#@cp ${FLV}/libzmq.dll* ../inst/libs/${FLV}
 	@rm -rf ../inst/libz*
 
 headers: ../inst/include/zmq.h
 ../inst/include/zmq.h:
 	@echo "Downloading ZMQ header files"
 	@[ -d ../inst/include ] || mkdir -p ../inst/include
-	@R -e 'download.file(\"${ZMQ_CPP_HEADER_URL}\", \"zmq.hpp\")'  # curl -skLO ${ZMQ_CPP_HEADER_URL}
+	@R -e 'download.file(\"${ZMQ_CPP_HEADER_URL}\", \"zmq.hpp\")'
 	@mv zmq.hpp ../inst/include
-	@R -e 'download.file(\"${ZMQ_CPPADDON_HEADER_URL}\", \"zmq_addon.hpp\")'  # curl -skLO ${ZMQ_CPPADDON_HEADER_URL}
+	@R -e 'download.file(\"${ZMQ_CPPADDON_HEADER_URL}\", \"zmq_addon.hpp\")'
 	@mv zmq_addon.hpp ../inst/include
-	@R -e 'download.file(\"${ZMQ_HEADERS_URL}\", \"${ZMQ_HEADER_TAR_FILE}\")'  # curl -skLO ${ZMQ_HEADERS_URL}
+	@R -e 'download.file(\"${ZMQ_HEADERS_URL}\", \"${ZMQ_HEADER_TAR_FILE}\")'
 	@tar -xzf ${ZMQ_HEADER_TAR_FILE}
 	@mv include/*h ../inst/include
 	@rm -rf ${ZMQ_HEADER_TAR_FILE} include
@@ -64,7 +65,7 @@ qstack: ../inst/include/xeus ../inst/include/xtl
 ../inst/include/xeus:
 	@echo "Fetching xeus headers..."
 	@[ -d ../inst/include ] || mkdir -p ../inst/include
-	@R -e 'download.file(\"${XEUS_URL}\", \"${XEUS_TAR_FILE}\")'  # curl -skLO ${XEUS_URL}
+	@R -e 'download.file(\"${XEUS_URL}\", \"${XEUS_TAR_FILE}\")'
 	@tar -xzf ${XEUS_TAR_FILE}
 	@mv xeus-${XEUS_VERSION}/include/xeus ../inst/include
 	@rm -rf xeus-${XEUS_VERSION} ${XEUS_TAR_FILE}
@@ -72,7 +73,7 @@ qstack: ../inst/include/xeus ../inst/include/xtl
 ../inst/include/xtl:
 	@echo "Fetching xtl headers..."
 	@[ -d ../inst/include ] || mkdir -p ../inst/include
-	@R -e 'download.file(\"${XTL_URL}\", \"${XTL_TAR_FILE}\")'            # curl -skLO ${XTL_URL}
+	@R -e 'download.file(\"${XTL_URL}\", \"${XTL_TAR_FILE}\")'
 	@tar -xzf ${XTL_TAR_FILE}
 	@mv xtl-${XTL_VERSION}/include/xtl ../inst/include
 	@rm -rf xtl-${XTL_VERSION} ${XTL_TAR_FILE}

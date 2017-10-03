@@ -1,2 +1,6 @@
 #!/bin/sh
+rm -rf ./src/x64
+rm -rf src/._include
+rm -rf src/libzmq*
+rm -rf *tar*
 exit 0
