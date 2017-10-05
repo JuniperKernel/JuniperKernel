@@ -28,8 +28,15 @@ XTL_TAR_FILE = ${XTL_VERSION}.tar.gz
 XTL_URL = https://github.com/QuantStack/xtl/archive/${XTL_TAR_FILE}
 
 
-all: deps $(SHLIB)
+all: clean deps $(SHLIB)
 deps: zmq qstack
+
+.Phony: clean
+clean:
+	@rm -rf *dll
+	@rm -rf *zmq*
+	@rm -rf *i386*
+	@rm -rf *x64*
 
 .Phony: zmq
 zmq: inst/libs/${FLV}/libzmq.dll headers
