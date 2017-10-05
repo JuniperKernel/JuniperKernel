@@ -16,7 +16,6 @@ ZMQ_HEADER_TAR_FILE = zmq-4.2.2-headers.tar.gz
 ZMQ_HEADERS_URL = https://github.com/JuniperKernel/zmq/raw/master/headers/${ZMQ_HEADER_TAR_FILE}
 ZMQ_CPP_HEADER_URL = https://github.com/zeromq/cppzmq/raw/master/zmq.hpp
 ZMQ_CPPADDON_HEADER_URL = https://raw.githubusercontent.com/zeromq/cppzmq/master/zmq_addon.hpp
-R="C:\Program Files\R\R-3.4.1\bin\R.exe"
 
 # qstack backon bits
 # xeus
