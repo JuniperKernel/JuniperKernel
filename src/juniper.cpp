@@ -105,3 +105,5 @@ void comm_request(const std::string type) {
   if( type=="close") xm.comm_manager().comm_close(xmsg);
   if( type=="msg"  ) xm.comm_manager().comm_msg(  xmsg); 
 }
+
+void R_init_libzmq(DllInfo *info) { R_registerRoutines(info, NULL, NULL, NULL, NULL); }
