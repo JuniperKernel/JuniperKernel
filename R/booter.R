@@ -29,6 +29,7 @@
 #' @export
 bootKernel <- function() {
   require(JuniperKernel)  # attach the package to the search path so we can call methods from Rcpp
+  require(uuid)
   argv <- commandArgs(trailingOnly=TRUE)
 
   if( length(argv)==0L )
@@ -36,6 +37,11 @@ bootKernel <- function() {
 
   if( length(argv)>1L )
     warning("Multiple arguments passed; all but the first will be ignored.")
+
+  repos <- getOption('repos')
+  nomirror <- is.null(repos) || length(repos) == 0L || repos[[1L]] == '@CRAN@'
+  if( nomirror )
+    options(repos = c(CRAN = "http://cran.rstudio.com"))
 
   userConnFile <- argv[1L]
   boot_kernel(.JUNIPER$kernel <- init_kernel(userConnFile))

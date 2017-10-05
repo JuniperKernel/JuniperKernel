@@ -4,7 +4,7 @@ Version: 0.0.0.1
 Date: 2017-10-02
 Maintainer: Spencer Aiello <spnrpa@gmail.com>
 Author: Spencer Aiello
-Depends: R (>= 3.2.0)
+Depends: R (>= 3.2.0), uuid
 Imports: utils,
          jsonlite,
          repr,

@@ -33,6 +33,7 @@ execute_request <- function(request_msg) {
   tryCatch(
     {
       res <- .chkDTVisible(withVisible(eval(parse(text=code), envir=.GlobalEnv)))
+      # .setGlobal(".Last.value", res$value, 1L)
       if( res$visible )
         .execute_result(res$value, cnt)
       return("ok")
@@ -63,4 +64,9 @@ execute_request <- function(request_msg) {
   if( "data.table" %in% oldClass(result$value) )
     result$visible <- result$visible && data.table::shouldPrint(result$value)
   result
+}
+
+# global env set hack
+.setGlobal <- function(key, val, pos) {
+  assign(key, val, envir=as.environment(pos))
 }

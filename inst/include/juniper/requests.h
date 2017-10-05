@@ -26,6 +26,26 @@ class RequestServer {
           // iopub thread.
           _inproc_pub = listen_on(ctx, INPROC_PUB, zmq::socket_type::pub);
           _inproc_sig = listen_on(ctx, INPROC_SIG, zmq::socket_type::pub);
+
+          // R sinks stdout/stderr to socketConnection, which is being listened
+          // to on a ZMQ_STREAM socket. Polling of this connection happens in a
+          // separate thread so that stdout/stderr can be streamed to IOPub
+          // asynchronously. This socket is created in the main thread and
+          // migrated to a polling thread. Why? R needs to know the port--which
+          // is chosen by the OS--to form the socketConnection: because R is
+          // executing in the main thread there is the option to block the main
+          // thread until it handshakes with the spawned thread via inproc
+          // transports; or migrate a socket to a new thread. Option 2 is
+          // simpler and totally legal according to the ZMQ docs since the socket
+          // creation and port scraping happens before the polling thread is spawned.
+          _stream_out = listen_on(*_ctx, "tcp://*:*", zmq::socket_type::stream);
+          _stream_err = listen_on(*_ctx, "tcp://*:*", zmq::socket_type::stream);
+          _stream_out_port = read_port(_stream_out);
+          _stream_err_port = read_port(_stream_err);
+          std::thread sout = stream_thread(_stream_out, true );
+          std::thread serr = stream_thread(_stream_err, false);
+          sout.detach();
+          serr.detach();
         }
 
     ~RequestServer() {
@@ -65,6 +85,10 @@ class RequestServer {
     const std::string _key;   // hmac key
     zmq::socket_t* _inproc_pub;
     zmq::socket_t* _inproc_sig;
+    zmq::socket_t* _stream_out;
+    zmq::socket_t* _stream_err;
+    int _stream_out_port;
+    int _stream_err_port;
     const Rcpp::Environment _jk;
 
     // R functions are pulled out of the JuniperKernel package environment.
@@ -74,30 +98,13 @@ class RequestServer {
     const RequestServer& handle(zmq::socket_t& sock) const {
       json req = _cur_msg.get();
       std::string msg_type = req["header"]["msg_type"];
-//      Rcpp::Rcout << "Handling message type: " << msg_type << std::endl;
-      // R sinks stdout/stderr to socketConnection, which is being listened
-      // to on a ZMQ_STREAM socket. Polling of this connection happens in a
-      // separate thread so that stdout/stderr can be streamed to IOPub 
-      // asynchronously. This socket is created in the main thread and 
-      // migrated to a polling thread. Why? R needs to know the port--which
-      // is chosen by the OS--to form the socketConnection: because R is 
-      // executing in the main thread there is the option to block the main
-      // thread until it handshakes with the spawned thread via inproc 
-      // transports; or migrate a socket to a new thread. Option 2 is  
-      // simpler and totally legal according to the ZMQ docs since the socket
-      // creation and port scraping happens before the polling thread is spawned.
-      zmq::socket_t* stream_out = listen_on(*_ctx, "tcp://*:*", zmq::socket_type::stream);
-      zmq::socket_t* stream_err = listen_on(*_ctx, "tcp://*:*", zmq::socket_type::stream);
-      req["stream_out_port"] = read_port(stream_out);  // stitch the stdout port into the client request
-      req["stream_err_port"] = read_port(stream_err);  // stitch the stderr into the client request
+      Rcpp::Rcout << "Handling message type: " << msg_type << std::endl;
+      req["stream_out_port"] = _stream_out_port;  // stitch the stdout port into the client request
+      req["stream_err_port"] = _stream_err_port;  // stitch the stderr into the client request
       Rcpp::Function handler = _jk[msg_type];
       Rcpp::Function do_request = _jk["doRequest"];
       // boot listener threads; execute request; join listeners
-      std::thread sout = stream_thread(stream_out, true );
-      std::thread serr = stream_thread(stream_err, false);
       Rcpp::List res = do_request(Rcpp::wrap(handler), from_json_r(req));
-      serr.join();  // stream_err is now destroyed
-      sout.join();  // stream_out is now destroyed
       json jres = from_list_r(res);
       // comms don't reply (except for comm_info_request)
       if( msg_type=="comm_open" || msg_type=="comm_close" || msg_type=="comm_msg" )
@@ -132,7 +139,7 @@ class RequestServer {
             // only ever have a single connection; and when it dies, we also
             // die (AKA signal death to the poller by returning false).
             if( msg[1].size()==0 )
-              return !connected++;
+              return true;
 
             // read the message and publish to stdout
             if( out ) rs.stream_out(msg_t_to_string(msg[1]));

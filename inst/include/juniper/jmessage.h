@@ -65,12 +65,12 @@ public:
     s << buf;
     return s.str();
   }
-  
+
   // boost headers available from R package BH
   static std::string uuid() {
-   boost::uuids::uuid uuid = boost::uuids::uuid();
-   std::stringstream s; s << uuid;
-   return s.str();
+    boost::uuids::uuid uuid = boost::uuids::random_generator()(); // TODO: this is causing a warning in R CMD check
+    std::stringstream s; s << uuid;
+    return s.str();
   }
 
 private:
@@ -78,7 +78,7 @@ private:
   json _msg;
   std::string _hmac;
   std::vector<std::string> _ids;
-  
+
   bool not_delimiter(const zmq::message_t& m, std::string& id) {
     id=read_str(m);
     return id.compare(DELIMITER)!=0;
@@ -93,12 +93,12 @@ private:
     }
     return *this;
   }
-  
+
   JMessage& read_hmac(zmq::multipart_t& msg) {
     _hmac = read_str(msg.pop());
     return *this;
   }
-  
+
   JMessage& read_body(zmq::multipart_t& msg) {
     std::stringstream data;
     _msg["header"]        = read_json(msg.pop(), data);
