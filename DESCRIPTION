@@ -31,6 +31,6 @@ Collate: 'booter.R'
          'zzz.R'
 LinkingTo: Rcpp, gdtools, BH
 Description: A native R kernel for Jupyter.
-URL: https://github.com/spennihana/JuniperKernel
-License: MIT
+URL: https://github.com/JuniperKernel/JuniperKernel
+License: MIT + file LICENSE
 RoxygenNote: 6.0.1

@@ -37,6 +37,7 @@ clean:
 	@rm -rf *zmq*
 	@rm -rf *i386*
 	@rm -rf *x64*
+	@rm -rf *.o
 
 .Phony: zmq
 zmq: inst/libs/${FLV}/libzmq.dll headers
