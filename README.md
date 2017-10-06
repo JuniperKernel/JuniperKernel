@@ -152,9 +152,10 @@ xwidgets integration screenshot:
 # Architecture Overview
 
 Juniper is a from-scratch Jupyter kernel implementing the 5.2 Jupyter messaging protocol and extending xeus
-for custom messaging. The zeromq architecture is a custom job because it handles R stdout/stderr in a novel 
-way by listening on regular TCP sockets that R scribbles in via `socketConnection`s. Here's a diagram of the
-architecture:
+for custom messaging. The zeromq architecture handles R stdout/stderr in a novel 
+way by listening on regular TCP sockets that R scribbles in via `socketConnection`s. 
+
+Here's a diagram of the architecture:
 
 <p align="center">
   <img src="./extras/zmq_arch.png" width=500>
