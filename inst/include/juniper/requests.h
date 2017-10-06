@@ -1,6 +1,7 @@
 #ifndef juniper_juniper_requests_H
 #define juniper_juniper_requests_H
 
+#include <atomic>
 #include <string>
 #include <thread>
 #include <zmq.hpp>
@@ -19,7 +20,8 @@ class RequestServer {
     RequestServer(zmq::context_t& ctx, const std::string& key):
       _ctx(&ctx),
       _key(key),
-      _jk("package:JuniperKernel")
+      _jk("package:JuniperKernel"),
+      _connected(0)
         {
           // these are internal routing sockets that push messages (e.g.
           // poison pills, results, etc.) to the heartbeat thread and
@@ -42,8 +44,8 @@ class RequestServer {
           _stream_err = listen_on(*_ctx, "tcp://*:*", zmq::socket_type::stream);
           _stream_out_port = read_port(_stream_out);
           _stream_err_port = read_port(_stream_err);
-          std::thread sout = stream_thread(_stream_out, true );
-          std::thread serr = stream_thread(_stream_err, false);
+          std::thread sout = stream_thread(_stream_out, true, _connected );
+          std::thread serr = stream_thread(_stream_err, false, _connected);
           sout.detach();
           serr.detach();
         }
@@ -90,6 +92,7 @@ class RequestServer {
     int _stream_out_port;
     int _stream_err_port;
     const Rcpp::Environment _jk;
+    std::atomic<int> _connected;
 
     // R functions are pulled out of the JuniperKernel package environment.
     // For each msg_type, there's a corresponding R function with that name.
@@ -103,9 +106,11 @@ class RequestServer {
       req["stream_err_port"] = _stream_err_port;  // stitch the stderr into the client request
       Rcpp::Function handler = _jk[msg_type];
       Rcpp::Function do_request = _jk["doRequest"];
+      int b4 = _connected.load();
       // boot listener threads; execute request; join listeners
       Rcpp::List res = do_request(Rcpp::wrap(handler), from_json_r(req));
       json jres = from_list_r(res);
+      while( _connected.load() ) { }
       // comms don't reply (except for comm_info_request)
       if( msg_type=="comm_open" || msg_type=="comm_close" || msg_type=="comm_msg" )
         return *this;
@@ -119,12 +124,12 @@ class RequestServer {
       return *this;
     }
 
-    std::thread stream_thread(zmq::socket_t* sock, const bool out=true) const {
+    std::thread stream_thread(zmq::socket_t* sock, const bool out, std::atomic<int>& connected) const {
       const RequestServer& rs = *this;
-      std::thread out_thread([&rs, sock, out]() {  // full fence membar
-        short connected=false;
+      std::thread out_thread([&rs, sock, out, &connected]() {  // full fence membar
+        short conn=false;
         std::function<bool()> handlers[] = {
-          [sock, &rs, out, &connected]() {
+          [sock, &rs, out, &connected, &conn]() {
             zmq::multipart_t msg;
             msg.recv(*sock);
 
@@ -138,9 +143,15 @@ class RequestServer {
             // identity disconnected. Our expectation is that we shall
             // only ever have a single connection; and when it dies, we also
             // die (AKA signal death to the poller by returning false).
-            if( msg[1].size()==0 )
+            if( msg[1].size()==0 ) {
+              if( !conn++ )
+                connected.fetch_add(1);
+                else {
+                  conn=false;
+                  connected.fetch_sub(1);
+                }
               return true;
-
+            }
             // read the message and publish to stdout
             if( out ) rs.stream_out(msg_t_to_string(msg[1]));
             else      rs.stream_err(msg_t_to_string(msg[1]));
