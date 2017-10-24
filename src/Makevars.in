@@ -30,9 +30,14 @@ CXX_STD      = CXX11
 PKG_CPPFLAGS = -I../inst/include/ -I../inst/include/xeus -I.
 PKG_LIBS     = -lzmq -L../inst/zmq -Wl,-rpath,$(R_LIB)/JuniperKernel/zmq
 
-all: deps $(SHLIB)
+all: rcpp deps $(SHLIB)
 
 @deps@
+
+rcpp:
+	@echo "Generating RcppExports"
+	@Rscript -e 'Rcpp::compileAttributes("..")'
+	@Rscript -e 'roxygen2::roxygenize("..")'
 
 .PHONY: zmq, lzmq
 zmq: ../inst/zmq/libzmq.a headers
