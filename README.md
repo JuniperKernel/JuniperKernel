@@ -12,8 +12,11 @@ An [R](https://cran.r-project.org/) kernel for [Jupyter](https://jupyter.org) ba
 ##### Requirements
 
 - R >= 3.4.0 
-- R packages: BH,  Rcpp (>= 0.11.0), gdtools (>= 0.1.6), roxygen2, jsonlite, repr
 - [Rtools34.exe](https://cran.r-project.org/bin/windows/Rtools/) for Windows
+
+If you're going to build from scratch, then these packages will be necessary to fetch:
+
+- R packages: BH,  Rcpp (>= 0.11.0), gdtools (>= 0.1.6), roxygen2, jsonlite, repr
 
 Other necessary bacon bits (fetched automatically--c.f. Makevars/Makevars.win):
 
@@ -21,14 +24,25 @@ Other necessary bacon bits (fetched automatically--c.f. Makevars/Makevars.win):
 - xeus (0.6.0)
 - xtl (0.2.3)
 
+#### Devtools Build and Install from Github
+
+Installing from github is probably the easiest option.
+
+Loop through the requirements, and then do:
+
+```
+devtools::install_github("JuniperKernel/JuniperKernel")
+```
+
+
 #### Building on Windows
 
 Supported compilers:
- - mingw64 (bundled with Rtools)
+ - mingw32/64 (bundled with Rtools)
  - no other compilers are officially supported (though you may have success via cygwin)
 
 Supported architectures:
- - 64 bit arch
+ - 32/64 bit arch
 
 To build and install the Juniper kernel run the following from a `cmd` prompt:
 
