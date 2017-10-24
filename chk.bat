@@ -8,5 +8,5 @@ mkdir build
 R CMD build .
 mv Juniper*tar.gz build
 
-cd build && R CMD check --as-cran --no-manual *tar.gz
+cd build && R CMD check --as-cran *tar.gz
 if %ERRORLEVEL% EQU 1 exit 1

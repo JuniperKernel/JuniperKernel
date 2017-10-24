@@ -106,7 +106,6 @@ class RequestServer {
       req["stream_err_port"] = _stream_err_port;  // stitch the stderr into the client request
       Rcpp::Function handler = _jk[msg_type];
       Rcpp::Function do_request = _jk["doRequest"];
-      int b4 = _connected.load();
       // boot listener threads; execute request; join listeners
       Rcpp::List res = do_request(Rcpp::wrap(handler), from_json_r(req));
       json jres = from_list_r(res);

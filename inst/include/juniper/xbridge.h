@@ -83,8 +83,7 @@ typename std::map<K,T>::iterator pos(std::map<K, T> m, K key, std::string type) 
   if( position==m.end() ) {
     std::stringstream ss;
     ss << "No such " << type << " registered: " << key;
-    Rcpp::Rcout << ss.str() << std::endl;
-    throw(ss.str());
+    std::cout << ss.str() << std::endl;
   }
   return position;
 }
@@ -96,6 +95,11 @@ xmessage to_xmessage(const json& request, const xmessage::guid_list& zmq_id) {
 void xcomm_manager::comm_open(const xmessage& request) {
   const xjson& content = request.content();
   std::string target_name = content["target_name"];
+  if( (m_targets.find(target_name))==m_targets.end() ) {
+    std::cout << "No such target registered: " << target_name << std::endl;
+    return;
+  }
+
   auto position = pos(m_targets, target_name, "target");
   xtarget& target = position->second;
   xguid id = content["comm_id"];

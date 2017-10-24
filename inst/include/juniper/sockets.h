@@ -45,11 +45,15 @@ void poll(zmq::context_t& context, zmq::socket_t* sockets[], std::function<bool(
       dead=true;
       break;
     }
-
+    try {
     for(int i=1; i<=n; i++)
       if( items[i].revents & ZMQ_POLLIN )
         if( (dead=!hp[i-1]()) )
           break;
+    } catch(const std::exception& x) {
+      std::cout << "Encountered C++ exception: " <<  x.what() << std::endl;
+      std::cout << "Polling continues..." << std::endl;
+    }
   }
 
   assert(dead);

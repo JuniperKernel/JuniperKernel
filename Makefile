@@ -42,3 +42,4 @@ clean:
 	rm -rf src/*o
 	rm -rf *gz *zip
 	rm -rf src/Makevars
+	rm -rf src/*dll
