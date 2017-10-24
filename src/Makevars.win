@@ -29,7 +29,12 @@ XTL_URL = https://github.com/QuantStack/xtl/archive/${XTL_TAR_FILE}
 
 
 all: clean deps $(SHLIB)
-deps: zmq qstack
+deps: rcpp zmq qstack
+
+rcpp:
+	@echo "Generating RcppExports"
+	@Rscript -e 'Rcpp::compileAttributes("..")'
+	@Rscript -e 'roxygen2::roxygenize("..")'
 
 .Phony: clean
 clean:
