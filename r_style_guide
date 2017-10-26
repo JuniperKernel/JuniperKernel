@@ -45,15 +45,15 @@ Instead of
 
 Function names are lower case:
 
-  void foo();
+  foo();
 
 Use camelCase for multi-word function names:
 
-  void doThis();
+  doThis();
 
 Instead of
 
-  void dont_do_this();
+  dont_do_this();
 
 Use a '.' to hide functions:
 
@@ -67,7 +67,7 @@ Function arguments and variables start lower case:
 
 Use camel-case for multi-word variables:
 
-  int myVariable;
+  myVariable;
 
 Supply sensible defaults for function arguments; use match.arg
 when a function can take on a variety of constants:
