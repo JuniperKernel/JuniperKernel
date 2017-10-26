@@ -15,6 +15,17 @@
 #include <juniper/external.h>
 #include <Rcpp.h>
 
+static short interrupted=false;
+static void sig_handler(int sig) { interrupted=true; }
+static void sig_catcher(void) {
+    struct sigaction action;
+    action.sa_handler = sig_handler;
+    action.sa_flags = 0;
+    sigemptyset(&action.sa_mask);
+    sigaction(SIGINT, &action, NULL);
+    sigaction(SIGTERM, &action, NULL);
+}
+
 static void kernelFinalizer(SEXP jk) {
   JuniperKernel* jkernel = reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(jk));
   if( jkernel ) {
@@ -33,6 +44,7 @@ xinterpreter& xeus::get_interpreter() { return *_xm; }
 
 // [[Rcpp::export]]
 SEXP init_kernel(const std::string& connection_file) {
+  sig_catcher();
   JuniperKernel* jk = JuniperKernel::make(connection_file);
 
   _xm = new xmock();
