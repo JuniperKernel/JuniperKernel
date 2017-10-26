@@ -16,4 +16,7 @@ R_HOME=$(R RHOME)
 RSCRIPT=${R_HOME}/bin/Rscript
 R_LIB=$(${RSCRIPT} -e 'cat(.Library)')
 sed -e"s|@rlib@|"${R_LIB}"|" -e"s|@arch@|"${ARCH}"|" -e"s|@sys@|"${SYS}"|" -e "s/@deps@/${DEPS}/" src/Makevars.in > src/Makevars
+
+${RSCRIPT} -e 'Rcpp::compileAttributes()'
+${RSCRIPT} -e 'roxygen2::roxygenize()'
 exit 0

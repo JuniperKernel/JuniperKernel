@@ -16,3 +16,5 @@ r_style_guide
 cpp_style_guide
 ^.*\.yml$
 ^.*\.bat$
+CODE_OF_CONDUCT.md$
+CONTRIBUTING.md$
