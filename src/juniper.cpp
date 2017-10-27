@@ -18,12 +18,16 @@
 static short interrupted=false;
 static void sig_handler(int sig) { interrupted=true; }
 static void sig_catcher(void) {
-    struct sigaction action;
-    action.sa_handler = sig_handler;
-    action.sa_flags = 0;
-    sigemptyset(&action.sa_mask);
-    sigaction(SIGINT, &action, NULL);
-    sigaction(SIGTERM, &action, NULL);
+#ifdef _WIN32
+  // TODO
+#else
+  struct sigaction action;
+  action.sa_handler = sig_handler;
+  action.sa_flags = 0;
+  sigemptyset(&action.sa_mask);
+  sigaction(SIGINT, &action, NULL);
+  sigaction(SIGTERM, &action, NULL);
+#endif
 }
 
 static void kernelFinalizer(SEXP jk) {
