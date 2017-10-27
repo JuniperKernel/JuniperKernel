@@ -33,7 +33,7 @@ execute_request <- function(request_msg) {
   tryCatch(
     {
       res <- .chkDTVisible(withVisible(eval(parse(text=code), envir=.GlobalEnv)))
-      # .setGlobal(".Last.value", res$value, 1L)
+      .setGlobal(".Last.value", res$value, 1L)
       if( res$visible )
         .execute_result(res$value, cnt)
       return("ok")
@@ -55,7 +55,7 @@ execute_request <- function(request_msg) {
   # loop over the available mimetypes using repr package
   data <- lapply(repr::mime2repr, function(mimeFun) mimeFun(result))
   # keep non-NULL results (NULL when no such mime repr exists)
-  content <- list(data=Filter(Negate(is.null), data), execution_count=cnt)
+  content <- list(data=Filter(Negate(is.null), data), execution_count=cnt, metadata=list())
   execute_result(.kernel(), content)
 }
 
