@@ -18,7 +18,7 @@ class xmock: public xinterpreter {
 public:
   JuniperKernel* _jk;
   using base_type = xinterpreter;
-  xmock() { register_comm_manager(_comm_mgr=new xcomm_manager()); }
+  xmock() { register_comm_manager(new xcomm_manager()); }
   virtual ~xmock() = default;
   xmock(const xmock&) = delete;
   xmock& operator=(const xmock&) = delete;
@@ -34,9 +34,11 @@ private:
   inline xjson is_complete_request_impl(const std::string&) override{throw("unimpl");}
   inline xjson kernel_info_request_impl() override{throw("unimpl");}
   inline void input_reply_impl(const std::string&) override{throw("unimpl");}
-  xcomm_manager* _comm_mgr;
 };
 
+extern xmock* _xm;
+// setup the mocked xeus interpreter
+inline xinterpreter& xeus::get_interpreter() { return *_xm; }
 xmock& get_xmock() { return static_cast<xmock&>(get_interpreter()); }
 
 void xinterpreter::display_data(xjson data, xjson metadata, xjson transient) {
@@ -55,6 +57,7 @@ xmessage_base::xmessage_base(xjson header, xjson parent_header, xjson metadata, 
   m_metadata(metadata),
   m_content(content){}
 const xjson& xmessage_base::content() const {return m_content; }
+const xjson& xmessage_base::metadata() const { return m_metadata; }
 
 xmessage::xmessage(const guid_list& zmq_id, xjson header, xjson parent_header, xjson metadata, xjson content):
   xmessage_base(header,parent_header,metadata,content){ m_zmq_id=zmq_id;}
@@ -104,7 +107,7 @@ void xcomm_manager::comm_open(const xmessage& request) {
   xtarget& target = position->second;
   xguid id = content["comm_id"];
   xcomm comm = xcomm(&target, id);
-  target(comm, request);
+  target(std::move(comm), request);
   comm.open(get_metadata(), content["data"]);
 }
 

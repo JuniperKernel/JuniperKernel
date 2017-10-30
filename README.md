@@ -21,8 +21,8 @@ If you're going to build from scratch, then these packages will be necessary to 
 Other necessary bacon bits (fetched automatically--c.f. Makevars/Makevars.win):
 
 - zeromq (4.4.2)
-- xeus (0.6.0)
-- xtl (0.2.3)
+- xeus (0.7.0)
+- xtl (0.3.1)
 
 #### Devtools Build and Install from Github
 

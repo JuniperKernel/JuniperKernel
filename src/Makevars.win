@@ -19,11 +19,11 @@ ZMQ_CPPADDON_HEADER_URL = https://raw.githubusercontent.com/zeromq/cppzmq/master
 
 # qstack backon bits
 # xeus
-XEUS_VERSION = 0.6.0
+XEUS_VERSION = 0.7.0
 XEUS_TAR_FILE = ${XEUS_VERSION}.tar.gz
 XEUS_URL = https://github.com/QuantStack/xeus/archive/${XEUS_TAR_FILE}
 # xtl
-XTL_VERSION = 0.2.3
+XTL_VERSION = 0.3.1
 XTL_TAR_FILE = ${XTL_VERSION}.tar.gz
 XTL_URL = https://github.com/QuantStack/xtl/archive/${XTL_TAR_FILE}
 

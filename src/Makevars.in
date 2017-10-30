@@ -1,4 +1,3 @@
-
 ARCH=@arch@
 SYS=@sys@
 R_LIB=@rlib@
@@ -13,15 +12,16 @@ ZMQ_HEADERS_URL = https://github.com/JuniperKernel/zmq/raw/master/headers/${ZMQ_
 ZMQ_CPP_HEADER_URL = https://github.com/zeromq/cppzmq/raw/master/zmq.hpp
 ZMQ_CPPADDON_HEADER_URL = https://raw.githubusercontent.com/zeromq/cppzmq/master/zmq_addon.hpp
 
-# qstack backon bits
-# xeus
-XEUS_VERSION = 0.6.0
-XEUS_TAR_FILE = ${XEUS_VERSION}.tar.gz
-XEUS_URL = https://github.com/QuantStack/xeus/archive/${XEUS_TAR_FILE}
+#quantstack bacon bits
 # xtl
-XTL_VERSION = 0.2.3
+XTL_VERSION = 0.3.1
 XTL_TAR_FILE = ${XTL_VERSION}.tar.gz
 XTL_URL = https://github.com/QuantStack/xtl/archive/${XTL_TAR_FILE}
+
+# xeus
+XEUS_VERSION = 0.7.0
+XEUS_TAR_FILE = ${XEUS_VERSION}.tar.gz
+XEUS_URL = https://github.com/QuantStack/xeus/archive/${XEUS_TAR_FILE}
 
 ## use C++11
 CXX_STD      = CXX11
@@ -59,15 +59,7 @@ headers: ../inst/include/zmq.h
 	@mv zmq_addon.hpp ../inst/include
 	@curl -skLO ${ZMQ_HEADERS_URL} && tar -xzf ${ZMQ_HEADER_TAR_FILE} && mv include/*h ../inst/include && rm -rf ${ZMQ_HEADER_TAR_FILE} include
 
-qstack: ../inst/include/xeus ../inst/include/xtl
-
-../inst/include/xeus:
-	@echo "Fetching xeus headers..."
-	@[ -d ../inst/include ] || mkdir -p ../inst/include
-	@curl -skLO ${XEUS_URL}
-	@tar -xzf ${XEUS_TAR_FILE}
-	@mv xeus-${XEUS_VERSION}/include/xeus ../inst/include
-	@rm -rf xeus-${XEUS_VERSION} ${XEUS_TAR_FILE}
+qstack: ../inst/include/xtl ../inst/include/xeus
 
 ../inst/include/xtl:
 	@echo "Fetching xtl headers..."
@@ -76,3 +68,11 @@ qstack: ../inst/include/xeus ../inst/include/xtl
 	@tar -xzf ${XTL_TAR_FILE}
 	@mv xtl-${XTL_VERSION}/include/xtl ../inst/include
 	@rm -rf xtl-${XTL_VERSION} ${XTL_TAR_FILE}
+
+../inst/include/xeus:
+	@echo "Fetching xeus headers..."
+	@[ -d ../inst/include ] || mkdir -p ../inst/include
+	@curl -skLO ${XEUS_URL}
+	@tar -xzf ${XEUS_TAR_FILE}
+	@mv xeus-${XEUS_VERSION}/include/xeus ../inst/include
+	@rm -rf xeus-${XEUS_VERSION} ${XEUS_TAR_FILE}

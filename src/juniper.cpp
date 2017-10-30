@@ -38,14 +38,20 @@ static void kernelFinalizer(SEXP jk) {
   }
 }
 
+static void xmockFinalizer(SEXP xm) {
+  xmock* _xm = reinterpret_cast<xmock*>(R_ExternalPtrAddr(xm));
+  if( _xm ) {
+    delete _xm;
+    R_ClearExternalPtr(xm);
+  }
+}
+
+
 static JuniperKernel* get_kernel(SEXP kernel) {
   return reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(kernel));
 }
 
-// setup the mocked xeus interpreter
-static xmock* _xm;
-xinterpreter& xeus::get_interpreter() { return *_xm; }
-
+xmock* _xm;
 // [[Rcpp::export]]
 SEXP init_kernel(const std::string& connection_file) {
   sig_catcher();
@@ -68,6 +74,13 @@ void boot_kernel(SEXP kernel) {
   jk->run();
   delete jk;
   delete _xm;
+}
+
+// [[Rcpp::export]]
+SEXP the_xmock() {
+  if( _xm==nullptr )
+    Rcpp::stop("no xmock available.");
+  return createExternalPointer<xmock>(_xm, xmockFinalizer, "xmock*");
 }
 
 // [[Rcpp::export]]
@@ -121,5 +134,3 @@ void comm_request(const std::string type) {
   if( type=="close") xm.comm_manager().comm_close(xmsg);
   if( type=="msg"  ) xm.comm_manager().comm_msg(  xmsg); 
 }
-
-void R_init_libzmq(DllInfo *info) { R_registerRoutines(info, NULL, NULL, NULL, NULL); }

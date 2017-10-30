@@ -8,6 +8,9 @@ export(defaultKernelName)
 export(installJuniper)
 export(listKernels)
 
+# rcpp exports
+export(the_xmock)
+
 # jupyter message handlers
 export(doRequest)
 export(comm_close)

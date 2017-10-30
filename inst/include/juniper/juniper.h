@@ -6,7 +6,6 @@
 #include <fstream>
 #include <unistd.h>
 #include <stdio.h>
-#include <signal.h>
 #include <stdlib.h>
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
