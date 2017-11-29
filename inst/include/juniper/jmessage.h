@@ -10,9 +10,6 @@
 #include <ctime>
 #include <iostream>
 #include <sha256.h>
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_io.hpp>
-#include <boost/uuid/uuid_generators.hpp>
 #include <juniper/external.h>
 #include <Rcpp.h>
 
@@ -20,6 +17,7 @@
 static const std::string DELIMITER = "<IDS|MSG>";
 
 using nlohmann::json;
+using namespace std::chrono;
 // Here's where we read and write messages using the jupyter protocol.
 // Since the protocol is actually serialized python dicts (a.k.a. JSON),
 // we are stuck with json (de)serialization.
@@ -37,7 +35,7 @@ public:
     JMessage jm;
     jm._key = parent._key;
     // construct header
-    jm._msg["header"]["msg_id"] = uuid();
+    jm._msg["header"]["msg_id"] = uniq_id();
     jm._msg["header"]["username"] = parent._msg["header"]["username"];
     jm._msg["header"]["session"] = parent._msg["header"]["session"];
     jm._msg["header"]["date"] = now();
@@ -66,15 +64,18 @@ public:
     return s.str();
   }
 
-  // boost headers available from R package BH
-  static std::string uuid() {
-    boost::uuids::uuid uuid = boost::uuids::random_generator()(); // TODO: this is causing a warning in R CMD check
-    std::stringstream s; s << uuid;
+  static long long int current_time_nanos() {
+    return duration_cast<nanoseconds>(system_clock::now().time_since_epoch()).count();
+  }
+
+  // smash the thread id and current time nanos for a uniq message id
+  static std::string uniq_id() {
+    std::stringstream s;
+    s << current_time_nanos() << "_" << (std::this_thread::get_id()) << std::endl;
     return s.str();
   }
 
 private:
-
   json _msg;
   std::string _hmac;
   std::vector<std::string> _ids;

@@ -126,5 +126,5 @@ void xcomm_manager::comm_msg(const xmessage& request) {
   position->second->handle_message(request);
 }
 
-xguid xeus::new_xguid() { return JMessage::uuid(); }
+xguid xeus::new_xguid() { return JMessage::uniq_id(); }
 #endif // #ifndef juniper_juniper_xbridge_H

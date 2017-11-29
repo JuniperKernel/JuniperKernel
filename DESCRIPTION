@@ -4,7 +4,7 @@ Version: 0.0.0.1
 Date: 2017-10-02
 Maintainer: Spencer Aiello <spnrpa@gmail.com>
 Author: Spencer Aiello
-Depends: R (>= 3.2.0), uuid
+Depends: R (>= 3.2.0)
 Imports: utils,
          jsonlite,
          repr,
@@ -29,7 +29,7 @@ Collate: 'booter.R'
          'request.R'
          'shutdown_request.R'
          'zzz.R'
-LinkingTo: Rcpp, gdtools, BH
+LinkingTo: Rcpp, gdtools
 Description: A native R kernel for Jupyter.
 URL: https://github.com/JuniperKernel/JuniperKernel
 License: GPL (>= 2)
