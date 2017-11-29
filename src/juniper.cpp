@@ -76,6 +76,14 @@ void boot_kernel(SEXP kernel) {
   delete _xm;
 }
 
+//' The XMock
+//'
+//' Get the xeus mock interpreter for interoperability with other
+//' projects.
+//'
+//' @author Spencer Aiello
+//'
+//' @export
 // [[Rcpp::export]]
 SEXP the_xmock() {
   if( _xm==nullptr )

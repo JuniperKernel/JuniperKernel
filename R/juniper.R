@@ -2,6 +2,9 @@
 #'
 #' @docType package
 #' @name JuniperKernel
+#' @import gdtools
+#' @import Rcpp
+#' @useDynLib JuniperKernel, .registration = TRUE
 NULL
 
 

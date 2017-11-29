@@ -43,3 +43,6 @@ clean:
 	rm -rf *gz *zip
 	rm -rf src/Makevars
 	rm -rf src/*dll
+	rm -rf inst/zmq
+	rm -rf inst/include/zmq*
+	rm -rf inst/include/x*
