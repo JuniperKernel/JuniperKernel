@@ -1,6 +1,7 @@
 #ifndef juniper_juniper_jmessage_H
 #define juniper_juniper_jmessage_H
 
+#include <atomic>
 #include <fstream>
 #include <string>
 #include <zmq.hpp>
@@ -65,13 +66,13 @@ public:
   }
 
   static long long int current_time_nanos() {
-    return duration_cast<nanoseconds>(system_clock::now().time_since_epoch()).count();
+    return duration_cast<nanoseconds>(high_resolution_clock::now().time_since_epoch()).count();
   }
 
-  // smash the thread id and current time nanos for a uniq message id
+  // smash the thread id and atomic long together
   static std::string uniq_id() {
     std::stringstream s;
-    s << current_time_nanos() << "_" << (std::this_thread::get_id()) << std::endl;
+    s << _ctr.fetch_add(1) << current_time_nanos() << "_" << (std::this_thread::get_id());
     return s.str();
   }
 
@@ -79,6 +80,7 @@ private:
   json _msg;
   std::string _hmac;
   std::vector<std::string> _ids;
+  static std::atomic<long long> _ctr;  // atomic counter for uniq ids
 
   bool not_delimiter(const zmq::message_t& m, std::string& id) {
     id=read_str(m);

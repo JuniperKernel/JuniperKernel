@@ -30,6 +30,9 @@ static void sig_catcher(void) {
 #endif
 }
 
+// init static vars now
+std::atomic<long long> JMessage::_ctr{0};
+
 static void kernelFinalizer(SEXP jk) {
   JuniperKernel* jkernel = reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(jk));
   if( jkernel ) {
