@@ -5,7 +5,7 @@ Juniper Kernel <img src="./extras/juniper_logo.png" width=120, align="right" />
 [![Appveyor Build status](https://ci.appveyor.com/api/projects/status/gah4rq18ml06d6xp?svg=true)](https://ci.appveyor.com/project/spennihana/juniperkernel)
 
 
-An [R](https://cran.r-project.org/) kernel for [Jupyter](https://jupyter.org) based on [Xeus](https://github.com/QuantStack/xeus) and built with [Rcpp](http://www.rcpp.org/).
+An [R](https://cran.r-project.org/) kernel for [Jupyter](https://jupyter.org) built with [Xeus](https://github.com/QuantStack/xeus) and [Rcpp](http://www.rcpp.org/).
 
 ## Building
 

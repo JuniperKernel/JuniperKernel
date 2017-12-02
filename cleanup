@@ -1,2 +1,18 @@
 #!/bin/bash
 rm -rf src/*.o src/*.so src/Makevars .Rhistory
+rm -rf build
+rm -rf man
+rm -rf JuniperKernel.Rcheck
+rm -rf R/RcppExports.R src/RcppExports.cpp
+rm -rf src/*o
+rm -rf *gz *zip
+rm -rf src/Makevars
+rm -rf src/*dll
+rm -rf inst/zmq
+rm -rf inst/include/zmq*
+rm -rf inst/include/x*
+rm -rf src/*gz
+rm -rf src/._*
+rm -rf src/x64
+rm -rf inst/._*
+rm -rf *.ipynb*
