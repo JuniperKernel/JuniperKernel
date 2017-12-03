@@ -3,26 +3,28 @@ check_notes_helper <- function(details) {
   stop("expected the notes details to be a data.frame")
 
   whitelist =
-  list( "CRAN incoming feasibility" =
-  c( "Maintainer:"
-  , "Checking URLs requires 'libcurl' support in the R build"
-  , "Days since last update"
-  , "Number of updates in past 6 months"
-  , "New submission"
-  )
-  , "package dependencies" =
-  c( "No repository set, so cyclic dependency check skipped"
-  , "Package suggested but not available for checking"
-  )
+    list(
+      "CRAN incoming feasibility" =
+        c( "Maintainer:"
+         , "Checking URLs requires 'libcurl' support in the R build"
+         , "Days since last update"
+         , "Number of updates in past 6 months"
+         , "New submission"
+         )
 
-  , "installed package size" =
-  c( "installed size is .*Mb"  # libs/include exceed some threshold
-  , "sub-directories of 1Mb or more"
-  , "include .*Mb"
-  , "libs .*Mb"
-  , "zmq .*Mb"
-  )
-  )
+     , "package dependencies" =
+        c( "No repository set, so cyclic dependency check skipped"
+         , "Package suggested but not available for checking"
+         )
+
+     , "installed package size" =
+        c( "installed size is .*Mb"  # libs/include exceed some threshold
+         , "sub-directories of 1Mb or more"
+         , "include .*Mb"
+         , "libs .*Mb"
+         , "zmq .*Mb"
+         )
+     )
   e <- new.env(parent=emptyenv())  # holds a bit for pass/fail checks in the *ply calls
   e$status <- TRUE
   lapply(1:nrow(details), function(rowid, e) {
