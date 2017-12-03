@@ -19,3 +19,4 @@ cpp_style_guide
 ^.*\.bat$
 CODE_OF_CONDUCT.md$
 CONTRIBUTING.md$
+src/zeromq*
