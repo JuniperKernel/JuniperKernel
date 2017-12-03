@@ -27,4 +27,3 @@ script:
 
 after_success:
   - make check
-  - make test
