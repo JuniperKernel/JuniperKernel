@@ -4,6 +4,7 @@
 .travis.yml
 .Rhistory
 scripts
+test
 extras
 Makefile$
 ^\.idea
