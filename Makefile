@@ -32,6 +32,7 @@ install:
 check: build/JuniperKernel_$(PKG_VERSION).tar.gz
 	@echo "running R CMD check"
 	@$(R) CMD check $(R_CHECK_ARGS) build/JuniperKernel_$(PKG_VERSION).tar.gz
+	@$(R) -f scripts/r_cmd_check_validate.R
 
 .PHONY: clean
 clean:

@@ -24,3 +24,7 @@ before_install:
 script:
   - g++ --version
   - make clean && make && R CMD INSTALL --build .
+
+after_success:
+  - make check
+  - make test
