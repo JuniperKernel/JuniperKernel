@@ -30,9 +30,9 @@ build_script:
   - travis-tool.sh install_deps
   - cmd.exe /c mk.bat
 
-test_script:
-  - cmd.exe /c chk.bat
-  - cmd.exe /c test.bat
+#test_script:
+#  - cmd.exe /c chk.bat
+#  - cmd.exe /c test.bat
 
 on_failure:
   - 7z a failure.zip *.Rcheck\*
