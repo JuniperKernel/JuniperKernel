@@ -52,3 +52,5 @@ clean:
 	rm -rf src/x64
 	rm -rf inst/._*
 	rm -rf *.ipynb*
+	rm -rf inst/libs
+	rm -rf src-*

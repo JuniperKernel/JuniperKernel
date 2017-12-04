@@ -6,7 +6,7 @@ else
 endif
 
 CXX_STD = CXX11
-PKG_CPPFLAGS = -I../inst/include -I. -Wno-conversion-null
+PKG_CPPFLAGS = -I../inst/include -I. -I../src -Wno-conversion-null
 PKG_LIBS = -lzmq -L${FLV}
 
 ZMQ_VERSION = 4.2.2
@@ -34,6 +34,9 @@ deps: rcpp zmq qstack
 rcpp:
 	@echo "Generating RcppExports"
 	@Rscript -e 'Rcpp::compileAttributes("..")'
+	@sed -i '/\r/d' ../src/RcppExports.cpp
+	@echo "Moving the generated RcppExports file"
+	@cp ../src/RcppExports.cpp .
 	@Rscript -e 'roxygen2::roxygenize("..")'
 
 .Phony: clean
