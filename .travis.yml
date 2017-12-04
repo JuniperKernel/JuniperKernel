@@ -24,6 +24,4 @@ before_install:
 script:
   - g++ --version
   - R CMD INSTALL --build .
-
-after_success:
   - make check
