@@ -48,14 +48,7 @@ execute_request <- function(request_msg) {
 
 # build and send the content of an execute_result iopub message.
 .execute_result <- function(result, cnt) {
-  # from the docs (http://jupyter-client.readthedocs.io/en/latest/messaging.html#display-data):
-  #     "A single message should contain all possible representations
-  #     of the same information. Each representation should be a
-  #     JSON'able data structure, and should be a valid MIME type"
-  # loop over the available mimetypes using repr package
-  data <- lapply(repr::mime2repr, function(mimeFun) mimeFun(result))
-  # keep non-NULL results (NULL when no such mime repr exists)
-  content <- list(data=Filter(Negate(is.null), data), execution_count=cnt, metadata=list())
+  content <- list(data=.mimeBundle(result), execution_count=cnt, metadata=list())
   execute_result(.kernel(), content)
 }
 
