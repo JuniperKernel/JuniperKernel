@@ -48,7 +48,7 @@ execute_request <- function(request_msg) {
 
 # build and send the content of an execute_result iopub message.
 .execute_result <- function(result, cnt) {
-  content <- list(data=.mimeBundle(result), execution_count=cnt, metadata=list())
+  content <- list(data=.mimeBundle(result), execution_count=cnt, metadata=list("__ignored__"=""))
   execute_result(.kernel(), content)
 }
 
