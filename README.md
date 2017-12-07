@@ -14,7 +14,7 @@ An [R](https://cran.r-project.org/) kernel for [Jupyter](https://jupyter.org) bu
 - [Rtools34.exe](https://cran.r-project.org/bin/windows/Rtools/) for Windows
 
 If you're going to build from scratch, then these packages will be necessary to fetch:
-
+ 
 - R packages: BH,  Rcpp (>= 0.11.0), gdtools (>= 0.1.6), roxygen2, jsonlite, repr
 
 Other necessary bacon bits (fetched automatically--c.f. Makevars/Makevars.win):
