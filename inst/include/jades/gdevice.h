@@ -20,7 +20,7 @@
 
 // Copyright (C) 2017  Spencer Aiello
 //
-//   This is a fork of the svglite c++ source with customized callbacks for JuniperKernel.
+//   This is a fork of the svglite c++ source with customized callbacks for JadesKernel.
 //   To differentiate, the device description class is renamed to JKDesc from SVGDesc.
 //   Additionally, the SvgStreamFile class is removed and the abstract SvgStream class
 //   replaced with a single concrete std::stringstream wrapper class. The original is
@@ -31,20 +31,20 @@
 //     (C) 2015 RStudio (Hadley Wickham): modernisation & refactoring
 //
 //
-// This file is part of JuniperKernel.
+// This file is part of JadesKernel.
 //
-// JuniperKernel is free software: you can redistribute it and/or modify it
+// JadesKernel is free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 2 of the License, or
 // (at your option) any later version.
 //
-// JuniperKernel is distributed in the hope that it will be useful, but
+// JadesKernel is distributed in the hope that it will be useful, but
 // WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with JuniperKernel.  If not, see <http://www.gnu.org/licenses/>.
+// along with JadesKernel.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <Rcpp.h>
 #include <gdtools.h>
@@ -590,7 +590,7 @@ void svg_raster(unsigned int *raster, int w, int h, double x, double y, double w
   stream->write('\n');
 }
 
-pDevDesc svg_driver_new(JuniperKernel* jk, int bg, double width, double height, double pointsize, bool standalone, Rcpp::List& aliases) {
+pDevDesc svg_driver_new(JadesKernel* jk, int bg, double width, double height, double pointsize, bool standalone, Rcpp::List& aliases) {
   pDevDesc dd = (DevDesc*) calloc(1, sizeof(DevDesc));
   if (dd == NULL) return dd;
   dd->startfill = bg;
@@ -650,7 +650,7 @@ pDevDesc svg_driver_new(JuniperKernel* jk, int bg, double width, double height, 
   return dd;
 }
 
-void makeDevice(JuniperKernel* jk, std::string bg_, double width, double height, double pointsize, bool standalone, Rcpp::List& aliases) {
+void makeDevice(JadesKernel* jk, std::string bg_, double width, double height, double pointsize, bool standalone, Rcpp::List& aliases) {
   int bg = R_GE_str2col(bg_.c_str());
   R_GE_checkVersionOrDie(R_GE_version);
   R_CheckDeviceAvailable();

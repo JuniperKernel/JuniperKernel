@@ -21,8 +21,9 @@
 #include <stdio.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <json.hpp>
-#include <juniper/conf.h>
+#include <xeus/xjson.hpp>
+#include <xeus/xserver.hpp>
+#include <jades/jades.h>
 #include <zmq.h>
 #include <zmq.hpp>
 #include <Rcpp.h>
@@ -46,70 +47,40 @@ static void sig_catcher(void) {
 std::atomic<long long> JMessage::_ctr{0};
 
 static void kernelFinalizer(SEXP jk) {
-  JuniperKernel* jkernel = reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(jk));
+  JuniperKernel* jkernel = reinterpret_cast<JadesKernel*>(R_ExternalPtrAddr(jk));
   if( jkernel ) {
     delete jkernel;
     R_ClearExternalPtr(jk);
   }
 }
 
-static void xmockFinalizer(SEXP xm) {
-  xmock* _xm = reinterpret_cast<xmock*>(R_ExternalPtrAddr(xm));
-  if( _xm ) {
-    delete _xm;
-    R_ClearExternalPtr(xm);
-  }
+static JadesKernel* get_kernel(SEXP kernel) {
+  return reinterpret_cast<JadesKernel*>(R_ExternalPtrAddr(kernel));
 }
 
-
-static JuniperKernel* get_kernel(SEXP kernel) {
-  return reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(kernel));
-}
-
-xmock* _xm;
 // [[Rcpp::export]]
 SEXP init_kernel(const std::string& connection_file) {
   sig_catcher();
-  JuniperKernel* jk = JuniperKernel::make(connection_file);
 
-  _xm = new xmock();
-  _xm->_jk=jk;  // mocked interpreter needs pointer to the kernel
+  xeus::xconfiguration config = xeus::load_configuration(connection_file);
+
+  using interpreter_ptr = std::unique_ptr<JadesInterpreter>;
+  zmq::context_t* ctx = new zmq::context_t(1);
+  interpreter_ptr interpreter = interpreter_ptr(new JadesInterpreter(ctx));
+  JadesKernel jk(config, "jades_kernel", std::move(interpreter), make_server, *ctx);
 
   // even if boot_kernel is exceptional and we don't run delete jk
   // this finalizer will be run on R's exit and a cleanup will trigger then
   // if the poller's never get a signal, then deletion will be blocked on join
   // until a forced shutdown comes in from a jupyter client
-  return createExternalPointer<JuniperKernel>(jk, kernelFinalizer, "JuniperKernel*");
+  return createExternalPointer<JuniperKernel>(jk, kernelFinalizer, "JadesKernel*");
 }
 
 // [[Rcpp::export]]
 void boot_kernel(SEXP kernel) {
-  JuniperKernel* jk = get_kernel(kernel);
-  jk->start_bg_threads();
-  jk->run();
+  JadesKernel* jk = get_kernel(kernel);
+  jk->start();
   delete jk;
-  delete _xm;
-}
-
-//' The XMock
-//'
-//' Get the xeus mock interpreter for interoperability with other
-//' projects.
-//'
-//' @author Spencer Aiello
-//'
-//' @export
-// [[Rcpp::export]]
-SEXP the_xmock() {
-  if( _xm==nullptr )
-    Rcpp::stop("no xmock available.");
-  return createExternalPointer<xmock>(_xm, xmockFinalizer, "xmock*");
-}
-
-
-// [[Rcpp::export]]
-void execute_result(SEXP kernel, Rcpp::List data) {
-  get_kernel(kernel)->_request_server->execute_result(from_list_r(data));
 }
 
 // [[Rcpp::export]]

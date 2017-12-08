@@ -6,10 +6,10 @@ SYS=''
 unamestr=`uname`
 if [[ `uname` == 'Linux' ]]; then
    SYS=linux
-   DEPS="deps: lzmq qstack headers"
+   DEPS="deps: libxeus qstack"
 elif [[ `uname` == 'Darwin' ]]; then
    SYS=osx
-   DEPS="deps: zmq qstack"
+   DEPS="deps: libxeus qstack"
 fi
 ARCH=64
 R_HOME=$(R RHOME)
