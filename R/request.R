@@ -1,19 +1,19 @@
 # Copyright (C) 2017  Spencer Aiello
 #
-# This file is part of JuniperKernel.
+# This file is part of JadesKernel.
 #
-# JuniperKernel is free software: you can redistribute it and/or modify it
+# JadesKernel is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 #
-# JuniperKernel is distributed in the hope that it will be useful, but
+# JadesKernel is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with JuniperKernel.  If not, see <http://www.gnu.org/licenses/>.
+# along with JadesKernel.  If not, see <http://www.gnu.org/licenses/>.
 
 #' Top-level Request Driver for R
 #'
@@ -58,18 +58,23 @@
 #' @author Spencer Aiello
 #' @export
 doRequest <- function(handler, request_msg) {
-  out <- socketConnection("localhost", port=request_msg$stream_out_port)
-  err <- socketConnection("localhost", port=request_msg$stream_err_port)
-  sink(out, type="output")
-  sink(err, type="message")
+  print("handler")
+  print(handler)
+  print(request_msg)
+  # print(paste0("handler: ", handler, "; request_msg: ", request_msg))
+  # out <- socketConnection("localhost", port=request_msg$stream_out_port)
+  # err <- socketConnection("localhost", port=request_msg$stream_err_port)
+  # sink(out, type="output")
+  # sink(err, type="message")
   aliases <- list(system=list(sans="Arial", serif="Times", mono="Courier", symbol="Symbol"), user=list())
   jk_device(.kernel(), "white", 10, 5, 12, FALSE, aliases)
   dev <- grDevices::dev.cur()
   tryCatch(
       return(handler(request_msg))
+    , error=function(e) print(e)
     , finally={
-        sink(type="message"); close(err);
-        sink(type="output" ); close(out);
+        # sink(type="message"); close(err);
+        # sink(type="output" ); close(out);
         grDevices::dev.off(dev)
       }
   )

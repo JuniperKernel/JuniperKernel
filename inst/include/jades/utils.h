@@ -17,17 +17,17 @@
 #ifndef jades_jades_utils_H
 #define jades_jades_utils_H
 #include <string>
-#include <jxeus/xson.hpp>
+#include <xeus/xjson.hpp>
 #include <zmq.hpp>
 #include <Rcpp.h>
 
 
+using namespace xeus;
 template<int SXP, class CTYPE>
 static xjson from_sexp(SEXP s) {
   Rcpp::Vector<SXP> rvec = Rcpp::as<Rcpp::Vector<SXP>>(s);
 
   if( rvec.size()==1 ) {
-    if( SXP==LGLSXP ) return (bool)rvec[0];
     return rvec[0];
   }
 
@@ -48,7 +48,7 @@ static xjson from_list_r(Rcpp::List lst) {
     case NILSXP:  { j[names.at(i++)] = nullptr;                         break; }
     case INTSXP:  { j[names.at(i++)] = from_sexp<INTSXP,  int>(*it);    break; }
     case REALSXP: { j[names.at(i++)] = from_sexp<REALSXP, double>(*it); break; }
-    case LGLSXP:  { j[names.at(i++)] = from_sexp<LGLSXP,  bool>(*it);   break; }
+    case LGLSXP:  { j[names.at(i++)] = from_sexp<LGLSXP,  int>(*it);   break; }
     case VECSXP:  { j[names.at(i++)] = from_list_r(*it);                break; }
     case STRSXP: {
       Rcpp::StringVector tmp = Rcpp::as<Rcpp::StringVector>(*it);
@@ -83,7 +83,7 @@ static SEXP as_sexp(const xjson& j, bool is_val) {
     res[0] = j.get<CTYPE>();
     return Rcpp::wrap(res);
   }
-  Rcpp::Vector<SXP> res(j.size());ƒ
+  Rcpp::Vector<SXP> res(j.size());
   for( size_t i=0; i<j.size(); ++i ) {
     res[i] = j[i].get<CTYPE>();
   }
@@ -97,13 +97,13 @@ static SEXP j_to_sexp(const xjson& j, bool is_val=false) {
   xjson::value_t type = is_val?j.type():j[0].type();
   switch( type ) {
   case xjson::value_t::null:            return R_NilValue;
-  case xjson::value_t::boolean:         return as_sexp<LGLSXP,bool>(j, is_val);
+  case xjson::value_t::boolean:         return as_sexp<LGLSXP, int>(j, is_val);
   case xjson::value_t::string:          return as_sexp<STRSXP,std::string>(j, is_val);
   case xjson::value_t::number_unsigned: /*fall through*/
   case xjson::value_t::number_integer:  return as_sexp<INTSXP, int>(j, is_val);
   case xjson::value_t::number_float:    return as_sexp<REALSXP, double>(j, is_val);
   case xjson::value_t::object:          return from_json_r(j);
-  default: 
+  default:
     std::stringstream s;
     s << "don't know what to do with type: " << (int)type;
     Rcpp::stop(s.str());

@@ -13,21 +13,16 @@ Imports: utils,
          methods
 Suggests: RUnit, roxygen2
 Collate: 'booter.R'
-         'comm_close.R'
-         'comm_info_request.R'
-         'comm_msg.R'
-         'comm_open.R'
          'complete_request.R'
          'execute_request.R'
          'history_request.R'
          'inspect_request.R'
          'is_complete_request.R'
-         'juniper.R'
+         'jades.R'
          'kernel_info_request.R'
          'kernelspec.R'
          'RcppExports.R'
          'request.R'
-         'shutdown_request.R'
          'zzz.R'
 LinkingTo: Rcpp, gdtools
 Description: A native R kernel for Jupyter. This package provides a full implementation of the Jupyter messaging protocol in C++ by leveraging Rcpp and Xeus. Hence, this package will form the core of a suite of packages that provide functionality in the Jupyter ecosystem (e.g., support for widgets, bqplot, jupyterlab integration, etc.).

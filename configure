@@ -9,7 +9,7 @@ if [[ `uname` == 'Linux' ]]; then
    DEPS="deps: libxeus qstack"
 elif [[ `uname` == 'Darwin' ]]; then
    SYS=osx
-   DEPS="deps: libxeus qstack"
+   DEPS="deps: libxeus headers qstack"
 fi
 ARCH=64
 R_HOME=$(R RHOME)

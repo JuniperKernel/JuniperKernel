@@ -17,10 +17,10 @@
 #ifndef jades_jades_sockets_H
 #define jades_jades_sockets_H
 
-#include <cassert>
-#include <string>
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
+#include <cassert>
+#include <string>
 
 zmq::socket_t* init_socket(zmq::socket_t* socket, const std::string& endpoint) {
   socket->setsockopt(ZMQ_LINGER, LINGER);

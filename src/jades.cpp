@@ -1,19 +1,19 @@
 // Copyright (C) 2017  Spencer Aiello
 //
-// This file is part of JuniperKernel.
+// This file is part of JadesKernel.
 //
-// JuniperKernel is free software: you can redistribute it and/or modify it
+// JadesKernel is free software: you can redistribute it and/or modify it
 // under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 2 of the License, or
 // (at your option) any later version.
 //
-// JuniperKernel is distributed in the hope that it will be useful, but
+// JadesKernel is distributed in the hope that it will be useful, but
 // WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with JuniperKernel.  If not, see <http://www.gnu.org/licenses/>.
+// along with JadesKernel.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <thread>
 #include <fstream>
@@ -22,8 +22,10 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <xeus/xjson.hpp>
-#include <xeus/xserver.hpp>
 #include <jades/jades.h>
+#include <jades/utils.h>
+#include <xeus/xkernel.hpp>
+#include <jades/gdevice.h>
 #include <zmq.h>
 #include <zmq.hpp>
 #include <Rcpp.h>
@@ -43,42 +45,50 @@ static void sig_catcher(void) {
 #endif
 }
 
-// init static vars now
-std::atomic<long long> JMessage::_ctr{0};
+typedef void(*finalizerT)(SEXP);
+template<typename T>
+SEXP createExternalPointer(T* p, finalizerT finalizer, const char* pname) {
+  SEXP ptr;
+  ptr = Rcpp::Shield<SEXP>(R_MakeExternalPtr(reinterpret_cast<void*>(p),Rf_install(pname),R_NilValue));
+  R_RegisterCFinalizerEx(ptr, finalizer, TRUE);
+  return ptr;
+}
+
 
 static void kernelFinalizer(SEXP jk) {
-  JuniperKernel* jkernel = reinterpret_cast<JadesKernel*>(R_ExternalPtrAddr(jk));
+  xeus::xkernel* jkernel = reinterpret_cast<xeus::xkernel*>(R_ExternalPtrAddr(jk));
   if( jkernel ) {
     delete jkernel;
     R_ClearExternalPtr(jk);
   }
 }
 
-static JadesKernel* get_kernel(SEXP kernel) {
-  return reinterpret_cast<JadesKernel*>(R_ExternalPtrAddr(kernel));
+static xeus::xkernel* get_kernel(SEXP kernel) {
+  return reinterpret_cast<xeus::xkernel*>(R_ExternalPtrAddr(kernel));
 }
 
 // [[Rcpp::export]]
 SEXP init_kernel(const std::string& connection_file) {
   sig_catcher();
+  std::cout << "KERNEL INIT" << std::endl;
 
   xeus::xconfiguration config = xeus::load_configuration(connection_file);
 
   using interpreter_ptr = std::unique_ptr<JadesInterpreter>;
-  zmq::context_t* ctx = new zmq::context_t(1);
-  interpreter_ptr interpreter = interpreter_ptr(new JadesInterpreter(ctx));
-  JadesKernel jk(config, "jades_kernel", std::move(interpreter), make_server, *ctx);
+  interpreter_ptr interpreter = interpreter_ptr(new JadesInterpreter());
+  xeus::xkernel* jk = new xeus::xkernel(config, "jades_kernel", std::move(interpreter));
 
   // even if boot_kernel is exceptional and we don't run delete jk
   // this finalizer will be run on R's exit and a cleanup will trigger then
   // if the poller's never get a signal, then deletion will be blocked on join
   // until a forced shutdown comes in from a jupyter client
-  return createExternalPointer<JuniperKernel>(jk, kernelFinalizer, "JadesKernel*");
+  return createExternalPointer<xeus::xkernel>(jk, kernelFinalizer, "xeus::xkernel*");
 }
 
 // [[Rcpp::export]]
 void boot_kernel(SEXP kernel) {
-  JadesKernel* jk = get_kernel(kernel);
+  xeus::xkernel* jk = get_kernel(kernel);
+    std::cout << "KERNEL START" << std::endl;
   jk->start();
   delete jk;
 }
@@ -91,5 +101,6 @@ void jk_device(SEXP kernel, std::string bg, double width, double height, double 
 // [[Rcpp::export]]
 void publish_execute_result(int execution_counter, Rcpp::List data) {
   xjson pub_data = from_list_r(data);
-  publish_execution_result(execution_counter, std::move(pub_data), xjson());
+  Rcpp::Rcout << "PUBLISHING EXEC RESULT: " << pub_data << std::endl;
+  xeus::get_interpreter().publish_execution_result(execution_counter, std::move(pub_data), xjson());
 }

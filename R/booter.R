@@ -1,19 +1,19 @@
 # Copyright (C) 2017  Spencer Aiello
 #
-# This file is part of JuniperKernel.
+# This file is part of JadesKernel.
 #
-# JuniperKernel is free software: you can redistribute it and/or modify it
+# JadesKernel is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 2 of the License, or
 # (at your option) any later version.
 #
-# JuniperKernel is distributed in the hope that it will be useful, but
+# JadesKernel is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with JuniperKernel.  If not, see <http://www.gnu.org/licenses/>.
+# along with JadesKernel.  If not, see <http://www.gnu.org/licenses/>.
   
 #' Juniper Kernel Booter
 #' @title Boot the Juniper Kernel
@@ -45,7 +45,7 @@
 #' for more details.
 #' @export
 bootKernel <- function() {
-  require(JuniperKernel)  # attach the package to the search path so we can call methods from Rcpp
+  require(JadesKernel)  # attach the package to the search path so we can call methods from Rcpp
   argv <- commandArgs(trailingOnly=TRUE)
 
   if( length(argv)==0L )
