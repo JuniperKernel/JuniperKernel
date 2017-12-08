@@ -1,9 +1,8 @@
 Package: JuniperKernel
-Title: An R Kernel for Jupyter
+Title: R Kernel for Jupyter
 Version: 0.0.0.1
 Date: 2017-11-28
-Maintainer: Spencer Aiello <spnrpa@gmail.com>
-Author: Spencer Aiello
+Authors@R: c(person("Spencer Aiello", role=c("aut", "cre", "cph"), email="spnrpa@gmail.com"))
 Depends: R (>= 3.2.0)
 Imports: utils,
          jsonlite,
@@ -31,7 +30,8 @@ Collate: 'booter.R'
          'shutdown_request.R'
          'zzz.R'
 LinkingTo: Rcpp, gdtools
-Description: A native R kernel for Jupyter.
+Description: A native R kernel for Jupyter. This package provides a full implementation of the Jupyter messaging protocol in C++ by leveraging Rcpp and Xeus. Hence, this package will form the core of a suite of packages that provide functionality in the Jupyter ecosystem (e.g., support for widgets, bqplot, jupyterlab integration, etc.).
 URL: https://github.com/JuniperKernel/JuniperKernel
 License: GPL (>= 2) | file LICENSE
+BugReports: https://github.com/JuniperKernel/JuniperKernel/issues
 RoxygenNote: 6.0.1

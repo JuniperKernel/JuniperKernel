@@ -1,3 +1,4 @@
+// This is the original license for this source file:
 //  (C) 2002 T Jake Luciani: SVG device, based on PicTex device
 //  (C) 2008 Tony Plate: Line type support from RSVGTipsDevice package
 //  (C) 2012 Matthieu Decorde: UTF-8 support, XML reserved characters and XML header
@@ -17,11 +18,34 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// NOTE:
-// This is a fork of the svglite c++ source with customized callbacks for JuniperKernel.
-// To differentiate, the device description class is renamed to JKDesc from SVGDesc.
-// Additionally, the SvgStreamFile class is removed and the abstract SvgStream class
-// replaced with a single concrete std::stringstream wrapper class.
+// Copyright (C) 2017  Spencer Aiello
+//
+//   This is a fork of the svglite c++ source with customized callbacks for JuniperKernel.
+//   To differentiate, the device description class is renamed to JKDesc from SVGDesc.
+//   Additionally, the SvgStreamFile class is removed and the abstract SvgStream class
+//   replaced with a single concrete std::stringstream wrapper class. The original is
+//   copyright:
+//     (C) 2002 T Jake Luciani: SVG device, based on PicTex device
+//     (C) 2008 Tony Plate: Line type support from RSVGTipsDevice package
+//     (C) 2012 Matthieu Decorde: UTF-8 support, XML reserved characters and XML header
+//     (C) 2015 RStudio (Hadley Wickham): modernisation & refactoring
+//
+//
+// This file is part of JuniperKernel.
+//
+// JuniperKernel is free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// JuniperKernel is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with JuniperKernel.  If not, see <http://www.gnu.org/licenses/>.
+
 #include <Rcpp.h>
 #include <gdtools.h>
 #include <string>
