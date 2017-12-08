@@ -56,7 +56,7 @@
 #include <fstream>
 #include <sstream>
 #include <cmath>
-#include <json.hpp>
+#include <xeus/xjson.hpp>
 #include <juniper/juniper.h>
 
 double dbl_format(double x) { return std::abs(x) < 0.01 ? 0.00 : x; }
@@ -89,7 +89,7 @@ typedef std::shared_ptr<SvgStream> SvgStreamPtr;
 
 class JKDesc {
 public:
-  JuniperKernel* _jk;
+  JadesKernel* _jk;
   SvgStreamPtr stream;
   int pageno;
   std::string clipid;  // ID for the clip path
@@ -99,7 +99,7 @@ public:
   Rcpp::List user_aliases;
   XPtrCairoContext cc;
 
-  JKDesc(JuniperKernel* jk, bool standalone_, Rcpp::List aliases_):
+  JKDesc(JadesKernel* jk, bool standalone_, Rcpp::List aliases_):
     _jk(jk),
     stream(new SvgStream()),
     pageno(0),
@@ -401,12 +401,12 @@ void svg_close(pDevDesc dd) {
 
   if( svgd->stream->_stream.rdbuf()->in_avail() ) {
     svgd->stream->write("</svg>");
-    json display_data;
+    xjson display_data;
     std::string svg = svgd->stream->_stream.str();
     std::string result;
     std::remove_copy(svg.begin(), svg.end(), std::back_inserter(result), '\n');
     display_data["data"]["image/svg+xml"] = result;
-    svgd->_jk->_request_server->display_data(display_data);
+    svgd->_jk->p_interpreter->display_data(display_data, xjson(), xjson());
   }
   svgd->stream->clear();
   delete(svgd);

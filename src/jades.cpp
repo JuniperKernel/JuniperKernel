@@ -25,10 +25,6 @@
 #include <juniper/conf.h>
 #include <zmq.h>
 #include <zmq.hpp>
-#include <juniper/gdevice.h>
-#include <juniper/juniper.h>
-#include <juniper/xbridge.h>
-#include <juniper/external.h>
 #include <Rcpp.h>
 
 static short interrupted=false;
@@ -110,20 +106,6 @@ SEXP the_xmock() {
   return createExternalPointer<xmock>(_xm, xmockFinalizer, "xmock*");
 }
 
-// [[Rcpp::export]]
-void stream_stdout(SEXP kernel, const std::string& output) {
-  get_kernel(kernel)->_request_server->stream_out(output);
-}
-
-// [[Rcpp::export]]
-void stream_stderr(SEXP kernel, const std::string& err) {
-  get_kernel(kernel)->_request_server->stream_err(err);
-}
-
-// [[Rcpp::export]]
-void rebroadcast_input(SEXP kernel, const std::string& execution_input, const int execution_count) {
-  get_kernel(kernel)->_request_server->rebroadcast_input(execution_input, execution_count);
-}
 
 // [[Rcpp::export]]
 void execute_result(SEXP kernel, Rcpp::List data) {
@@ -136,28 +118,7 @@ void jk_device(SEXP kernel, std::string bg, double width, double height, double 
 }
 
 // [[Rcpp::export]]
-SEXP filter_comms(std::string target_name) {
-  json comms;
-  const xmock& xm = get_xmock();
-  for( auto it = xm.comm_manager().comms().cbegin(); it != xm.comm_manager().comms().cend(); ++it ) {
-    const std::string& name = it->second->target().name();
-    if( target_name.empty() || name == target_name ) {
-      xjson info;
-      info["target_name"] = name;
-      comms[it->first] = std::move(info);
-    }
-  }
-  if( comms.empty() ) comms = {};
-  return from_json_r({{"status", "ok"}, {"comms", comms}});
-}
-
-// [[Rcpp::export]]
-void comm_request(const std::string type) {
-  xmock& xm = get_xmock();
-  JMessage jm = xm._jk->_request_server->_cur_msg;
-
-  xmessage xmsg = to_xmessage(jm.get(), jm.ids());
-  if( type=="open" ) xm.comm_manager().comm_open( xmsg);
-  if( type=="close") xm.comm_manager().comm_close(xmsg);
-  if( type=="msg"  ) xm.comm_manager().comm_msg(  xmsg); 
+void publish_execute_result(int execution_counter, Rcpp::List data) {
+  xjson pub_data = from_list_r(data);
+  publish_execution_result(execution_counter, std::move(pub_data), xjson());
 }
