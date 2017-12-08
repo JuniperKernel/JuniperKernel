@@ -21,3 +21,4 @@ CODE_OF_CONDUCT.md$
 CONTRIBUTING.md$
 src/zeromq*
 cran-comments.md$
+travis-tool.sh.cmd$
