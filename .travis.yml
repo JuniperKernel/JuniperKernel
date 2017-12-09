@@ -37,4 +37,4 @@ deploy:
   file: '*gz'
   skip_cleanup: true
   on:
-    tags
+    tags: true
