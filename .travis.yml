@@ -31,6 +31,10 @@ script:
   - R CMD INSTALL --build .
   - make check
 
+before_deploy:
+  - ls -la
+  - pwd
+
 deploy:
   provider: releases
   api_key: '$GITHUB_API_KEY'
