@@ -34,7 +34,7 @@ structures, typedefs, class definitions, etc.)
     foo
 
 Connect opening parenthesis to control statements (if, while, switch,
-for, etc.) and pad parenthesized expressions with spaces
+for, etc.) and pad parenthesized expressions with spaces  
 
   if( x ) {
   }
