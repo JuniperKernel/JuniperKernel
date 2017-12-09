@@ -35,7 +35,7 @@ deploy:
   provider: releases
   api_key: '$GITHUB_API_KEY'
   file: 
-    - JuniperKernel
+    - target/JuniperKernel_1.0.0.0.tar.gz
   skip_cleanup: true
   on:
     tags: false
