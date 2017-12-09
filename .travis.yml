@@ -37,5 +37,5 @@ deploy:
   file: 'JuniperKernel_1.0.0.0.tar.gz'
   skip_cleanup: true
   on:
-    tags: true
+    tags: false
     all_branches: true
