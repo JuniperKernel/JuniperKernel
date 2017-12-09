@@ -30,6 +30,8 @@ script:
   - g++ --version
   - R CMD INSTALL --build .
   - make check
+  - ls -la
+  - pwd
 
 before_deploy:
   - ls -la
@@ -39,7 +41,7 @@ deploy:
   provider: releases
   api_key: '$GITHUB_API_KEY'
   file: 
-    - target/JuniperKernel_1.0.0.0.tar.gz
+    - JuniperKernel_1.0.0.0_R_x86_64-pc-linux-gnu.tar.gz
   skip_cleanup: true
   on:
     tags: false
