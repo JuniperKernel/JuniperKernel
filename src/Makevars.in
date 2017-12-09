@@ -41,8 +41,7 @@ lzmq:
 	@echo "Installing zmq for linux"
 	@[ -d ../inst/zmq ] || mkdir -p ../inst/zmq
 	@curl -skLO ${ZMQ_TAR_URL} && tar -xzf ${ZMQ_TAR_FILE}
-	@mv zeromq-${ZMQ_VERSION} ../..
-	@(cd ../../zeromq-${ZMQ_VERSION}/ && ./configure && sudo make install && sudo ldconfig)
+	@cp libzmq-4.2.2/* ../inst/zmq
 
 ../inst/zmq/libzmq.a:
 	@echo "Downloading libzmq prebuild"
