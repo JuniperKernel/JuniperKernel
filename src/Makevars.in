@@ -42,8 +42,6 @@ lzmq:
 	@[ -d ../inst/zmq ] || mkdir -p ../inst/zmq
 	@curl -skLO ${ZMQ_TAR_URL} && tar -xzf ${ZMQ_TAR_FILE}
 	@cp libzmq-4.2.2/* ../inst/zmq
-	@cp ../inst/zmq/libzmq.so ../inst/zmq/libzmq.so.5.1.2
-	@cp ../inst/zmq/libzmq.so ../inst/zmq/libzmq.so.5
 
 ../inst/zmq/libzmq.a:
 	@echo "Downloading libzmq prebuild"
