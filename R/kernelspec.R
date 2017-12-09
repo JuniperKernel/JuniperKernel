@@ -162,7 +162,7 @@ installJuniper <- function(useJupyterDefault = FALSE, kernelName = defaultKernel
   if( name!=kernelName )
     warning("Mixed case characters are ignored: ", kernelName, " -> ", name)
 
-  if( !useJupyterDefault && prefix='' )
+  if( !nzchar(prefix) && !useJupyterDefault )
     stop("Must specify `useJupyterDefault` as TRUE or `prefix` must be a path.")
 
   # write the kernels.json file

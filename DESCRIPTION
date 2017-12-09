@@ -2,13 +2,13 @@ Package: JuniperKernel
 Title: Kernel for 'Jupyter'
 Version: 1.0.0.0
 Date: 2017-12-07
-Authors@R: c( person("Spencer Aiello",   role=c("aut", "cre", "cph"), email="spnrpa@gmail.com"),
-              person("Stephan Brumme",   role=c("cph")),
-              person("Jake Luciani",     role=c("cph")),
-              person("Tony Plate",       role=c("cph")),
-              person("Matthieu Decorde", role=c("cph")),
-              person("RStudio (Hadley Wickham)", role=c("cph"))
-)
+Authors@R: c(
+  person("Spencer Aiello",   role=c("aut", "cre", "cph"), email="spnrpa@gmail.com"),
+  person("Stephan Brumme",   role="cph"),
+  person("Jake Luciani",     role="cph"),
+  person("Tony Plate",       role="cph"),
+  person("Matthieu Decorde", role="cph"),
+  person("RStudio (Hadley Wickham)", role="cph") )
 Copyright: See the file COPYRIGHTS
 Depends: R (>= 3.2.0)
 Imports: utils,
