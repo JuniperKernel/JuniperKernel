@@ -1,0 +1,8 @@
+File: inst/include/gdevice.h
+Copyrights:
+  (C) 2002 T Jake Luciani: SVG device, based on PicTex device
+  (C) 2008 Tony Plate: Line type support from RSVGTipsDevice package
+  (C) 2012 Matthieu Decorde: UTF-8 support, XML reserved characters and XML header
+  (C) 2015 RStudio (Hadley Wickham): modernisation & refactoring
+License: GNU General Public License
+Original Location: r-lib/svglite github location at https://github.com/r-lib/svglite/tree/master/src

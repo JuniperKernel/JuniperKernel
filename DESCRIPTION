@@ -1,8 +1,15 @@
 Package: JuniperKernel
-Title: R Kernel for Jupyter
+Title: Kernel for 'Jupyter'
 Version: 1.0.0.0
 Date: 2017-12-07
-Authors@R: c(person("Spencer Aiello", role=c("aut", "cre", "cph"), email="spnrpa@gmail.com"))
+Authors@R: c( person("Spencer Aiello",   role=c("aut", "cre", "cph"), email="spnrpa@gmail.com"),
+              person("Stephan Brumme",   role=c("cph")),
+              person("Jake Luciani",     role=c("cph")),
+              person("Tony Plate",       role=c("cph")),
+              person("Matthieu Decorde", role=c("cph")),
+              person("RStudio (Hadley Wickham)", role=c("cph"))
+)
+Copyright: See the file COPYRIGHTS
 Depends: R (>= 3.2.0)
 Imports: utils,
          jsonlite,
@@ -30,7 +37,10 @@ Collate: 'booter.R'
          'shutdown_request.R'
          'zzz.R'
 LinkingTo: Rcpp, gdtools
-Description: A native R kernel for Jupyter. This package provides a full implementation of the Jupyter messaging protocol in C++ by leveraging Rcpp and Xeus. Hence, this package will form the core of a suite of packages that provide functionality in the Jupyter ecosystem (e.g., support for widgets, bqplot, jupyterlab integration, etc.).
+Description: Provides a full implementation of the 'Jupyter' <http://jupyter.org/> messaging protocol in C++ by leveraging 'Rcpp' and 'Xeus' <https://github.com/QuantStack/xeus>.
+             'Jupyter' supplies an interactive computing environment for multiple programming languages and a messaging protocol that is defined over 'ZeroMQ' so that new languages
+             can be exposed in the interactive environment. Languages are exposed by providing 'Jupyter' a piece of software called a "kernel", of which 'JuniperKernel' is one. 'Xeus'
+             is a C++ library that facilitates the implementation of kernels for 'Jupyter'.
 URL: https://github.com/JuniperKernel/JuniperKernel
 License: GPL (>= 2) | file LICENSE
 BugReports: https://github.com/JuniperKernel/JuniperKernel/issues

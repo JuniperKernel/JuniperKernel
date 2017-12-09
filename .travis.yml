@@ -30,3 +30,11 @@ script:
   - g++ --version
   - R CMD INSTALL --build .
   - make check
+
+deploy:
+  provider: releases
+  api_key: '$GITHUB_API_KEY'
+  file: '*gz'
+  skip_cleanup: true
+  on:
+    tags

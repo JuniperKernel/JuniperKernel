@@ -50,7 +50,7 @@
   tmpPath
 }
 
-.installSpec <- function(user, prefix, kernelName, tmpPath) {
+.installSpec <- function(useJupyterDefault, prefix, kernelName, tmpPath) {
   kernelspec <- file.path(tmpPath, 'kernelspec')
   args <- c( "kernelspec"
            , "install"
@@ -58,7 +58,7 @@
            , "--name"
            , kernelName
            # --user flag
-           , ifelse(user, '--user', '')
+           , ifelse(useJupyterDefault, '--user', '')
            # --prefix prefix
            , ifelse(nzchar(prefix), '--prefix', '')
            , ifelse(nzchar(prefix), prefix, '')
@@ -118,16 +118,16 @@ defaultDisplayName <- function() {
 #' between versions of R, but installs having the same kernel name replace an existing
 #' kernel.
 #'
-#' @param user
-#' If \code{TRUE}, install the kernel in a user-local fashion. For macOS,
-#' the user-local directory is \code{~/Library/Jupyter/kernels}. For Windows, the
-#' user-local directory is \code{\%APPDATA\%\\jupyter\\kernels}. For Linux this directory is
+#' @param useJupyterDefault
+#' If \code{TRUE}, install the kernel in a default Jupyter kernel location fashion. For macOS,
+#' the default Jupyter kernel location is \code{~/Library/Jupyter/kernels}. For Windows, the
+#' default Jupyter kernel location is \code{\%APPDATA\%\\jupyter\\kernels}. For Linux this directory is
 #' \code{~/.local/share/jupyter/kernels}.
 #' If \code{FALSE}, the kernel is installed system-wide. For unix-based machines,
 #' the system-level directory is \code{/usr/share/jupyter/kernels} or
 #' \code{/usr/local/share/jupyter/kernels}. For Windows, the location is
 #' \code{\%PROGRAMDATA\%\\jupyter\\kernels}.
-#' If the \code{prefix} argument is specified, then the \code{user} parameter is ignored.
+#' If the \code{prefix} argument is specified, then the \code{useJupyterDefault} parameter is ignored.
 #'
 #' @param kernelName
 #' A character string representing the location of the kernel. This is required
@@ -149,10 +149,10 @@ defaultDisplayName <- function() {
 #'
 #' @examples
 #' \dontrun{
-#'   installJuniper()  # install into user-local directory
+#'   installJuniper()  # install into default Jupyter kernel location
 #' }
 #' @export
-installJuniper <- function (user = TRUE, kernelName = defaultKernelName(), displayName = defaultDisplayName(), prefix='') {
+installJuniper <- function(useJupyterDefault = FALSE, kernelName = defaultKernelName(), displayName = defaultDisplayName(), prefix='') {
   .stopIfJupyterMissing()
 
   if( regexpr("^[a-zA-Z_][a-zA-Z0-9_.-]*$", kernelName)[1L] == -1L )
@@ -162,14 +162,17 @@ installJuniper <- function (user = TRUE, kernelName = defaultKernelName(), displ
   if( name!=kernelName )
     warning("Mixed case characters are ignored: ", kernelName, " -> ", name)
 
+  if( !useJupyterDefault && prefix='' )
+    stop("Must specify `useJupyterDefault` as TRUE or `prefix` must be a path.")
+
   # write the kernels.json file
   tmpPath <- .writeSpec(displayName)
 
-  if( user && nzchar(prefix) ) {
-    warning("`user` and `prefix` specifed. `user` is ignored.")
-    user <- FALSE
+  if( useJupyterDefault && nzchar(prefix) ) {
+    warning("`useJupyterDefault` and `prefix` specifed. `useJupyterDefault` is ignored.")
+    useJupyterDefault <- FALSE
   }
 
   # install the kernel for jupyter to see
-  invisible(.installSpec(user, prefix, name, tmpPath))
+  invisible(.installSpec(useJupyterDefault, prefix, name, tmpPath))
 }
