@@ -1,3 +1,22 @@
+## Resubmission
+This is a resubmission. In this version I have:
+
+* Used single quotes for software names (e.g. 'Rcpp', 'Jupyter', 'Xeus')
+
+* Expanded the Description field of DESCRIPTION to describe 'Jupyter' and 'Xeus' and provide links in the form <http://...> and <https://...>.
+
+* Explained more clearly that this package provides interoperability with the 'Jupyter' ecosystem (and hopefully made clear that there will not be multiple packages).
+
+* Removed redundant "R" in the package title.
+
+* Added COPYRIGHTS file to inst/ and included all copyright holders into the Authors@R field.
+
+* Renamed the arguments somewhat in the `installJuniper` function to clearly illustrate that the `prefix` field is for sepcifying custom paths. Additionally, the
+  `user` argument has been renamed to illsutrate that it relates to the default 'Jupyter' installation and has a new default value of FALSE so that the user does
+  not install into a user-local directory by default.
+
+* Added dynamically linkable zeromq libs for linux distribution Ubuntu 14.04.5 LTS.
+
 ## Test environments
 * local OS X install, R 3.4.3
 * local Windows 10 install, R 3.4.3 and R 3.4.1

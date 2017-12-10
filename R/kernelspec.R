@@ -149,7 +149,7 @@ defaultDisplayName <- function() {
 #'
 #' @examples
 #' \dontrun{
-#'   installJuniper()  # install into default Jupyter kernel location
+#'   installJuniper(useJupyterDefault = TRUE)  # install into default Jupyter kernel location
 #' }
 #' @export
 installJuniper <- function(useJupyterDefault = FALSE, kernelName = defaultKernelName(), displayName = defaultDisplayName(), prefix='') {
