@@ -39,6 +39,8 @@ before_deploy:
 
 after_failure:
   - cat ./JuniperKernel.Rcheck/00install.out
+  - ldd ./src/JuniperKernel.so
+  - ls -la inst/zmq
 
 deploy:
   provider: releases
