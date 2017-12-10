@@ -37,6 +37,9 @@ before_deploy:
   - ls -la
   - pwd
 
+after_failure:
+  - cat ./JuniperKernel.Rcheck/00install.out
+
 deploy:
   provider: releases
   api_key: '$GITHUB_API_KEY'
