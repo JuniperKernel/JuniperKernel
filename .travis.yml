@@ -42,12 +42,12 @@ after_failure:
   - ldd ./src/JuniperKernel.so
   - ls -la ./inst/zmq
 
-deploy:
-  provider: releases
-  api_key: '$GITHUB_API_KEY'
-  file: 
-    - JuniperKernel_1.0.0.0_R_x86_64-pc-linux-gnu.tar.gz
-  skip_cleanup: true
-  on:
-    tags: false
-    all_branches: true
+#deploy:
+#  provider: releases
+#  api_key: '$GITHUB_API_KEY'
+#  file: 
+#    - JuniperKernel_1.0.0.0_R_x86_64-pc-linux-gnu.tar.gz
+#  skip_cleanup: true
+#  on:
+#    tags: true
+#    all_branches: true
