@@ -2,7 +2,6 @@ ARCH=@arch@
 SYS=@sys@
 R_LIB=@rlib@
 
-
 # zmq bacon bits
 ZMQ_VERSION = 4.2.2
 ZMQ_TAR_FILE= libzmq-${ZMQ_VERSION}.tar.gz
@@ -28,7 +27,7 @@ CXX_STD      = CXX11
 
 # set include and linker options
 PKG_CPPFLAGS = -I../inst/include/ -I.
-PKG_LIBS     = -lzmq -L../inst/zmq -Wl,-rpath,$(R_LIB)/JuniperKernel/zmq
+PKG_LIBS     = -lzmq -L../inst/zmq -Wl,-rpath,$(R_LIB)/JuniperKernel/zmq -Wl,-R,'$$ORIGIN/../zmq'
 
 all: deps $(SHLIB)
 
@@ -46,6 +45,8 @@ lzmq:
 	@cp  ../inst/zmq/libzmq.so.5.1.2 ../inst/zmq/libzmq.so
 	@cp  ../inst/zmq/libzmq.so.5.1.2 ../inst/zmq/libzmq.so.5
 	@ls -la ../inst/zmq
+	@rm -rf zeromq-4.2.2
+	@rm -rf libzmq*
 
 ../inst/zmq/libzmq.a:
 	@echo "Downloading libzmq prebuild"
