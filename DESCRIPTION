@@ -38,10 +38,10 @@ Collate: 'booter.R'
          'zzz.R'
 LinkingTo: Rcpp, gdtools
 Description: Provides a full implementation of the 'Jupyter' <http://jupyter.org/> messaging protocol in C++ by leveraging 'Rcpp' and 'Xeus' <https://github.com/QuantStack/xeus>.
-             'Jupyter' supplies an interactive computing environment for multiple programming languages and a messaging protocol that is defined over 'ZeroMQ' so that new languages such as 'R'
-             may be exposed in the interactive environment. Languages are exposed by providing 'Jupyter' a piece of software called a "kernel", of which 'JuniperKernel' is one. 'Xeus'
-             is a C++ library that facilitates the implementation of kernels for 'Jupyter' and interoperability with other libraries that exist in the 'Jupyter' ecosystem for building widgets
-             and plotting.
+             'Jupyter' supplies an interactive computing environment and a messaging protocol defined over 'ZeroMQ' for multiple programming languages. This package implements
+             the 'Jupyter' kernel interface so that 'R' is exposed to this interactive computing environment.
+             'Xeus' is a C++ library that facilitates the implementation of kernels for 'Jupyter'. Additionally, 'Xeus' provides interoperability with other libraries that exist in the 'Jupyter' ecosystem for building widgets,
+             plotting, and more <https://blog.jupyter.org/interactive-workflows-for-c-with-jupyter-fe9b54227d92>. 'JuniperKernel' uses 'Xeus' as a library for the 'Jupyter' messaging protocol.
 URL: https://github.com/JuniperKernel/JuniperKernel
 License: GPL (>= 2) | file LICENSE
 BugReports: https://github.com/JuniperKernel/JuniperKernel/issues

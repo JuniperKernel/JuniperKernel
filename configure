@@ -1,5 +1,10 @@
 #!/bin/bash
 
+ARCH=64
+R_HOME=$(R RHOME)
+RSCRIPT=${R_HOME}/bin/Rscript
+R_LIB=$(${RSCRIPT} -e 'cat(.Library)')
+
 # Decide OS
 # Essentially switch between osx and Linux; fail if windows
 SYS=''
@@ -7,15 +12,13 @@ unamestr=`uname`
 if [[ `uname` == 'Linux' ]]; then
    SYS=linux
    DEPS="deps: lzmq qstack headers"
+   LINKER="-Wl,-R,'\$\$ORIGIN/../zmq'"
 elif [[ `uname` == 'Darwin' ]]; then
    SYS=osx
    DEPS="deps: zmq qstack"
+   LINKER="-Wl,-rpath,${R_LIB}/JuniperKernel/zmq"
 fi
-ARCH=64
-R_HOME=$(R RHOME)
-RSCRIPT=${R_HOME}/bin/Rscript
-R_LIB=$(${RSCRIPT} -e 'cat(.Library)')
-sed -e"s|@rlib@|"${R_LIB}"|" -e"s|@arch@|"${ARCH}"|" -e"s|@sys@|"${SYS}"|" -e "s/@deps@/${DEPS}/" src/Makevars.in > src/Makevars
+sed -e"s|@rlib@|"${R_LIB}"|" -e"s|@arch@|"${ARCH}"|" -e"s|@sys@|"${SYS}"|" -e"s/@deps@/${DEPS}/"  -e"s|@LINKER@|"${LINKER}"|" src/Makevars.in > src/Makevars
 
 ${RSCRIPT} -e 'Rcpp::compileAttributes()'
 ${RSCRIPT} -e 'roxygen2::roxygenize()'
