@@ -46,5 +46,10 @@ if %ERRORLEVEL% EQU 1 exit 1
 Rscript -e roxygen2::roxygenize()
 if %ERRORLEVEL% EQU 1 exit 1
 
-R CMD INSTALL --build .
+R CMD build .
 if %ERRORLEVEL% EQU 1 exit 1
+
+mkdir build
+C:\Rtools\bin\mv Juniper*gz build
+cd build
+R CMD INSTALL Juniper*gz
