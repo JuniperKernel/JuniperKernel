@@ -5,13 +5,13 @@ set "ZMQ_HEADERS_URL=https://github.com/JuniperKernel/zmq/raw/master/headers/%ZM
 set "ZMQ_CPP_HEADER_URL=https://github.com/zeromq/cppzmq/raw/master/zmq.hpp"
 set "ZMQ_CPPADDON_HEADER_URL=https://raw.githubusercontent.com/zeromq/cppzmq/master/zmq_addon.hpp"
 
-#quantstack bacon bits
-# xtl
+::quantstack bacon bits
+:: xtl
 set "XTL_VERSION=0.3.1"
 set "XTL_TAR_FILE=%XTL_VERSION%.tar.gz"
 set "XTL_URL=https://github.com/QuantStack/xtl/archive/%XTL_TAR_FILE%"
 
-# xeus
+:: xeus
 set "XEUS_VERSION=0.7.0"
 set "XEUS_TAR_FILE=%XEUS_VERSION%.tar.gz"
 set "XEUS_URL=https://github.com/QuantStack/xeus/archive/%XEUS_TAR_FILE%"
@@ -24,7 +24,7 @@ powershell -Command "Invoke-WebRequest %ZMQ_CPP_HEADER_URL% -OutFile .\inst\incl
 powershell -Command "Invoke-WebRequest %ZMQ_CPPADDON_HEADER_URL% -OutFile .\inst\include\zmq_addon.hpp"
 powershell -Command "Invoke-WebRequest %ZMQ_HEADERS_URL% -OutFile %ZMQ_HEADER_TAR_FILE%"
 C:\Rtools\bin\tar -xzf %ZMQ_HEADER_TAR_FILE%
-C:\Rtools\bin\mv include\*h .\inst\include
+C:\Rtools\bin\mv include/*h .\inst\include
 C:\Rtools\bin\rm -rf %ZMQ_HEADER_TAR_FILE% include
 
 :: fetch xtl headers
@@ -36,7 +36,7 @@ C:\Rtools\bin\rm -rf xtl-%XTL_VERSION% %XTL_TAR_FILE%
 
 :: fetch xeus headers
 powershell -Command "Invoke-WebRequest %XEUS_URL% -OutFile %XEUS_TAR_FILE%"
-C:\Rtools\bin\tar -xzf %XTL_TAR_FILE%
+C:\Rtools\bin\tar -xzf %XEUS_TAR_FILE%
 C:\Rtools\bin\mv xeus-%XEUS_VERSION%\include\xeus .\inst\include
 C:\Rtools\bin\rm -rf xeus-%XEUS_VERSION% %XEUS_TAR_FILE%
 

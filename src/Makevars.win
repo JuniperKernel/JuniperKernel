@@ -24,7 +24,7 @@ clean:
 	@rm -rf *.o
 
 .Phony: zmq
-zmq: inst/libs/${FLV}/libzmq.dll headers
+zmq: inst/libs/${FLV}/libzmq.dll
 inst/libs/${FLV}/libzmq.dll:
 	@[ -d ../zmq/win/${FLV} ] || mkdir -p ../zmq/win/${FLV}
 	@[ -f ../zmq/win/${FLV}/${ZMQ_TAR_FILE} ] || Rscript -e "download.file('${ZMQ_TAR_URL}', '${ZMQ_TAR_FILE}')"
