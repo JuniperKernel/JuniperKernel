@@ -12,32 +12,8 @@ PKG_LIBS = -lzmq -L${FLV}
 ZMQ_VERSION = 4.2.2
 ZMQ_TAR_FILE= libzmq-${ZMQ_VERSION}-${FLV}.tar.gz
 ZMQ_TAR_URL = https://github.com/JuniperKernel/zmq/raw/master/win${WIN}/${ZMQ_TAR_FILE}
-ZMQ_HEADER_TAR_FILE = zmq-4.2.2-headers.tar.gz
-ZMQ_HEADERS_URL = https://github.com/JuniperKernel/zmq/raw/master/headers/${ZMQ_HEADER_TAR_FILE}
-ZMQ_CPP_HEADER_URL = https://github.com/zeromq/cppzmq/raw/master/zmq.hpp
-ZMQ_CPPADDON_HEADER_URL = https://raw.githubusercontent.com/zeromq/cppzmq/master/zmq_addon.hpp
 
-# qstack backon bits
-# xeus
-XEUS_VERSION = 0.7.0
-XEUS_TAR_FILE = ${XEUS_VERSION}.tar.gz
-XEUS_URL = https://github.com/QuantStack/xeus/archive/${XEUS_TAR_FILE}
-# xtl
-XTL_VERSION = 0.3.1
-XTL_TAR_FILE = ${XTL_VERSION}.tar.gz
-XTL_URL = https://github.com/QuantStack/xtl/archive/${XTL_TAR_FILE}
-
-all: clean deps $(SHLIB)
-deps: rcpp zmq qstack
-
-rcpp:
-	@echo "Rexe: ${Rexe}"
-	@echo "Generating RcppExports"
-	@Rscript -e 'Rcpp::compileAttributes("..")'
-	@sed -i '/\r/d' ../src/RcppExports.cpp
-	@echo "Moving the generated RcppExports file"
-	@cp ../src/RcppExports.cpp .
-	@Rscript -e 'roxygen2::roxygenize("..")'
+all: clean zmq $(SHLIB)
 
 .Phony: clean
 clean:
@@ -61,34 +37,3 @@ inst/libs/${FLV}/libzmq.dll:
 	#@[ -d ../inst/libs/${FLV} ] || mkdir -p ../inst/libs/${FLV}
 	#@cp ${FLV}/libzmq.dll* ../inst/libs/${FLV}
 	@rm -rf ../inst/libz*
-
-headers: ../inst/include/zmq.h
-../inst/include/zmq.h:
-	@echo "Downloading ZMQ header files"
-	@[ -d ../inst/include ] || mkdir -p ../inst/include
-	@Rscript -e "download.file('${ZMQ_CPP_HEADER_URL}', 'zmq.hpp')"
-	@mv zmq.hpp ../inst/include
-	@Rscript -e "download.file('${ZMQ_CPPADDON_HEADER_URL}', 'zmq_addon.hpp')"
-	@mv zmq_addon.hpp ../inst/include
-	@Rscript -e "download.file('${ZMQ_HEADERS_URL}', '${ZMQ_HEADER_TAR_FILE}')"
-	@tar -xzf ${ZMQ_HEADER_TAR_FILE}
-	@mv include/*h ../inst/include
-	@rm -rf ${ZMQ_HEADER_TAR_FILE} include
-
-qstack: ../inst/include/xeus ../inst/include/xtl
-
-../inst/include/xeus:
-	@echo "Fetching xeus headers..."
-	@[ -d ../inst/include ] || mkdir -p ../inst/include
-	@Rscript -e "download.file('${XEUS_URL}', '${XEUS_TAR_FILE}')"
-	@tar -xzf ${XEUS_TAR_FILE}
-	@mv xeus-${XEUS_VERSION}/include/xeus ../inst/include
-	@rm -rf xeus-${XEUS_VERSION} ${XEUS_TAR_FILE}
-
-../inst/include/xtl:
-	@echo "Fetching xtl headers..."
-	@[ -d ../inst/include ] || mkdir -p ../inst/include
-	@Rscript -e "download.file('${XTL_URL}', '${XTL_TAR_FILE}')"
-	@tar -xzf ${XTL_TAR_FILE}
-	@mv xtl-${XTL_VERSION}/include/xtl ../inst/include
-	@rm -rf xtl-${XTL_VERSION} ${XTL_TAR_FILE}

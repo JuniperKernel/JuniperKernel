@@ -11,15 +11,13 @@ SYS=''
 unamestr=`uname`
 if [[ `uname` == 'Linux' ]]; then
    SYS=linux
-   DEPS="deps: lzmq qstack headers"
+   DEPS="deps: lzmq"
    LINKER="-Wl,-R,'\$\$ORIGIN/../zmq'"
 elif [[ `uname` == 'Darwin' ]]; then
    SYS=osx
-   DEPS="deps: zmq qstack"
+   DEPS="deps: zmq"
    LINKER="-Wl,-rpath,${R_LIB}/JuniperKernel/zmq"
 fi
 sed -e"s|@rlib@|"${R_LIB}"|" -e"s|@arch@|"${ARCH}"|" -e"s|@sys@|"${SYS}"|" -e"s/@deps@/${DEPS}/"  -e"s|@LINKER@|"${LINKER}"|" src/Makevars.in > src/Makevars
 
-${RSCRIPT} -e 'Rcpp::compileAttributes()'
-${RSCRIPT} -e 'roxygen2::roxygenize()'
 exit 0
