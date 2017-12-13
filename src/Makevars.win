@@ -28,7 +28,7 @@ clean:
 buildzmq:
 	@mkdir temp
 	@cp ../inst/pbdZMQ-0.2-6.zip temp
-	@cd temp && unzip -q pbdZMQ-0.2-6.zip && cp pbdZMQ-0.2-6/src/Makevars.win pbdZMQ-0.2-6/src/Makefile && $(MAKE) -C pbdZMQ-0.2-6/src ./libzmq.dll
+	@cd temp && unzip -q pbdZMQ-0.2-6.zip && $(MAKE) -C pbdZMQ-0.2-6/src -f Makevars.win ./libzmq.dll
 	@[ -d ${FLV} ] || mkdir -p ${FLV}
 	@cp temp/pbdZMQ-0.2-6/src/libzmq.dll ${FLV}
 	@cp temp/pbdZMQ-0.2-6/src/libzmq.dll .
