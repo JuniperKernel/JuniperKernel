@@ -177,14 +177,6 @@ class RequestServer {
       });
       return out_thread;
     }
-    static int read_port(zmq::socket_t* sock) {
-      char endpoint[32];
-      size_t sz = sizeof(endpoint); 
-      sock->getsockopt(ZMQ_LAST_ENDPOINT, &endpoint, &sz);
-      std::string ep(endpoint);
-      std::string port(ep.substr(ep.find(":", ep.find(":")+1)+1));
-      return stoi(port);
-    }
 };
 
 #endif // ifndef juniper_juniper_requests_H

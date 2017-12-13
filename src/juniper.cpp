@@ -31,20 +31,6 @@
 #include <juniper/external.h>
 #include <Rcpp.h>
 
-static short interrupted=false;
-static void sig_handler(int sig) { interrupted=true; }
-static void sig_catcher(void) {
-#ifdef _WIN32
-  // TODO
-#else
-  struct sigaction action;
-  action.sa_handler = sig_handler;
-  action.sa_flags = 0;
-  sigemptyset(&action.sa_mask);
-  sigaction(SIGINT, &action, NULL);
-  sigaction(SIGTERM, &action, NULL);
-#endif
-}
 
 // init static vars now
 std::atomic<long long> JMessage::_ctr{0};
@@ -73,7 +59,6 @@ static JuniperKernel* get_kernel(SEXP kernel) {
 xmock* _xm;
 // [[Rcpp::export]]
 SEXP init_kernel(const std::string& connection_file) {
-  sig_catcher();
   JuniperKernel* jk = JuniperKernel::make(connection_file);
 
   _xm = new xmock();
