@@ -21,7 +21,8 @@ src/*so
 src/*o
 inst/libs
 src/x64
-*zip
+src/*zip
+./*zip
 *dll
 *gz
 inst/include/xtl
