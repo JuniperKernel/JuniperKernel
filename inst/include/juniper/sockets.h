@@ -46,9 +46,9 @@ zmq::socket_t* listen_on(zmq::context_t& context, const std::string& endpoint, z
 // false, stop polling and teardown.
 // All callers get an additional signal listener.
 void poll(zmq::context_t& context, zmq::socket_t* sockets[], std::function<bool()> handlers[], int n) {
-  zmq::pollitem_t items[n + 1 /* one more for the inproc signaller*/];
+  zmq::pollitem_t* items = (zmq::pollitem_t*)malloc((n+1/* one more for the inproc signaller*/)*sizeof(zmq::pollitem_t));
   zmq::socket_t* signaller = subscribe_to(context, INPROC_SIG);
-  items[0] = {*signaller, 0, ZMQ_POLLIN, 0 };
+  items[0] = {*signaller, 0, ZMQ_POLLIN, 0};
   for( int i=1; i<=n; i++ )
     items[i] = {*sockets[i-1], 0, ZMQ_POLLIN, 0};
 
@@ -69,10 +69,11 @@ void poll(zmq::context_t& context, zmq::socket_t* sockets[], std::function<bool(
         Rcpp::Rcout << "Encountered C++ exception: " <<  x.what() << std::endl;
         Rcpp::Rcout << "Polling continues..." << std::endl;
       }
-    } catch(zmq::error_t& e) { /*ignored*/}
+    } catch(zmq::error_t& e) { /*ignored*/ }
   }
 
   assert(dead);
+  free(items);
 
   // cleanup
   // loop over sockets, set their lingers to 0, and delete

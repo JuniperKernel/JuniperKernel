@@ -37,7 +37,8 @@ std::thread start_hb_thread(zmq::context_t& ctx, const std::string& endpoint) {
         return true;
       }
     };
-    poll(ctx, std::move((zmq::socket_t*[]){hbSock}), handlers, 1);
+    zmq::socket_t* sock[1] = {hbSock};
+    poll(ctx, sock, handlers, 1);
   });
   return hbthread;
 }
@@ -61,7 +62,8 @@ std::thread start_io_thread(zmq::context_t& ctx, const std::string& endpoint) {
       },
       [] { assert(false); return false; /* only here to keep handler same shape as sockets*/ }
     };
-    poll(ctx, std::move((zmq::socket_t*[]){pubsub, io}), handlers, 2);
+    zmq::socket_t* sock[2] = {pubsub, io};
+    poll(ctx, sock, handlers, 2);
   });
   return iothread;
 }

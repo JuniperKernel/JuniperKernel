@@ -47,6 +47,7 @@
   fc <- file(specPath)
   writeLines(jsonlite::toJSON(spec, pretty=TRUE, auto_unbox=TRUE), specPath)
   close(fc)
+  file.copy(system.file("extdata", "logo-64x64.png", package="JuniperKernel"), file.path(tmpPath, 'kernelspec'))
   tmpPath
 }
 
