@@ -6,7 +6,7 @@ else
 endif
 
 CXX_STD = CXX11
-PKG_CPPFLAGS = -I../inst/include -I. -I../src -Wno-conversion-null
+PKG_CPPFLAGS = -I../inst/include -I. -I../src -Wall -pedantic
 PKG_LIBS = -lzmq -L${FLV}
 
 ZMQ_VERSION = 4.2.2
