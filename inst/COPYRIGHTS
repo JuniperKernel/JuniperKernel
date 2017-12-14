@@ -6,3 +6,15 @@ Copyrights:
   (C) 2015 RStudio (Hadley Wickham): modernisation & refactoring
 License: GNU General Public License
 Original Location: r-lib/svglite github location at https://github.com/r-lib/svglite/tree/master/src
+
+File inst/include/json.hpp
+Copyrights: Copyright (c) 2013-2017 Niels Lohmann <http://nlohmann.me>.
+License: Licensed under the MIT License <http://opensource.org/licenses/MIT>.
+Original Location: https://github.com/nlohmann/json/releases/download/v2.1.1/json.hpp
+
+File hmac.h, sha256.h:
+Copyrights:
+  Copyright (c) 2015 Stephan Brumme. All rights reserved.
+License:  see http://create.stephan-brumme.com/disclaimer.html
+Original Location: http://create.stephan-brumme.com/hash-library/
+
