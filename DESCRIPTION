@@ -43,6 +43,6 @@ Description: Provides a full implementation of the 'Jupyter' <http://jupyter.org
              'Xeus' is a C++ library that facilitates the implementation of kernels for 'Jupyter'. Additionally, 'Xeus' provides interoperability with other libraries that exist in the 'Jupyter' ecosystem for building widgets,
              plotting, and more <https://blog.jupyter.org/interactive-workflows-for-c-with-jupyter-fe9b54227d92>. 'JuniperKernel' uses 'Xeus' as a library for the 'Jupyter' messaging protocol.
 URL: https://github.com/JuniperKernel/JuniperKernel
-License: GPL (>= 2) | file LICENSE
+License: GPL (>= 2)
 BugReports: https://github.com/JuniperKernel/JuniperKernel/issues
 RoxygenNote: 6.0.1
