@@ -86,7 +86,7 @@ check_notes_helper <- function(details) {
 
   status <- chkResults$JuniperKernel$status
   if( status %in% c("FAIL", "ERROR", "WARN") ) {
-    message(readLines(path, warn=FALSE), collapse='\n')
+    message(paste0(readLines(path, warn=FALSE), collapse='\n'))
     stop("R CMD CHECK completed with status ", status, ".\n")
   }
 
