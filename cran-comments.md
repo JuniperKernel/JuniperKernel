@@ -7,7 +7,7 @@ This is the second resubmission of 'JuniperKernel' 1.0.0.0. In this version I ha
 
 * Removed all install-time downloads of binaries and headers.
 
-* Bundled source files for 'ZeroMQ' and bundled the copyright information in the COPYRIGHTS file.
+* Bundled source files for 'ZeroMQ' and updated the copyright information in the COPYRIGHTS file.
 
 * Reconfigured the build scripts for all platforms (Linux, Mac, and Windows) so that 'ZeroMQ' libraries are created
   at install time of the source package. Notably, this shrinks the Windows installed package size by 10MB to an
