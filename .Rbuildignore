@@ -22,3 +22,7 @@ CONTRIBUTING.md$
 src/zeromq*
 cran-comments.md$
 travis-tool.sh.cmd$
+LICENSE$
+LICENSE
+^LICENSE$
+^LICENSE

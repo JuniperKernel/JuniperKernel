@@ -19,7 +19,6 @@
 #include <fstream>
 #include <unistd.h>
 #include <stdio.h>
-#include <signal.h>
 #include <stdlib.h>
 #include <json.hpp>
 #include <juniper/conf.h>

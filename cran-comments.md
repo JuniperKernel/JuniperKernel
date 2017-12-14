@@ -1,52 +1,26 @@
-## Resubmission
-This is a resubmission. In this version I have:
+## Resubmission 2
+This is the second resubmission of 'JuniperKernel' 1.0.0.0. In this version I have:
 
-* Used single quotes for software names (e.g. 'Rcpp', 'Jupyter', 'Xeus')
+* Removed the install-time dependency of the packages in the 'Suggests' section.
 
-* Expanded the Description field of DESCRIPTION to describe 'Jupyter' and 'Xeus' and provide links in the form <http://...> and <https://...>.
+* Bundled the Rd man files with the source 'JuniperKernel' package.
 
-* Explained more clearly that this package provides interoperability with the 'Jupyter' ecosystem (and hopefully made clear that there will not be multiple packages).
+* Removed all install-time downloads of binaries and headers.
 
-* Removed redundant "R" in the package title.
+* Bundled source files for 'ZeroMQ' and updated the copyright information in the COPYRIGHTS file.
 
-* Added COPYRIGHTS file to inst/ and included all copyright holders into the Authors@R field.
-
-* Renamed the arguments somewhat in the `installJuniper` function to clearly illustrate that the `prefix` field is for sepcifying custom paths. Additionally, the
-  `user` argument has been renamed to illsutrate that it relates to the default 'Jupyter' installation and has a new default value of FALSE so that the user does
-  not install into a user-local directory by default.
-
-* Added dynamically linkable zeromq libs for linux distribution Ubuntu 14.04.5 LTS.
-
-## Test environments
-* local OS X install, R 3.4.3
-* local Windows 10 install, R 3.4.3 and R 3.4.1
-* ubuntu 14.04.5 LTS (on travis-ci), R 3.4.3
-* Windows Server 2012 R2 x64 (build 9600) (on Appveyor), R 3.4.3
-* win-builder (release, devel, oldrelease)
-
-## R CMD check results
-There were no ERRORs or WARNINGs.
-
-For all builds there was the New submission NOTE:
-
-```
-* checking CRAN incoming feasibility ... NOTE
-Maintainer: 'Spencer Aiello <spnrpa@gmail.com>'
- 
-New submission
-```
-
-For all Windows builds there was an additional NOTE:
+* Reconfigured the build scripts for all platforms (Linux, Mac, and Windows) so that 'ZeroMQ' libraries are created
+  at install time of the source package. Notably, this shrinks the Windows installed package size by 10MB to an
+  observed size of:
 
 ```
 * checking installed package size ... NOTE
-  installed size is 17.9Mb
+  installed size is  7.7Mb
   sub-directories of 1Mb or more:
     include   1.5Mb
-    libs     16.4Mb
+    libs      6.1Mb
 ```
 
-The libs directory contain the zeromq and JuniperKernel dlls for both 32/64-bit architectures. The
-windows ZeroMQ DLLs + headers are linked by JuniperKernel and so must be included. There is an R
-package on CRAN (pbdZMQ) that bundles the zeromq headers and shared objects, but these cannot be
-linked as-is.
+* Fixed ISO C++ forbidden warnings by removing variable length arrays and compound literals. Compilation with the
+  -Wall -pedantic flags were checked on a local Ubuntu 14.04, Travis CI Ubuntu 14.04, local Mac, local Windows, and
+  AppVeyor Windows.

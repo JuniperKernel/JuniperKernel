@@ -87,7 +87,8 @@ class JuniperKernel {
            return true;
          }
        };
-       poll(*_ctx, std::move((zmq::socket_t* []){cntrl, shell}), handlers, 2);
+       zmq::socket_t* sock[2] = {cntrl, shell};
+       poll(*_ctx, sock, handlers, 2);
      }
 
     ~JuniperKernel() {

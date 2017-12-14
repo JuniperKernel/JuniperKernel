@@ -1,6 +1,5 @@
 #!/bin/bash
 
-ARCH=64
 R_HOME=$(R RHOME)
 RSCRIPT=${R_HOME}/bin/Rscript
 R_LIB=$(${RSCRIPT} -e 'cat(.Library)')
@@ -10,14 +9,32 @@ R_LIB=$(${RSCRIPT} -e 'cat(.Library)')
 SYS=''
 unamestr=`uname`
 if [[ `uname` == 'Linux' ]]; then
-   SYS=linux
-   DEPS="deps: lzmq"
    LINKER="-Wl,-R,'\$\$ORIGIN/../zmq'"
 elif [[ `uname` == 'Darwin' ]]; then
-   SYS=osx
-   DEPS="deps: zmq"
    LINKER="-Wl,-rpath,${R_LIB}/JuniperKernel/zmq"
 fi
-sed -e"s|@rlib@|"${R_LIB}"|" -e"s|@arch@|"${ARCH}"|" -e"s|@sys@|"${SYS}"|" -e"s/@deps@/${DEPS}/"  -e"s|@LINKER@|"${LINKER}"|" src/Makevars.in > src/Makevars
+sed -e"s|@LINKER@|"${LINKER}"|" src/Makevars.in > src/Makevars
 
+mkdir temp
+mkdir inst/zmq
+cd temp
+cp ../inst/zeromq-4.2.2.tar.gz .
+tar -xzf zeromq-4.2.2.tar.gz
+cd zeromq-4.2.2
+if [[ `uname` == 'Linux' ]]; then
+  ./configure CPPFLAGS=-DPIC CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-fPIC
+  make
+  cp src/.libs/libzmq.so.5.1.2 ../../inst/zmq/libzmq.so
+  cp src/.libs/libzmq.so.5.1.2 ../../inst/zmq/libzmq.so.5
+elif [[ `uname` == 'Darwin' ]]; then
+  ./configure --disable-shared --enable-static
+  make
+  mv src/.libs/libzmq.a ../../inst/zmq
+fi
+
+cd ..
+cd ..
+rm -rf temp
+rm -rf inst/*zip
+rm -rf inst/*gz
 exit 0

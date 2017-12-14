@@ -1,12 +1,3 @@
-ARCH=@arch@
-SYS=@sys@
-R_LIB=@rlib@
-
-# zmq bacon bits
-ZMQ_VERSION = 4.2.2
-ZMQ_TAR_FILE= libzmq-${ZMQ_VERSION}.tar.gz
-ZMQ_TAR_URL = https://github.com/JuniperKernel/zmq/raw/master/${SYS}${ARCH}/${ZMQ_TAR_FILE}
-
 ## use C++11
 CXX_STD      = CXX11
 
@@ -14,26 +5,4 @@ CXX_STD      = CXX11
 PKG_CPPFLAGS = -I../inst/include/ -I.
 PKG_LIBS     = -lzmq -L../inst/zmq @LINKER@
 
-all: deps $(SHLIB)
-
-@deps@
-
-.PHONY: zmq, lzmq
-zmq: ../inst/zmq/libzmq.a
-
-lzmq:
-	@echo "Installing zmq for linux"
-	@[ -d ../inst/zmq ] || mkdir -p ../inst/zmq
-	@curl -skLO ${ZMQ_TAR_URL} && tar -xzf ${ZMQ_TAR_FILE}
-	@cp zeromq-4.2.2/* ../inst/zmq
-	@ls -la ../inst/zmq
-	@cp  ../inst/zmq/libzmq.so.5.1.2 ../inst/zmq/libzmq.so
-	@cp  ../inst/zmq/libzmq.so.5.1.2 ../inst/zmq/libzmq.so.5
-	@ls -la ../inst/zmq
-	@rm -rf zeromq-4.2.2
-	@rm -rf libzmq*
-
-../inst/zmq/libzmq.a:
-	@echo "Downloading libzmq prebuild"
-	@[ -d ../inst/zmq ] || mkdir -p ../inst/zmq
-	@curl -skLO ${ZMQ_TAR_URL} && tar -xzf ${ZMQ_TAR_FILE} -C ../inst/zmq && rm -rf ${ZMQ_TAR_FILE}
+all: $(SHLIB)

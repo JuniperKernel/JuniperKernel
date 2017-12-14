@@ -173,7 +173,8 @@ class RequestServer {
             return true;
           }
         };
-        poll(*rs._ctx, std::move((zmq::socket_t* []){sock}), handlers, 1);
+        zmq::socket_t* socket[1] = {sock};
+        poll(*rs._ctx, socket, handlers, 1);
       });
       return out_thread;
     }

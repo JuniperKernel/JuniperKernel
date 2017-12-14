@@ -1,0 +1,17 @@
+Creator
+=======
+Wei-Chen Chen
+
+Authors
+=======
+Wei-Chen Chen
+Drew Schmidt
+Christian Heckendorf (file transfer)
+George Ostrouchov (Mac OSX),
+
+Contributors
+============
+Whit Armstrong (some functions are modified from the rzmq package for backwards compatibility)
+Brian Ripley (C code of shellexec, and Solaris)
+R Core team (some functions are modified from the R source code)
+Philipp A. (Fedora)
