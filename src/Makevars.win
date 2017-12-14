@@ -36,4 +36,5 @@ buildzmq:
 	@rm -rf ../inst/zeromq*
 ifeq "${FLV}" "x64"
 	@rm -rf ../inst/pbdZMQ-0.2-6.zip
+	@rm -rf ../inst/zeromq-4.2.2.tar.gz
 endif
