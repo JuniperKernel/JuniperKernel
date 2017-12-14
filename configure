@@ -24,7 +24,8 @@ cd zeromq-4.2.2
 if [[ `uname` == 'Linux' ]]; then
   ./configure CPPFLAGS=-DPIC CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-fPIC
   make
-	cp src/.libs/libzmq.so.5.1.2 ../../inst/zmq/libzmq.so.5
+  cp src/.libs/libzmq.so.5.1.2 ../../inst/zmq/libzmq.so
+  cp src/.libs/libzmq.so.5.1.2 ../../inst/zmq/libzmq.so.5
 elif [[ `uname` == 'Darwin' ]]; then
   ./configure --disable-shared --enable-static
   make
