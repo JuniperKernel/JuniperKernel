@@ -28,6 +28,7 @@
 #include <juniper/juniper.h>
 #include <juniper/xbridge.h>
 #include <juniper/external.h>
+#include <jclient/jclient.h>
 #include <Rcpp.h>
 
 
@@ -144,4 +145,10 @@ void comm_request(const std::string type) {
   if( type=="open" ) xm.comm_manager().comm_open( xmsg);
   if( type=="close") xm.comm_manager().comm_close(xmsg);
   if( type=="msg"  ) xm.comm_manager().comm_msg(  xmsg); 
+}
+
+
+// [[Rcpp::export]]
+void run_client() {
+  JupyterTestClient* jclient = new JupyterTestClient();
 }

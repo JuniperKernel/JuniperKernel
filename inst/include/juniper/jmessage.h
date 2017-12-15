@@ -159,7 +159,6 @@ private:
 
   // JMessage (this) -> multipart_t
   zmq::multipart_t to_multipart_t() {
-    std::stringstream s;
     zmq::multipart_t multi_msg;
     
     // add IDS

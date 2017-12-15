@@ -60,5 +60,8 @@ bootKernel <- function() {
     options(repos = c(CRAN = "http://cran.rstudio.com"))
 
   userConnFile <- argv[1L]
+  if( !file.exists(userConnFile) )
+    stop("Connection file does not exist: ", userConnFile)
+
   boot_kernel(.JUNIPER$kernel <- init_kernel(userConnFile))
 }
