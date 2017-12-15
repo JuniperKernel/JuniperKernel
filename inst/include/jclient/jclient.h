@@ -48,14 +48,8 @@ class JupyterTestClient {
       _ctx(new zmq::context_t(1)), _shell(_key,_ctx), _stdin(_ctx), _ctrl(_ctx) {
         Rcpp::Rcout << "initializing juniper test client" << std::endl;
         _inproc_sig = listen_on(*_ctx, INPROC_SIG, zmq::socket_type::pub);
-        Rcpp::Rcout << "CRUNK1" << std::endl;
-
         _hb.start_hb(_ctx);
-                Rcpp::Rcout << "CRUNK2" << std::endl;
-
         _iopub.start_iopub(_ctx);
-                Rcpp::Rcout << "CRUNK3" << std::endl;
-
       }
 
     ~JupyterTestClient() {
@@ -68,12 +62,6 @@ class JupyterTestClient {
     }
 
     std::string config() {
-    Rcpp::Rcout << "CTRL PORT "  << _ctrl._port  << std::endl;
-    Rcpp::Rcout << "HB PORT "    << _hb._port    << std::endl;
-    Rcpp::Rcout << "IOPUB PORT " << _iopub._port << std::endl;
-    Rcpp::Rcout << "SHELL PROT " << _shell._port << std::endl;
-    Rcpp::Rcout << "STDIN PORT " << _stdin._port << std::endl;
-
       json conf;
       conf["control_port"    ] = _ctrl._port;
       conf["hb_port"         ] = _hb._port;

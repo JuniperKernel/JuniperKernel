@@ -40,20 +40,13 @@ class HB {
 
     const HB& start_hb(zmq::context_t* ctx) {
       zmq::socket_t* sock = listen_on(*ctx, "tcp://*:*", zmq::socket_type::req);
-                      Rcpp::Rcout << "THUMP1" << std::endl;
-
       _port = read_port(sock);
-                      Rcpp::Rcout << "THUMP2" << std::endl;
-
       std::thread hb_thread([sock, ctx]() {
         bool dead=false;
-        std::string ping="ping";
-
         zmq::socket_t* signaller = subscribe_to(*ctx, INPROC_SIG);
         try {
           zmq::multipart_t conn;
           beat(sock);
-          Rcpp::Rcout << "SENT BEAT" << std::endl;
           conn.recv(*sock); // wait for a connection, then enter the loop
 
           int no_hb=0;
