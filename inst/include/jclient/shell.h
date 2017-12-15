@@ -29,9 +29,9 @@ class Shell {
     const std::string _key;
     zmq::socket_t* _sock;
 
-    std::string _port;
+    int _port;
     Shell(const std::string& key, zmq::context_t* ctx): _key(key), _sock(listen_on(*ctx, "tcp://*:*", zmq::socket_type::dealer)) {
-      _port = std::move(read_port(_sock));
+      _port = read_port(_sock);
     }
     ~Shell() {
       _sock->setsockopt(ZMQ_LINGER,0);

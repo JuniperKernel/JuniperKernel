@@ -27,9 +27,9 @@ class Stdin {
   public:
     zmq::socket_t* _sock;
 
-    std::string _port;
+    int _port;
     Stdin(zmq::context_t* ctx): _sock(listen_on(*ctx, "tcp://*:*", zmq::socket_type::dealer)) {
-      _port = std::move(read_port(_sock));
+      _port = read_port(_sock);
     }
 
     ~Stdin() {

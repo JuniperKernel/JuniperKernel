@@ -43,6 +43,14 @@ static void kernelFinalizer(SEXP jk) {
   }
 }
 
+static void testClientFinalizer(SEXP jtc) {
+  JupyterTestClient* jclient = reinterpret_cast<JupyterTestClient*>(R_ExternalPtrAddr(jtc));
+  if( jclient ) {
+    delete jclient;
+    R_ClearExternalPtr(jtc);
+  }
+}
+
 static void xmockFinalizer(SEXP xm) {
   xmock* _xm = reinterpret_cast<xmock*>(R_ExternalPtrAddr(xm));
   if( _xm ) {
@@ -148,7 +156,22 @@ void comm_request(const std::string type) {
 }
 
 
+
+
+// FOR TESTING
+
 // [[Rcpp::export]]
-void run_client() {
+SEXP run_client() {
   JupyterTestClient* jclient = new JupyterTestClient();
+  return createExternalPointer<JupyterTestClient>(jclient, testClientFinalizer, "JupyterTestClient*");
+}
+
+static JupyterTestClient* get_client(SEXP jtc) {
+  return reinterpret_cast<JupyterTestClient*>(R_ExternalPtrAddr(jtc));
+}
+
+
+// [[Rcpp::export]]
+std::string client_info(SEXP jtc) {
+  return get_client(jtc)->config();
 }

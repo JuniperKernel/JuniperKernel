@@ -18,7 +18,7 @@ Imports: utils,
          gdtools (>= 0.1.6),
          data.table,
          methods
-Suggests: RUnit, roxygen2
+Suggests: RUnit, roxygen2, subprocess
 Collate: 'booter.R'
          'comm_close.R'
          'comm_info_request.R'

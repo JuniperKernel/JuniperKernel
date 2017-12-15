@@ -25,49 +25,63 @@
 #include <juniper/utils.h>
 #include <juniper/conf.h>
 
+const std::string PING = "ping";
+
+void beat(zmq::socket_t* sock) {
+  zmq::multipart_t msg;
+  msg.add(zmq::message_t(PING.begin(), PING.end()));
+  msg.send(*sock);
+}
 
 class HB {
   public:
-    std::string _port;
+    int _port;
     std::thread _hb_t;
 
     const HB& start_hb(zmq::context_t* ctx) {
       zmq::socket_t* sock = listen_on(*ctx, "tcp://*:*", zmq::socket_type::req);
-      _port = std::move(read_port(sock));
+                      Rcpp::Rcout << "THUMP1" << std::endl;
+
+      _port = read_port(sock);
+                      Rcpp::Rcout << "THUMP2" << std::endl;
 
       std::thread hb_thread([sock, ctx]() {
         bool dead=false;
-        zmq::socket_t* signaller = subscribe_to(*ctx, INPROC_SIG);
-        zmq::multipart_t conn;
-        conn.recv(*sock); // wait for a connection, then enter the loop
-        std::cout << "connected; heart beat started" << std::endl;
-        int no_hb=0;
         std::string ping="ping";
-        while( !dead ) {
-          std::this_thread::sleep_for(std::chrono::seconds(30));
-          zmq::multipart_t msg;
-          msg.add(zmq::message_t(ping.begin(), ping.end()));
-          msg.send(*sock);
 
-          zmq::pollitem_t items[] = {
-            {*signaller, 0, ZMQ_POLLIN, 0},
-            {*sock, 0, ZMQ_POLLIN, 0}
-          };
-          zmq::poll(items, 2, 1000/*seconds*/);
+        zmq::socket_t* signaller = subscribe_to(*ctx, INPROC_SIG);
+        try {
+          zmq::multipart_t conn;
+          beat(sock);
+          Rcpp::Rcout << "SENT BEAT" << std::endl;
+          conn.recv(*sock); // wait for a connection, then enter the loop
 
-          if( (dead=(items[0].revents & ZMQ_POLLIN)) )
-            break;
+          int no_hb=0;
+          while( !dead ) {
+            std::this_thread::sleep_for(std::chrono::seconds(30));
+            beat(sock);
 
-          if( items[1].revents & ZMQ_POLLIN ) {
-            zmq::multipart_t rec;
-            std::cout << "HB: " << rec.recv(*sock) << std::endl;
-            continue;
+            zmq::pollitem_t items[] = {
+              {*signaller, 0, ZMQ_POLLIN, 0},
+              {*sock, 0, ZMQ_POLLIN, 0}
+            };
+            zmq::poll(items, 2, 1000/*seconds*/);
+
+            if( (dead=(items[0].revents & ZMQ_POLLIN)) )
+              break;
+
+            if( items[1].revents & ZMQ_POLLIN ) {
+              zmq::multipart_t rec;
+              std::cout << "HB: " << rec.recv(*sock) << std::endl;
+              continue;
+            }
+
+            if( no_hb > 2 )
+              break;
           }
-
-          std::cout << "No heart beat..." << no_hb << std::endl;
-          if( no_hb > 2 )
-            break;
-        }
+        } catch( const std::exception& x ) {
+          Rcpp::Rcout << "exception in HB thread: " << x.what() << std::endl;
+        } catch( zmq::error_t& e ) { /*ignored*/ }
 
         signaller->setsockopt(ZMQ_LINGER,0);
         delete signaller;

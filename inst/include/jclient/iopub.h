@@ -27,30 +27,39 @@
 class IOPub {
   public:
     long long *_msg_ctr;  // count messages received
-    std::string _port;
+    int _port;
     std::thread _io_t;
 
     const IOPub& start_iopub(zmq::context_t* ctx) {
-      zmq::socket_t* sock = subscribe_to(*ctx, "tcp://*:*");
-      _port = std::move(read_port(sock));
-      long long ctr = *_msg_ctr;
-      std::thread io_thread([sock, ctx, &ctr]() {
-        std::function<bool()> handlers[] = {
-          [sock, &ctr]() {
-            zmq::multipart_t msg;
-            msg.recv(*sock);
-            if( msg[1].size()==0 )
-              return true;  // (dis)connects are ignored
+      zmq::socket_t* sock = new zmq::socket_t(*ctx, zmq::socket_type::sub);
+      Rcpp::Rcout  << "FRUMP1" << std::endl;
+      sock->setsockopt(ZMQ_SUBSCRIBE, "" /*no filter*/, 0);
+      sock->bind("tcp://*:*");
+            Rcpp::Rcout  << "FRUMP2" << std::endl;
 
-            ctr++;  // bump the message count
-            std::cout << "IOPUB: " << msg_t_to_string(msg[1]) << std::endl;
-            return true;
-          }
-        };
-        zmq::socket_t* sockets[1] = {sock};
-        poll(*ctx, sockets, handlers, 1);
-      });
-      _io_t = std::move(io_thread);
+
+      _port = read_port(sock);
+            Rcpp::Rcout  << "FRUMP3" << std::endl;
+
+      long long ctr = *_msg_ctr;
+      ctr=0;
+//      std::thread io_thread([sock, ctx, &ctr]() {
+//        std::function<bool()> handlers[] = {
+//          [sock, &ctr]() {
+//            zmq::multipart_t msg;
+//            msg.recv(*sock);
+//            if( msg[1].size()==0 )
+//              return true;  // (dis)connects are ignored
+//
+//            ctr++;  // bump the message count
+////            Rcpp::cout << "IOPUB: " << msg_t_to_string(msg[1]) << std::endl;
+//            return true;
+//          }
+//        };
+//        zmq::socket_t* sockets[1] = {sock};
+//        poll(*ctx, sockets, handlers, 1);
+//      });
+//      _io_t = std::move(io_thread);
       return *this;
     }
 
