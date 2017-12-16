@@ -48,7 +48,7 @@ class HB {
           zmq::multipart_t conn;
           beat(sock);
           conn.recv(*sock); // wait for a connection, then enter the loop
-
+          Rcpp::Rcout << "HB CONNECTION" << std::endl;
           int no_hb=0;
           while( !dead ) {
             std::this_thread::sleep_for(std::chrono::seconds(30));
@@ -58,7 +58,7 @@ class HB {
               {*signaller, 0, ZMQ_POLLIN, 0},
               {*sock, 0, ZMQ_POLLIN, 0}
             };
-            zmq::poll(items, 2, 1000/*seconds*/);
+            zmq::poll(items, 2, 1000/*millis*/);
 
             if( (dead=(items[0].revents & ZMQ_POLLIN)) )
               break;

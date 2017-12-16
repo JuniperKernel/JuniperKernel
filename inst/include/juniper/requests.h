@@ -118,6 +118,7 @@ class RequestServer {
       json req = _cur_msg.get();
       std::string msg_type = req["header"]["msg_type"];
       Rcpp::Rcout << "Handling message type: " << msg_type << std::endl;
+      Rcpp::Rcout << "MESSAGE: " << req << std::endl;
       req["stream_out_port"] = _stream_out_port;  // stitch the stdout port into the client request
       req["stream_err_port"] = _stream_err_port;  // stitch the stderr into the client request
       Rcpp::Function handler = _jk[msg_type];
