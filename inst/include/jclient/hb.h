@@ -28,9 +28,11 @@
 const std::string PING = "ping";
 
 void beat(zmq::socket_t* sock) {
+  Rcpp::Rcout << "sending hb" << std::endl;
   zmq::multipart_t msg;
   msg.add(zmq::message_t(PING.begin(), PING.end()));
-  msg.send(*sock);
+  msg.send(*sock,ZMQ_NOBLOCK);
+  Rcpp::Rcout << "beat sent" << std::endl;
 }
 
 class HB {
@@ -44,24 +46,39 @@ class HB {
       std::thread hb_thread([sock, ctx]() {
         bool dead=false;
         zmq::socket_t* signaller = subscribe_to(*ctx, INPROC_SIG);
+        zmq::pollitem_t items[] = {
+          {*signaller, 0, ZMQ_POLLIN, 0},
+          {*sock, 0, ZMQ_POLLIN, 0}
+        };
         try {
           zmq::multipart_t conn;
           beat(sock);
-          conn.recv(*sock); // wait for a connection, then enter the loop
-          Rcpp::Rcout << "HB CONNECTION" << std::endl;
-          int no_hb=0;
-          while( !dead ) {
-            std::this_thread::sleep_for(std::chrono::seconds(30));
-            beat(sock);
 
-            zmq::pollitem_t items[] = {
-              {*signaller, 0, ZMQ_POLLIN, 0},
-              {*sock, 0, ZMQ_POLLIN, 0}
-            };
-            zmq::poll(items, 2, 1000/*millis*/);
-
+          // poll for a connection
+          while( true ) {
+            zmq::poll(&items[0], 1, 1000);
             if( (dead=(items[0].revents & ZMQ_POLLIN)) )
               break;
+
+            if( items[1].revents & ZMQ_POLLIN ) {
+              zmq::multipart_t rec;
+              std::cout << "HB: " << rec.recv(*sock) << std::endl;
+              Rcpp::Rcout << "HB CONNECTION" << std::endl;
+              break;
+            }
+          }
+          int no_hb=0;
+          while( !dead ) {
+            Rcpp::Rcout << "sleeping 5"  << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+            zmq::poll(&items[0], 1, 1000);
+            if( (dead=(items[0].revents & ZMQ_POLLIN)) )
+              break;
+
+            Rcpp::Rcout << "awake; sending beat..." << std::endl;
+            beat(sock);
+            Rcpp::Rcout << "beat sent; polling for response" << std::endl;
+            zmq::poll(&items[1], 1, 1000/*millis*/);
 
             if( items[1].revents & ZMQ_POLLIN ) {
               zmq::multipart_t rec;
@@ -74,12 +91,13 @@ class HB {
           }
         } catch( const std::exception& x ) {
           Rcpp::Rcout << "exception in HB thread: " << x.what() << std::endl;
-        } catch( zmq::error_t& e ) { /*ignored*/ }
+        } catch( zmq::error_t& e ) { Rcpp::Rcout << "HEART BEAT ZMQ ERR: " << e.what() << std::endl; /*ignored*/ }
 
         signaller->setsockopt(ZMQ_LINGER,0);
         delete signaller;
         sock->setsockopt(ZMQ_LINGER,0);
         delete sock;
+        Rcpp::Rcout << "signaller and hb sock destroyed" << std::endl;
       });
       _hb_t = std::move(hb_thread);
       return *this;

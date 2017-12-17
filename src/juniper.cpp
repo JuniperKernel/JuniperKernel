@@ -46,8 +46,11 @@ static void kernelFinalizer(SEXP jk) {
 static void testClientFinalizer(SEXP jtc) {
   JupyterTestClient* jclient = reinterpret_cast<JupyterTestClient*>(R_ExternalPtrAddr(jtc));
   if( jclient ) {
+    Rcpp::Rcout << "deleting test client" << std::endl;
     delete jclient;
+    Rcpp::Rcout << "attempting to clear the external pointer" << std::endl;
     R_ClearExternalPtr(jtc);
+    Rcpp::Rcout << "external pointer for test client cleared" << std::endl;
   }
 }
 
@@ -169,7 +172,6 @@ SEXP run_client() {
 static JupyterTestClient* get_client(SEXP jtc) {
   return reinterpret_cast<JupyterTestClient*>(R_ExternalPtrAddr(jtc));
 }
-
 
 // [[Rcpp::export]]
 std::string client_info(SEXP jtc) {

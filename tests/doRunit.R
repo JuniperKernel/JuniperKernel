@@ -21,9 +21,9 @@ tryCatch(
     connInfo <- JuniperKernel:::client_info(jtc)
     tmpPath <- tempfile()
     dir.create(tmpPath, recursive=TRUE)
-    test.env$connectionFile <- connectionFile <- file.path(tmpPath, "connection_file.json")
+    connectionFile <- file.path(tmpPath, "connection_file.json")
     print(paste0("CONNECTION_INFO: ", connInfo))
-    test.env$fc <- fc <- file(connectionFile)
+    fc <- file(connectionFile)
     writeLines(connInfo, fc)
     close(fc)
     print("connection file written")
@@ -45,17 +45,16 @@ tryCatch(
                    )
       stop(txt)
     }
-    print(paste0("FILE: ", tmpPath))
-    Sys.sleep(10)
-    print(paste0(jkp, collapse="\n"))
-    print(paste0("STDOUT: ", subprocess::process_read(jkp), collapse="\n"))
-    print(paste0("STDOUT: ", subprocess::process_read(jkp)$stdout, collapse="\n"))
-    print(paste0("STDERR: ", subprocess::process_read(jkp)$stderr, collapse="\n"))
-    Sys.sleep(10)
-    print(paste0("STDOUT: ", subprocess::process_read(jkp), collapse="\n"))
-
-    unlink(connectionFile)
-    print(paste0("STDOUT: ", subprocess::process_read(jkp), collapse="\n"))
+    # Sys.sleep(10)
+    # print(paste0(jkp, collapse="\n"))
+    # print(paste0("STDOUT: ", subprocess::process_read(jkp), collapse="\n"))
+    # print(paste0("STDOUT: ", subprocess::process_read(jkp)$stdout, collapse="\n"))
+    # print(paste0("STDERR: ", subprocess::process_read(jkp)$stderr, collapse="\n"))
+    # Sys.sleep(10)
+    # print(paste0("STDOUT: ", subprocess::process_read(jkp), collapse="\n"))
+    #
+    # unlink(connectionFile)
+    # print(paste0("STDOUT: ", subprocess::process_read(jkp), collapse="\n"))
 
 
 
@@ -85,13 +84,13 @@ tryCatch(
       print(e)
 
     }
-  , finally = function() {
-      browser()
-      if( subprocess::process_state(test.env$juniperKernelProc)=="running" ) {
-        tryCatch(if(!subprocess::process_terminate(test.env$juniperKernelProc)) stop("proc terminate did not return TRUE"), error=function(e) print("Could not terminate the process", e))
-      }
-      tryCatch(unlink(test.env$connectionFile), error=function(e) stop("could not delete temp connection file: ", test.env$connectionFile))
-      JuniperKernel:::.JUNIPER$jupyterTestClient <- NULL
-      gc()
-    }
+  # , finally = {
+  #     jtc <- NULL
+  #     if( subprocess::process_state(test.env$juniperKernelProc)=="running" ) {
+  #       tryCatch(if(!subprocess::process_terminate(test.env$juniperKernelProc)) stop("proc terminate did not return TRUE"), error=function(e) print("Could not terminate the process", e))
+  #     }
+  #     tryCatch(unlink(test.env$connectionFile), error=function(e) stop("could not delete temp connection file: ", test.env$connectionFile))
+  #     gc()
 )
+
+gc()

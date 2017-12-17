@@ -28,6 +28,7 @@ class Stdin {
     zmq::socket_t* _sock;
 
     int _port;
+    Stdin(){}
     Stdin(zmq::context_t* ctx): _sock(listen_on(*ctx, "tcp://*:*", zmq::socket_type::dealer)) {
       _port = read_port(_sock);
     }
@@ -35,5 +36,6 @@ class Stdin {
     ~Stdin() {
       _sock->setsockopt(ZMQ_LINGER,0);
       delete _sock;
+      Rcpp::Rcout << "Stdin dead" << std::endl;
     }
 };

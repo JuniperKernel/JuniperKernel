@@ -30,12 +30,14 @@ class Shell {
     zmq::socket_t* _sock;
 
     int _port;
+    Shell(){}
     Shell(const std::string& key, zmq::context_t* ctx): _key(key), _sock(listen_on(*ctx, "tcp://*:*", zmq::socket_type::dealer)) {
       _port = read_port(_sock);
     }
     ~Shell() {
       _sock->setsockopt(ZMQ_LINGER,0);
       delete _sock;
+      Rcpp::Rcout << "Shell dead" << std::endl;
     }
 
     std::string execute_request(std::string req) {
