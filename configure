@@ -27,9 +27,9 @@ if [[ `uname` == 'Linux' ]]; then
   cp src/.libs/libzmq.so.5.1.2 ../../inst/zmq/libzmq.so
   cp src/.libs/libzmq.so.5.1.2 ../../inst/zmq/libzmq.so.5
 elif [[ `uname` == 'Darwin' ]]; then
-  ./configure --disable-shared --enable-static
+  ./configure CPPFLAGS=-DPIC CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-fPIC
   make
-  mv src/.libs/libzmq.a ../../inst/zmq
+  cp src/.libs/libzmq.a ../../inst/zmq/
 fi
 
 cd ..

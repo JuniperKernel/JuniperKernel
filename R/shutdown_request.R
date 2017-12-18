@@ -31,6 +31,13 @@
 #'
 #' @author Spencer Aiello
 #' @references \url{http://jupyter-client.readthedocs.io/en/latest/messaging.html#kernel-shutdown}
+#'
+#' @examples
+#' \dontrun{
+#'   request_msg <- list(restart=FALSE)
+#'   shutdown_request(request_msg)
+#' }
+#'
 #' @export
 shutdown_request <- function(request_msg) {
   list( msg_type="shutdown_reply", content=list(restart=request_msg$content$restart))

@@ -31,6 +31,13 @@
 #'
 #' @author Spencer Aiello
 #' @references \url{http://jupyter-client.readthedocs.io/en/latest/messaging.html#introspection}
+#'
+#' @examples
+#' \dontrun{
+#'   request_msg <- list("comm_id"="my_open_comm_id", "data"=list())
+#'   comm_request(request_msg)
+#' }
+#'
 #' @export
 comm_msg <- function(request_msg) {
   comm_request("msg")

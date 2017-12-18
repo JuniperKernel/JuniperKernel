@@ -73,7 +73,7 @@ headers: ./inst/include/zmq.h ./inst/include/xtl ./inst/include/xeus
 	@tar -xzf ${XEUS_TAR_FILE}
 	@mv xeus-${XEUS_VERSION}/include/xeus ./inst/include
 	@rm -rf xeus-${XEUS_VERSION} ${XEUS_TAR_FILE}
-
+	@cp ./inst/nl_json.hpp ./inst/include/xeus/nl_json.hpp
 
 check: build/JuniperKernel_$(PKG_VERSION).tar.gz
 	@echo "running R CMD check"

@@ -56,6 +56,14 @@
 #'   chosen randomly by the \code{RequestServer}.
 #'
 #' @author Spencer Aiello
+#'
+#' @examples
+#' \dontrun{
+#'   handler <- execute_request
+#'   request_msg <- list(stream_out_port=54321, stream_err_port=54322, list(code="rnorm(1000)"))
+#'   doRequest(handler, request_msg)
+#' }
+#'
 #' @export
 doRequest <- function(handler, request_msg) {
   out <- socketConnection("localhost", port=request_msg$stream_out_port)
