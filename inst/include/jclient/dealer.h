@@ -36,9 +36,7 @@ class DealerSocket {
 
     void init_socket(zmq::context_t* ctx) {
       _sock = new zmq::socket_t(*ctx, zmq::socket_type::dealer);
-      Rcpp::Rcout << "connecting to endpoint: " << _endpoint << std::endl;
       _sock->connect(_endpoint);
-      Rcpp::Rcout << "dealer socket init'd" << std::endl;
     }
 
     void close() {
