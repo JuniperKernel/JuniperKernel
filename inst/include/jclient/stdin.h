@@ -14,6 +14,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with JuniperKernel.  If not, see <http://www.gnu.org/licenses/>.
+#ifndef juniper_jclient_stdin_H
+#define juniper_jclient_stdin_H
 #include <string>
 #include <thread>
 #include <stdio.h>
@@ -22,20 +24,11 @@
 #include <zmq.hpp>
 #include <juniper/sockets.h>
 #include <juniper/utils.h>
+#include <juniper/jmessage.h>
+#include <jclient/dealer.h>
 
-class Stdin {
+class Stdin: public DealerSocket {
   public:
-    zmq::socket_t* _sock;
-
-    int _port;
-    Stdin(){}
-    Stdin(zmq::context_t* ctx): _sock(listen_on(*ctx, "tcp://*:*", zmq::socket_type::dealer)) {
-      _port = read_port(_sock);
-    }
-
-    ~Stdin() {
-      _sock->setsockopt(ZMQ_LINGER,0);
-      delete _sock;
-      Rcpp::Rcout << "Stdin dead" << std::endl;
-    }
+    Stdin(): DealerSocket("tcp://127.0.0.1:53958", 54958) {}
 };
+#endif // #ifndef juniper_jclient_stdin_H

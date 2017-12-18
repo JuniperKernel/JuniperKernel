@@ -14,11 +14,20 @@ set.seed(42)
 test.env <- new.env(parent=emptyenv())
 tryCatch(
   {
-    # start a new jupyter client
-    jtc <- JuniperKernel:::run_client()
-    print("test client started")
     # write the connection file
-    connInfo <- JuniperKernel:::client_info(jtc)
+
+    connInfo <- list(
+      "control_port"    = 53959,
+      "hb_port"         = 53960,
+      "iopub_port"      = 53961,
+      "ip"              = "127.0.0.1",
+      "key"             = "cc496d37-59a9-4c61-8900-d826985f564d",
+      "shell_port"      = 53957,
+      "signature_scheme"= "hmac-sha256",
+      "stdin_port"      = 53958,
+      "transport"       = "tcp")
+    connInfo <- jsonlite:::toJSON(connInfo, pretty=TRUE, auto_unbox=TRUE)
+
     tmpPath <- tempfile()
     dir.create(tmpPath, recursive=TRUE)
     connectionFile <- file.path(tmpPath, "connection_file.json")
@@ -45,17 +54,33 @@ tryCatch(
                    )
       stop(txt)
     }
-    # Sys.sleep(10)
-    # print(paste0(jkp, collapse="\n"))
-    # print(paste0("STDOUT: ", subprocess::process_read(jkp), collapse="\n"))
-    # print(paste0("STDOUT: ", subprocess::process_read(jkp)$stdout, collapse="\n"))
-    # print(paste0("STDERR: ", subprocess::process_read(jkp)$stderr, collapse="\n"))
-    # Sys.sleep(10)
-    # print(paste0("STDOUT: ", subprocess::process_read(jkp), collapse="\n"))
-    #
-    # unlink(connectionFile)
-    # print(paste0("STDOUT: ", subprocess::process_read(jkp), collapse="\n"))
+    while( TRUE ) {
+      outerr <- paste0(subprocess::process_read(jkp), collapse='\n')
+      if( outerr!="" ) {
+        print(outerr)
+        break
+      }
+    }
+    print("process is running...")
+    print(paste0(jkp, collapse="\n"))
+    Sys.sleep(10)
 
+
+    print(paste0(subprocess::process_read(jkp), collapse='\n'))
+
+
+
+    # start a new jupyter client
+    jtc <- JuniperKernel:::run_client()
+    print("test client started")
+
+    payload <- '{"content":{},"header":{"date":"2017-12-17T00:30:33.180360Z","msg_id":"1a7186aa-1d2fcbab990a326ebb6747d4","msg_type":"kernel_info_request","session":"944E351AF3AD44B78054DF4DAB6FA0E5","username":"spencer","version":"5.2"},"metadata":{},"parent_header":{}}'
+    kinfo <- JuniperKernel:::client_exec_request(jtc, payload)
+
+    print(kinfo)
+
+    Sys.sleep(2)
+    outerr <- paste0(subprocess::process_read(jkp), collapse='\n')
 
 
     # DEFINE TEST SUITE
@@ -63,6 +88,12 @@ tryCatch(
                                 , dirs=system.file("runits", package = "JuniperKernel")
                                 , testFuncRegexp = "^[Tt]est.+"
                                 )
+    print(paste0(subprocess::process_read(jkp), collapse='\n'))
+
+
+    Sys.sleep(10)
+    print(paste0(subprocess::process_read(jkp), collapse='\n'))
+    JuniperKernel:::.setGlobal("JTC", jtc, 1L)
 
     # RUN TESTS
     tests <- runTestSuite(testSuite)
@@ -78,19 +109,15 @@ tryCatch(
 
     print("ALL TESTS PASSED")
   }
-  , errpr = function(e) {
-      browser()
+  , error = function(e) {
       print("ERROR")
       print(e)
-
     }
-  # , finally = {
-  #     jtc <- NULL
-  #     if( subprocess::process_state(test.env$juniperKernelProc)=="running" ) {
-  #       tryCatch(if(!subprocess::process_terminate(test.env$juniperKernelProc)) stop("proc terminate did not return TRUE"), error=function(e) print("Could not terminate the process", e))
-  #     }
-  #     tryCatch(unlink(test.env$connectionFile), error=function(e) stop("could not delete temp connection file: ", test.env$connectionFile))
-  #     gc()
+  , finally = {
+      jtc <- NULL
+      gc()
+      print(paste0(subprocess::process_read(jkp), collapse='\n'))
+      print(subprocess::process_terminate(jkp))
+      print(jkp)
+    }
 )
-
-gc()

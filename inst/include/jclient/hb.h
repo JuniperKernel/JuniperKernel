@@ -14,6 +14,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with JuniperKernel.  If not, see <http://www.gnu.org/licenses/>.
+#ifndef juniper_jclient_hb_H
+#define juniper_jclient_hb_H
 #include <string>
 #include <thread>
 #include <stdio.h>
@@ -28,61 +30,45 @@
 const std::string PING = "ping";
 
 void beat(zmq::socket_t* sock) {
-  Rcpp::Rcout << "sending hb" << std::endl;
   zmq::multipart_t msg;
   msg.add(zmq::message_t(PING.begin(), PING.end()));
-  msg.send(*sock,ZMQ_NOBLOCK);
-  Rcpp::Rcout << "beat sent" << std::endl;
+  msg.send(*sock);
 }
 
 class HB {
   public:
-    int _port;
+    int _port=54960;
+    std::string _endpoint = "tcp://127.0.0.1:53960";
     std::thread _hb_t;
-
     const HB& start_hb(zmq::context_t* ctx) {
-      zmq::socket_t* sock = listen_on(*ctx, "tcp://*:*", zmq::socket_type::req);
-      _port = read_port(sock);
+      zmq::socket_t* sock = new zmq::socket_t(*ctx, zmq::socket_type::req);
+      sock->connect(_endpoint);
       std::thread hb_thread([sock, ctx]() {
         bool dead=false;
         zmq::socket_t* signaller = subscribe_to(*ctx, INPROC_SIG);
-        zmq::pollitem_t items[] = {
-          {*signaller, 0, ZMQ_POLLIN, 0},
-          {*sock, 0, ZMQ_POLLIN, 0}
-        };
         try {
           zmq::multipart_t conn;
           beat(sock);
-
-          // poll for a connection
-          while( true ) {
-            zmq::poll(&items[0], 1, 1000);
-            if( (dead=(items[0].revents & ZMQ_POLLIN)) )
-              break;
-
-            if( items[1].revents & ZMQ_POLLIN ) {
-              zmq::multipart_t rec;
-              std::cout << "HB: " << rec.recv(*sock) << std::endl;
-              Rcpp::Rcout << "HB CONNECTION" << std::endl;
-              break;
-            }
-          }
+          conn.recv(*sock); // wait for a connection, then enter the loop
+          Rcpp::Rcout << "HB CONNECTION" << std::endl;
+          zmq::pollitem_t items[] = {
+            {*signaller, 0, ZMQ_POLLIN, 0},
+            {*sock, 0, ZMQ_POLLIN, 0}
+          };
           int no_hb=0;
           while( !dead ) {
-            Rcpp::Rcout << "sleeping 5"  << std::endl;
-            std::this_thread::sleep_for(std::chrono::seconds(5));
-            zmq::poll(&items[0], 1, 1000);
+            zmq::poll(&items[0], 1, 10*1000);  // heartbeat every 10s
+            if( (dead=(items[0].revents & ZMQ_POLLIN)) )
+              break;
+            beat(sock);
+            zmq::poll(items, 2, 1000/*millis*/);
             if( (dead=(items[0].revents & ZMQ_POLLIN)) )
               break;
 
-            Rcpp::Rcout << "awake; sending beat..." << std::endl;
-            beat(sock);
-            Rcpp::Rcout << "beat sent; polling for response" << std::endl;
-            zmq::poll(&items[1], 1, 1000/*millis*/);
-
             if( items[1].revents & ZMQ_POLLIN ) {
               zmq::multipart_t rec;
-              std::cout << "HB: " << rec.recv(*sock) << std::endl;
+              rec.recv(*sock);
+              std::cout << "HB: " << read_str(rec.pop()) << std::endl;
               continue;
             }
 
@@ -91,15 +77,15 @@ class HB {
           }
         } catch( const std::exception& x ) {
           Rcpp::Rcout << "exception in HB thread: " << x.what() << std::endl;
-        } catch( zmq::error_t& e ) { Rcpp::Rcout << "HEART BEAT ZMQ ERR: " << e.what() << std::endl; /*ignored*/ }
+        } catch( zmq::error_t& e ) { /*ignored*/ }
 
         signaller->setsockopt(ZMQ_LINGER,0);
         delete signaller;
         sock->setsockopt(ZMQ_LINGER,0);
         delete sock;
-        Rcpp::Rcout << "signaller and hb sock destroyed" << std::endl;
       });
       _hb_t = std::move(hb_thread);
       return *this;
     }
 };
+#endif // #ifndef juniper_jclient_hn_H

@@ -27,14 +27,12 @@
 
 std::thread start_hb_thread(zmq::context_t& ctx, const std::string& endpoint) {
   std::thread hbthread([&ctx, endpoint]() {
-    zmq::socket_t* hbSock = new zmq::socket_t(ctx, zmq::socket_type::rep);
-    hbSock->connect(endpoint);
+    zmq::socket_t* hbSock = listen_on(ctx, endpoint, zmq::socket_type::rep);  // bind to the heartbeat endpoint
     std::function<bool()> handlers[] = {
       // ping-pong the message on heartbeat
       [&hbSock]() {
         zmq::multipart_t msg;
         msg.recv(*hbSock);
-        Rcpp::Rcout << "GOT HEARTBEAT" << std::endl;
         msg.send(*hbSock);
         return true;
       }

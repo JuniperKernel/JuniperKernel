@@ -174,6 +174,6 @@ static JupyterTestClient* get_client(SEXP jtc) {
 }
 
 // [[Rcpp::export]]
-std::string client_info(SEXP jtc) {
-  return get_client(jtc)->config();
+std::string client_exec_request(SEXP jtc, std::string payload) {
+  return get_client(jtc)->_shell.execute_request(payload);
 }

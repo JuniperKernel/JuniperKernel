@@ -14,8 +14,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with JuniperKernel.  If not, see <http://www.gnu.org/licenses/>.
-#ifndef juniper_jclient_ctrl_H
-#define juniper_jclient_ctrl_H
+#ifndef juniper_jclient_dealer_H
+#define juniper_jclient_dealer_H
 #include <string>
 #include <thread>
 #include <stdio.h>
@@ -25,10 +25,27 @@
 #include <juniper/sockets.h>
 #include <juniper/utils.h>
 #include <juniper/jmessage.h>
-#include <jclient/dealer.h>
 
-class Ctrl: public DealerSocket {
+class DealerSocket {
   public:
-    Ctrl(): DealerSocket("tcp://127.0.0.1:53959", 55959) {}
+    zmq::socket_t* _sock=NULL;
+    std::string _endpoint;
+    int _port;
+
+    DealerSocket(const std::string& endpoint, int port): _endpoint(endpoint), _port(port) {Rcpp::Rcout << "Dealer init" << std::endl; }
+
+    void init_socket(zmq::context_t* ctx) {
+      _sock = new zmq::socket_t(*ctx, zmq::socket_type::dealer);
+      Rcpp::Rcout << "connecting to endpoint: " << _endpoint << std::endl;
+      _sock->connect(_endpoint);
+      Rcpp::Rcout << "dealer socket init'd" << std::endl;
+    }
+
+    void close() {
+      if( _sock!=nullptr ) {
+        _sock->setsockopt(ZMQ_LINGER, 0);
+        delete _sock;
+      }
+    }
 };
-#endif // #ifndef juniper_jclient_ctrl_H
+#endif // #ifndef juniper_jclient_dealer_H

@@ -145,4 +145,13 @@ static int read_port(zmq::socket_t* sock) {
   std::string port(ep.substr(ep.find(":", ep.find(":")+1)+1));
   return stoi(port);
 }
+
+static std::string read_str(const zmq::message_t& msg) {
+  std::stringstream ss;
+  const char* buf = msg.data<const char>();
+  size_t buflen = msg.size();
+  for(size_t i=0; i<buflen; ++i)
+    ss << static_cast<char>(buf[i]);
+  return ss.str();
+}
 #endif // #ifndef juniper_juniper_utils_H
