@@ -245,3 +245,19 @@ channel to the client. Reply content is created by doing some work in the langua
 (e.g., `plot(x,y)` or `hist(data)`) and then handing back any results to be packaged for client 
 consumption. The request handler, therefore, is the most appropriate place to draw a boundary where 
 the zeromq architecture can be abstracted away from the code-exec'ing one.
+
+
+# Version Notes
+Release versions will be of the form <odd>.<even>.<patch>.0
+Dev versions will be of the form <odd>.<odd>.<patch>.<dev>
+
+For example:  
+  1.0.0.0 is a release version
+  1.1.0.0 is a dev version
+next minor:
+  1.2.0.0 is the next minor release version
+  1.3.0.0 is the next minor dev version
+next major:
+  2.0.0.0 is the next major release version
+  2.1.0.0 is the next major dev version
+         

@@ -1,6 +1,6 @@
 Package: JuniperKernel
 Title: Kernel for 'Jupyter'
-Version: 1.0.0.999
+Version: 1.1.0.0
 Date: 2017-12-07
 Authors@R: c(
   person("Spencer Aiello",   role=c("aut", "cre", "cph"), email="spnrpa@gmail.com"),
