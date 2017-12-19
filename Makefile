@@ -6,7 +6,7 @@
 #        > VARIABLE = value_of_variable
 print-%  : ; @echo $*=$($*)
 
-PKG_VERSION=1.0.0.0
+PKG_VERSION=1.0.0.999
 
 R_BUILD_ARGS= --no-manual --no-build-vignettes
 R_CHECK_ARGS= --no-manual --no-build-vignettes --as-cran
