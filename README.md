@@ -7,6 +7,14 @@ Juniper Kernel <img src="./extras/juniper_logo.png" width=120, align="right" />
 
 An [R](https://cran.r-project.org/) kernel for [Jupyter](https://jupyter.org) built with [Xeus](https://github.com/QuantStack/xeus) and [Rcpp](http://www.rcpp.org/).
 
+## Install from CRAN
+
+```
+> install.package("JuniperKernel")
+> library(JuniperKernel)
+> installJuniper(useJupyterDefault = TRUE)  # install into default Jupyter kernel location
+```
+
 ## Building
 
 ##### Requirements
