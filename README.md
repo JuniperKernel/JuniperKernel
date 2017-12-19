@@ -10,7 +10,7 @@ An [R](https://cran.r-project.org/) kernel for [Jupyter](https://jupyter.org) bu
 ## Install from CRAN
 
 ```
-> install.package("JuniperKernel")
+> install.packages("JuniperKernel")
 > library(JuniperKernel)
 > installJuniper(useJupyterDefault = TRUE)  # install into default Jupyter kernel location
 ```
