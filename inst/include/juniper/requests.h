@@ -117,6 +117,8 @@ class RequestServer {
     const RequestServer& handle(zmq::socket_t& sock) const {
       json req = _cur_msg.get();
       std::string msg_type = req["header"]["msg_type"];
+      Rcpp::Rcout << "Handling message type: " << msg_type << std::endl;
+      Rcpp::Rcout << "MESSAGE: " << req << std::endl;
 //      Rcpp::Rcout << "Handling message type: " << msg_type << std::endl;
       req["stream_out_port"] = _stream_out_port;  // stitch the stdout port into the client request
       req["stream_err_port"] = _stream_err_port;  // stitch the stderr into the client request
@@ -177,14 +179,6 @@ class RequestServer {
         poll(*rs._ctx, socket, handlers, 1);
       });
       return out_thread;
-    }
-    static int read_port(zmq::socket_t* sock) {
-      char endpoint[32];
-      size_t sz = sizeof(endpoint); 
-      sock->getsockopt(ZMQ_LAST_ENDPOINT, &endpoint, &sz);
-      std::string ep(endpoint);
-      std::string port(ep.substr(ep.find(":", ep.find(":")+1)+1));
-      return stoi(port);
     }
 };
 
