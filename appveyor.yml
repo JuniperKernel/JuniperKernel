@@ -26,12 +26,7 @@ environment:
     R_ARCH: x64
 
 before_build:
-  - ps: >-
-      if (-Not (Test-Path "C:\Program Files (x86)\Pandoc\")) {
-        cinst pandoc
-      }
-  - ps: $env:Path += ";C:\Program Files (x86)\Pandoc\"
-  - pandoc -v
+  - cinst pandoc
 
 cache:
   - C:\RLibrary
