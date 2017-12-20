@@ -25,6 +25,14 @@ environment:
   - R_VERSION: release
     R_ARCH: x64
 
+before_build:
+  - cinst pandoc
+  - ps: $env:Path += ";C:\Program Files (x86)\Pandoc\"
+
+cache:
+  - C:\RLibrary
+  - C:\Program Files (x86)\Pandoc\
+
 build_script:
   - set _R_CHECK_FORCE_SUGGESTS_=false
   - travis-tool.sh install_deps
