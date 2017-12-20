@@ -1,10 +1,19 @@
 Juniper Kernel <img src="./extras/juniper_logo.png" width=120, align="right" />
 ==============================================================================
 
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/JuniperKernel)](https://CRAN.R-project.org/package=JuniperKernel)
 [![Travis](https://travis-ci.org/JuniperKernel/JuniperKernel.svg?branch=master)](https://travis-ci.org/JuniperKernel/JuniperKernel)
 [![Appveyor Build status](https://ci.appveyor.com/api/projects/status/gah4rq18ml06d6xp?svg=true)](https://ci.appveyor.com/project/spennihana/juniperkernel)
 
 An [R](https://cran.r-project.org/) kernel for [Jupyter](https://jupyter.org) built with [Xeus](https://github.com/QuantStack/xeus) and [Rcpp](http://www.rcpp.org/).
+
+## Install from CRAN
+
+```
+> install.packages("JuniperKernel")
+> library(JuniperKernel)
+> installJuniper(useJupyterDefault = TRUE)  # install into default Jupyter kernel location
+```
 
 ## Building
 
@@ -236,3 +245,19 @@ channel to the client. Reply content is created by doing some work in the langua
 (e.g., `plot(x,y)` or `hist(data)`) and then handing back any results to be packaged for client 
 consumption. The request handler, therefore, is the most appropriate place to draw a boundary where 
 the zeromq architecture can be abstracted away from the code-exec'ing one.
+
+
+# Version Notes
+Release versions will be of the form <odd>.<even>.<patch>.0
+Dev versions will be of the form <odd>.<odd>.<patch>.<dev>
+
+For example:  
+  1.0.0.0 is a release version
+  1.1.0.0 is a dev version
+next minor:
+  1.2.0.0 is the next minor release version
+  1.3.0.0 is the next minor dev version
+next major:
+  2.0.0.0 is the next major release version
+  2.1.0.0 is the next major dev version
+         

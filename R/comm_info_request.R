@@ -31,6 +31,13 @@
 #'
 #' @author Spencer Aiello
 #' @references \url{http://jupyter-client.readthedocs.io/en/latest/messaging.html#comm-info}
+#'
+#' @examples
+#' \dontrun{
+#'   request_msg <- list("target"=NULL, "target_name"="my_open_comm_id")
+#'   comm_info_request(request_msg)
+#' }
+#'
 #' @export
 comm_info_request <- function(request_msg) {
   target <- ifelse(is.null(request_msg$target), "", request_msg$target_name)

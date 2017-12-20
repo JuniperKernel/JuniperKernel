@@ -31,6 +31,18 @@
 #'
 #' @author Spencer Aiello
 #' @references \url{http://jupyter-client.readthedocs.io/en/latest/messaging.html#code-completeness}
+#'
+#' @examples
+#' \dontrun{
+#'   request_msg <- list(code="print(")  'incomplete'
+#'   is_complete_request(request_msg)
+#' }
+#'
+#' \dontrun{
+#'   request_msg <- list(code="print(5)")  # 'complete'
+#'   is_complete_request(request_msg)
+#' }
+#'
 #' @export
 is_complete_request <- function(request_msg) {
   code <- request_msg$content$code

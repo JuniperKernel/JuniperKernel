@@ -31,6 +31,12 @@
 #'
 #' @author Spencer Aiello
 #' @references \url{http://jupyter-client.readthedocs.io/en/latest/messaging.html#kernel-info}
+#'
+#' @examples
+#' \dontrun{
+#'   kernel_info_request(list())
+#' }
+#'
 #' @export
 kernel_info_request <- function(request_msg) {
   linfo <- list ( name = "R"

@@ -31,6 +31,13 @@
 #'
 #' @author Spencer Aiello
 #' @references \url{http://jupyter-client.readthedocs.io/en/latest/messaging.html#completion}
+#'
+#' @examples
+#' \dontrun{
+#'   request_msg <- list("code"="print(\"hello\")", cursor_pos=4)
+#'   complete_request(request_msg)
+#' }
+#'
 #' @export
 complete_request <- function(request_msg) {
   code <- request_msg$content$code

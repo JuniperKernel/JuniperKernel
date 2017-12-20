@@ -31,6 +31,13 @@
 #'
 #' @author Spencer Aiello
 #' @references \url{http://jupyter-client.readthedocs.io/en/latest/messaging.html#execution-results}
+#'
+#' @examples
+#' \dontrun{
+#'   request_msg <- list("code"="5+5")
+#'   execute_request(request_msg)
+#' }
+#'
 #' @export
 execute_request <- function(request_msg) {
   content <- request_msg$content

@@ -32,6 +32,13 @@
 #' @author Spencer Aiello
 #' @references \url{http://jupyter-client.readthedocs.io/en/latest/messaging.html#introspection}
 #' @importFrom methods is
+#'
+#' @examples
+#' \dontrun{
+#'   request_msg <- list(code="print(99+rnorm(1))", cursor_pos=11, detail_level=0)
+#'   inspect_request(request_msg)
+#' }
+#'
 #' @export
 inspect_request <- function(request_msg) {
   code <- request_msg$content$code

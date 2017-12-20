@@ -10,4 +10,5 @@ rm -rf src/._*
 rm -rf src/x64
 rm -rf inst/._*
 rm -rf *.ipynb*
+rm -rf inst/nl_json.hpp
 exit 0

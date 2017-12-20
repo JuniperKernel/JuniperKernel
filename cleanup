@@ -12,3 +12,4 @@ rm -rf src/x64
 rm -rf inst/._*
 rm -rf *.ipynb*
 rm -rf src/zeromq*
+rm -rf inst/nl_json.hpp

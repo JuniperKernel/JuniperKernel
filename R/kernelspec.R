@@ -76,6 +76,12 @@
 #' @title List Installed Jupyter Kernels
 #' @details
 #' Prints the currently installed kernels and their install locations.
+#'
+#' @examples
+#' \dontrun{
+#'   listKernels()
+#' }
+#'
 #' @export
 listKernels <- function() {
   .stopIfJupyterMissing()
@@ -86,6 +92,12 @@ listKernels <- function() {
 #'
 #' @title Create the Default Kernel Name
 #' @seealso \code{\link{installJuniper}}.
+#'
+#' @examples
+#' \dontrun{
+#'   defaultKernelName()
+#' }
+#'
 #' @export
 defaultKernelName <- function() {
   s <- utils::sessionInfo()
@@ -96,6 +108,12 @@ defaultKernelName <- function() {
 #'
 #' @title Create the Default Kernel Display Name
 #' @seealso \code{\link{installJuniper}}.
+#'
+#' @examples
+#' \dontrun{
+#'   defaultDisplayName()
+#' }
+#'
 #' @export
 defaultDisplayName <- function() {
   s <- utils::sessionInfo()

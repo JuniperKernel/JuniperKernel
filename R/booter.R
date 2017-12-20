@@ -43,6 +43,12 @@
 #'
 #' See http://jupyter-client.readthedocs.io/en/latest/kernels.html#connection-files
 #' for more details.
+#'
+#' @examples
+#' \dontrun{
+#'   /path/to/R -e 'JuniperKernel::bootKernel()' --args /path/to/connection_file.json
+#' }
+#'
 #' @export
 bootKernel <- function() {
   require(JuniperKernel)  # attach the package to the search path so we can call methods from Rcpp
