@@ -26,6 +26,7 @@
 #include <juniper/sockets.h>
 #include <juniper/utils.h>
 #include <juniper/conf.h>
+#include <Rcpp.h>
 
 const std::string PING = "ping";
 
@@ -68,7 +69,7 @@ class HB {
             if( items[1].revents & ZMQ_POLLIN ) {
               zmq::multipart_t rec;
               rec.recv(*sock);
-              std::cout << "HB: " << read_str(rec.pop()) << std::endl;
+              Rcpp::Rcout << "HB: " << read_str(rec.pop()) << std::endl;
               continue;
             }
 

@@ -31,5 +31,9 @@ if [ ! -f ./inst/zmq/libzmq.a ]; then
     ./configure CPPFLAGS=-DPIC CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-fPIC
     make
     cp src/.libs/libzmq.a ../../inst/zmq/
+  fi
+  cd ../..
+  rm -rf temp
+  rm -rf inst/*gz inst/*zip
 fi
 exit 0
