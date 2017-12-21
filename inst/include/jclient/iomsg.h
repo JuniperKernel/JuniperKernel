@@ -37,10 +37,8 @@ class IOMessage {
 
     std::string recv() {
       zmq::multipart_t msg;
-      if( msg.recv(*_sock, ZMQ_DONTWAIT) ) {
-        Rcpp::Rcout << "MESSAGE ON THE IOPUB WAS: " << msg.str() << std::endl;
+      if( msg.recv(*_sock, ZMQ_DONTWAIT) )
         return read_str(msg[0]);
-      }
       return "";
     }
 
