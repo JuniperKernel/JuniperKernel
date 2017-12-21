@@ -14,27 +14,34 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with JuniperKernel.  If not, see <http://www.gnu.org/licenses/>.
-#ifndef juniper_jclient_dealer_H
-#define juniper_jclient_dealer_H
+#ifndef juniper_jclient_iomsg_H
+#define juniper_jclient_iomsg_H
 #include <string>
 #include <thread>
 #include <stdio.h>
 #include <stdlib.h>
 #include <zmq.h>
 #include <zmq.hpp>
+#include <json.hpp>
 #include <juniper/sockets.h>
 #include <juniper/utils.h>
 #include <juniper/jmessage.h>
 
-class DealerSocket {
+class IOMessage {
   public:
-    zmq::socket_t* _sock=NULL;
-    int _port;
+    zmq::socket_t* _sock;
 
-    void init_socket(zmq::context_t* ctx, int port) {
-      _port=port;
-      _sock = new zmq::socket_t(*ctx, zmq::socket_type::dealer);
-      _sock->connect("tcp://127.0.0.1:" + std::to_string(port));
+    void init_socket(zmq::context_t& ctx) {
+      _sock = subscribe_to(ctx, "inproc://iopub");
+    }
+
+    std::string recv() {
+      zmq::multipart_t msg;
+      if( msg.recv(*_sock, ZMQ_DONTWAIT) ) {
+        Rcpp::Rcout << "MESSAGE ON THE IOPUB WAS: " << msg.str() << std::endl;
+        return read_str(msg[0]);
+      }
+      return "";
     }
 
     void close() {
@@ -44,4 +51,4 @@ class DealerSocket {
       }
     }
 };
-#endif // #ifndef juniper_jclient_dealer_H
+#endif // #ifndef juniper_jclient_iomsg_H

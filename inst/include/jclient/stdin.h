@@ -28,7 +28,5 @@
 #include <jclient/dealer.h>
 
 class Stdin: public DealerSocket {
-  public:
-    Stdin(): DealerSocket("tcp://127.0.0.1:53958", 54958) {}
 };
 #endif // #ifndef juniper_jclient_stdin_H

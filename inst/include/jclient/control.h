@@ -27,8 +27,5 @@
 #include <juniper/jmessage.h>
 #include <jclient/dealer.h>
 
-class Ctrl: public DealerSocket {
-  public:
-    Ctrl(): DealerSocket("tcp://127.0.0.1:53959", 55959) {}
-};
+class Ctrl: public DealerSocket {};
 #endif // #ifndef juniper_jclient_ctrl_H

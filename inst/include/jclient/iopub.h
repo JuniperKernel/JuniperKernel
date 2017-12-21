@@ -29,38 +29,39 @@
 
 class IOPub {
   public:
-    long long *_msg_ctr;  // count messages received
-    int _port=54961;
-    std::string _endpoint= "tcp://127.0.0.1:53961";
+    int _port;
     std::thread _io_t;
 
-    const IOPub& start_iopub(zmq::context_t* ctx) {
+    IOPub& start_iopub(zmq::context_t* ctx, int port) {
+      _port=port;
       zmq::socket_t* sock = new zmq::socket_t(*ctx, zmq::socket_type::sub);
       sock->setsockopt(ZMQ_SUBSCRIBE, "" /*no filter*/, 0);
-      sock->connect(_endpoint);
-//      _port = read_port(sock);
-      long long ctr = *_msg_ctr;
-      ctr=0;
-      std::thread io_thread([sock, ctx, &ctr]() {
+      sock->connect("tcp://127.0.0.1:" + std::to_string(port));
+      std::thread io_thread([sock, ctx]() mutable {
+        zmq::socket_t* iopub = listen_on(*ctx, "inproc://iopub", zmq::socket_type::pub);
         std::function<bool()> handlers[] = {
-          [sock, &ctr]() {
+          [sock, iopub]() mutable {
+          std::string _key = "cc496d37-59a9-4c61-8900-d826985f564d";
             zmq::multipart_t msg;
             msg.recv(*sock);
-            if( msg[1].size()==0 )
+            if( msg[1].size()==0 ) {
+              Rcpp::Rcout << "IOPub connect/disconnect" << std::endl;
               return true;  // (dis)connects are ignored
-
-            ctr++;  // bump the message count
-            Rcpp::Rcout << "IOPUB: " << read_str(msg[1]) << std::endl;
+            }
+            std::string msg_str = JMessage::read(msg, _key).get().dump();
+            zmq::multipart_t pubmsg;
+            pubmsg.add(zmq::message_t(msg_str.begin(), msg_str.end()));
+            pubmsg.send(*iopub);
             return true;
           }
         };
         zmq::socket_t* sockets[1] = {sock};
         poll(*ctx, sockets, handlers, 1);
+        iopub->setsockopt(ZMQ_LINGER,0);
+        delete iopub;
       });
       _io_t = std::move(io_thread);
       return *this;
     }
-
-    const long long message_count() const { return *_msg_ctr; }
 };
 #endif // #ifndef juniper_jclient_iopub_H

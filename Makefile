@@ -24,12 +24,12 @@ ZMQ_CPPADDON_HEADER_URL = https://raw.githubusercontent.com/zeromq/cppzmq/master
 
 #quantstack bacon bits
 # xtl
-XTL_VERSION = 0.3.1
+XTL_VERSION = 0.3.8
 XTL_TAR_FILE = ${XTL_VERSION}.tar.gz
 XTL_URL = https://github.com/QuantStack/xtl/archive/${XTL_TAR_FILE}
 
 # xeus
-XEUS_VERSION = 0.7.0
+XEUS_VERSION = 0.8.1
 XEUS_TAR_FILE = ${XEUS_VERSION}.tar.gz
 XEUS_URL = https://github.com/QuantStack/xeus/archive/${XEUS_TAR_FILE}
 
@@ -90,7 +90,7 @@ clean:
 	rm -rf *gz *zip
 	rm -rf src/Makevars
 	rm -rf src/*dll
-	#rm -rf inst/zmq
+	rm -rf inst/zmq
 	#rm -rf inst/include/zmq*
 	#rm -rf inst/include/x*
 	rm -rf src/*gz

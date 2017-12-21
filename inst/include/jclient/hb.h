@@ -38,20 +38,23 @@ void beat(zmq::socket_t* sock) {
 
 class HB {
   public:
-    int _port=54960;
-    std::string _endpoint = "tcp://127.0.0.1:53960";
+    int _port;
     std::thread _hb_t;
-    const HB& start_hb(zmq::context_t* ctx) {
+    volatile bool _beating;
+
+    const HB& start_hb(zmq::context_t* ctx, int port) {
+      _port=port;
       zmq::socket_t* sock = new zmq::socket_t(*ctx, zmq::socket_type::req);
-      sock->connect(_endpoint);
-      std::thread hb_thread([sock, ctx]() {
+      sock->connect("tcp://127.0.0.1:" + std::to_string(port));
+      volatile bool* is_beating = &_beating;
+      std::thread hb_thread([sock, ctx, is_beating]() {
         bool dead=false;
         zmq::socket_t* signaller = subscribe_to(*ctx, INPROC_SIG);
         try {
           zmq::multipart_t conn;
           beat(sock);
           conn.recv(*sock); // wait for a connection, then enter the loop
-          Rcpp::Rcout << "HB CONNECTION" << std::endl;
+          *is_beating=true;
           zmq::pollitem_t items[] = {
             {*signaller, 0, ZMQ_POLLIN, 0},
             {*sock, 0, ZMQ_POLLIN, 0}
@@ -78,7 +81,7 @@ class HB {
           }
         } catch( const std::exception& x ) {
           Rcpp::Rcout << "exception in HB thread: " << x.what() << std::endl;
-        } catch( zmq::error_t& e ) { /*ignored*/ }
+        }
 
         signaller->setsockopt(ZMQ_LINGER,0);
         delete signaller;

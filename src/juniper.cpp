@@ -164,8 +164,8 @@ void comm_request(const std::string type) {
 // FOR TESTING
 
 // [[Rcpp::export]]
-SEXP run_client() {
-  JupyterTestClient* jclient = new JupyterTestClient();
+SEXP run_client(int hbport, int ioport, int shport, int ctport, int inport) {
+  JupyterTestClient* jclient = new JupyterTestClient(hbport, ioport, shport, ctport, inport);
   return createExternalPointer<JupyterTestClient>(jclient, testClientFinalizer, "JupyterTestClient*");
 }
 
@@ -174,6 +174,21 @@ static JupyterTestClient* get_client(SEXP jtc) {
 }
 
 // [[Rcpp::export]]
-std::string client_exec_request(SEXP jtc, std::string payload) {
+void client_exec_request(SEXP jtc, std::string payload) {
   return get_client(jtc)->_shell.execute_request(payload);
+}
+
+// [[Rcpp::export]]
+std::string client_exec_reply(SEXP jtc) {
+  return get_client(jtc)->_shell.execute_reply();
+}
+
+// [[Rcpp::export]]
+void wait_for_hb(SEXP jtc) {
+  return get_client(jtc)->wait_for_hb();
+}
+
+// [[Rcpp::export]]
+std::string iopub_recv(SEXP jtc) {
+  return get_client(jtc)->_iomsg.recv();
 }

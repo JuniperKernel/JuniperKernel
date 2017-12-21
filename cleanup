@@ -5,7 +5,7 @@ rm -rf src/*o
 rm -rf *gz *zip
 rm -rf src/Makevars
 rm -rf src/*dll
-#rm -rf inst/zmq
+rm -rf inst/zmq
 rm -rf src/*gz
 rm -rf src/._*
 rm -rf src/x64

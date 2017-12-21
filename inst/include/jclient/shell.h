@@ -34,15 +34,12 @@ class Shell: public DealerSocket {
     const std::string _id = "8487E89F214545E19FFADD3C8D56E4AC";
     const std::string _del= "<IDS|MSG>";
 
-    Shell(): DealerSocket("tcp://127.0.0.1:53957", 55957) {}
-    std::string execute_request(std::string req) {
+    void execute_request(std::string req) {
       json request = json::parse(req);
-      Rcpp::Rcout << "SHELL REQUEST: " << req << std::endl;
       zmq::multipart_t msg;
       msg.add(zmq::message_t(_id.begin(), _id.end()));
       msg.add(zmq::message_t(_del.begin(), _del.end()));
       std::string hmac = compute_hmac(request);
-      Rcpp::Rcout << "THIS HMAC IS: " << hmac << std::endl;
       msg.add(zmq::message_t(hmac.begin(), hmac.end()));
       std::string header = request["header"].dump();
       std::string parent_header = request["parent_header"].dump();
@@ -52,9 +49,10 @@ class Shell: public DealerSocket {
       msg.add(zmq::message_t(parent_header.begin(), parent_header.end()));
       msg.add(zmq::message_t(metadata.begin(), metadata.end()));
       msg.add(zmq::message_t(content.begin(), content.end()));
-
       msg.send(*_sock);
-      Rcpp::Rcout << "SHELL REQUEST SENT" << std::endl;
+    }
+
+    std::string execute_reply() {
       zmq::multipart_t res;
       res.recv(*_sock);
       return JMessage::read(res, _key).get().dump();

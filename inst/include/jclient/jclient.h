@@ -30,6 +30,7 @@
 #include <jclient/shell.h>
 #include <jclient/control.h>
 #include <jclient/stdin.h>
+#include <jclient/iomsg.h>
 #include <zmq.h>
 #include <zmq.hpp>
 #include <Rcpp.h>
@@ -39,26 +40,31 @@ class JupyterTestClient {
     zmq::context_t* _ctx;
     Shell _shell;
     Stdin _stdin;
-    Ctrl _ctrl;
+    Ctrl _cntrl;
+    IOMessage _iomsg;
     zmq::socket_t* _inproc_sig;
+
     HB _hb;
     IOPub _iopub;
 
-    JupyterTestClient() {
+    JupyterTestClient(int hbport, int ioport, int shport, int ctport, int inport) {
       Rcpp::Rcout << "initializing juniper test client" << std::endl;
       _ctx = new zmq::context_t(1);
-      _shell.init_socket(_ctx);
-      _stdin.init_socket(_ctx);
-      _ctrl.init_socket(_ctx);
       _inproc_sig = listen_on(*_ctx, INPROC_SIG, zmq::socket_type::pub);
-      _hb.start_hb(_ctx);
-      _iopub.start_iopub(_ctx);
+      // connect the 5 client sockets
+      _shell.init_socket(_ctx, shport);
+      _stdin.init_socket(_ctx, inport);
+      _cntrl.init_socket(_ctx, ctport);
+      _hb.start_hb(_ctx, hbport);
+      _iopub.start_iopub(_ctx, ioport);
+      _iomsg.init_socket(*_ctx);
     }
 
     ~JupyterTestClient() {
       _shell.close();
-      _ctrl.close();
+      _cntrl.close();
       _stdin.close();
+      _iomsg.close();
       // force a shutdown
       zmq::message_t m(0); _inproc_sig->send(m);
       _inproc_sig->setsockopt(ZMQ_LINGER,0);
@@ -72,6 +78,10 @@ class JupyterTestClient {
       if( _ctx )
         delete _ctx;
       Rcpp::Rcout << "Juniper Test Client successfully destroyed." << std::endl;
+    }
+
+    void wait_for_hb() {
+      while( !_hb._beating ) {}
     }
 };
 #endif // #ifndef juniper_jclient_jclient_H
