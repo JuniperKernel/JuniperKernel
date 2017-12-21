@@ -7,6 +7,7 @@ stopifnot(require(RUnit, quietly=TRUE))
 stopifnot(require(JuniperKernel, quietly=TRUE))
 stopifnot(require(subprocess, quietly=TRUE))
 source("launch_kernel.R")
+source("check_iopub.R")
 
 # SETUP
 ports <- floor((5+runif(5))*10000)  # randomize ports before seed is set
