@@ -54,9 +54,8 @@ class Shell: public DealerSocket {
 
     std::string execute_reply() {
       zmq::multipart_t res;
-      if( res.recv(*_sock, ZMQ_DONTWAIT) )
-        return JMessage::read(res, _key).get().dump();
-      throw("FAILED_TO_RECV");
+      res.recv(*_sock);
+      return JMessage::read(res, _key).get().dump();
     }
 
     std::string compute_hmac(const json& req) {

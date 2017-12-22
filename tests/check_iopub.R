@@ -44,28 +44,34 @@ recv_msgs <- function() {
   if( nzchar(msg) )
     msgs <- c(msgs, msg)
 
-  # read all messages until reaching "" or idle
-  # if no idle, then poll the queue for 3 seconds for more messages...
-  # even if no messages were read above, this will try One More Time
+  # Optimistically poll for the idle message. iopub_recv races with all
+  # message writers, so intermittently the queue will be empty and produce
+  # a read resulting in "". Allow for ~3 seconds of polling if no idle is
+  # reached so that we don't gum up the test suite.
+  # Note that even if the previous poll produced no messages read, then
+  # this loop tries One More Time. And, on each non-zero length message
+  # the retry mechanism is reset.
   ntries <- 30L
-  while( nzchar(msg <- JuniperKernel:::iopub_recv(jclient)) || ntries >=0L ) {
+  notIdle <- TRUE
+  while( notIdle ) {
+    if( ntries <= 0L ) break
+    msg <- JuniperKernel:::iopub_recv(jclient)
     if( nzchar(msg) ) {
+      ntries <- 30L  # reset
       msgs <- c(msgs, msg)
       # check if we got the idle message (which is the last message)
       jmsg <- jsonlite::fromJSON(msg)
       if( !is.null(jmsg$content$execution_state) &&
            jmsg$content$execution_state=="idle" ) {
-        break
+        notIdle <- FALSE
       }
-      ntries <- 30L  # reset
     } else {
       # Poll the iopub message queue until the "idle" message arrives.
-      # we are racily reading messages from the iopub queue and we may
-      # miss the idle if we aren't careful. The logic here is to continue
-      # to poll until we get an "", which indicates an empty queue... BUT
-      # more messages may be yet to come if we have not read an "idle".
-      # However, we don't want to spin forever, so we poll for 3 seconds
-      # and then let the tests continue running.
+      # we are racily reading messages from the iopub queue whilst writers
+      # are in progress. An empty queue with no "idle" message published may
+      # mean more messages are yet to come, or a more serious problem.
+      # If no messages come after `ntries` attempts, then bail on this and
+      # return what we have so far.
       #
       # Note that if we fail to recv the idle message, then all downstream
       # tests will be broken!
