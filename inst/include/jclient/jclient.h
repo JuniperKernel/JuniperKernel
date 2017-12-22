@@ -20,6 +20,7 @@
 #include <thread>
 #include <fstream>
 #include <unistd.h>
+#include <chrono>
 #include <stdio.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -57,6 +58,8 @@ class JupyterTestClient {
       _cntrl.init_socket(_ctx, ctport);
       _hb.start_hb(_ctx, hbport);
       _iopub.start_iopub(_ctx, ioport);
+      Rcpp::Rcout << "Waiting for client to start..." << std::endl;
+      std::this_thread::sleep_for(std::chrono::milliseconds(1500));  // FIXME/HACK: sleep for 1.5 seconds while iopub boots
       _iomsg.init_socket(*_ctx);
     }
 

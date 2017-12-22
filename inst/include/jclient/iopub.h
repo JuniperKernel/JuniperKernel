@@ -37,10 +37,10 @@ class IOPub {
       zmq::socket_t* sock = new zmq::socket_t(*ctx, zmq::socket_type::sub);
       sock->setsockopt(ZMQ_SUBSCRIBE, "" /*no filter*/, 0);
       sock->connect("tcp://127.0.0.1:" + std::to_string(port));
-      std::thread io_thread([sock, ctx]() mutable {
+      std::thread io_thread([sock, ctx]() {
         zmq::socket_t* iopub = listen_on(*ctx, "inproc://iopub", zmq::socket_type::pub);
         std::function<bool()> handlers[] = {
-          [sock, iopub]() mutable {
+          [sock, iopub]() {
           std::string _key = "cc496d37-59a9-4c61-8900-d826985f564d";
             zmq::multipart_t msg;
             msg.recv(*sock);

@@ -29,6 +29,7 @@
 #include <Rcpp.h>
 
 const std::string PING = "ping";
+const int HEARTBEAT_INTERVAL_SECS = 60;
 
 void beat(zmq::socket_t* sock) {
   zmq::multipart_t msg;
@@ -61,7 +62,7 @@ class HB {
           };
           int no_hb=0;
           while( !dead ) {
-            zmq::poll(&items[0], 1, 10*1000);  // heartbeat every 10s
+            zmq::poll(&items[0], 1, HEARTBEAT_INTERVAL_SECS*1000);  // heartbeat
             if( (dead=(items[0].revents & ZMQ_POLLIN)) )
               break;
             beat(sock);

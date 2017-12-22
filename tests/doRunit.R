@@ -4,11 +4,14 @@
 
 # load RUnit and JuniperKernel packages
 stopifnot(require(RUnit, quietly=TRUE))
-stopifnot(require(JuniperKernel, quietly=TRUE))
 stopifnot(require(subprocess, quietly=TRUE))
+stopifnot(require(jsonlite, quietly=TRUE))
+stopifnot(require(JuniperKernel, quietly=TRUE))
+
 source("launch_kernel.R")
 source("check_iopub.R")
 
+println("=======================R UNIT SETUP=======================")
 # SETUP
 ports <- floor((5+runif(5))*10000)  # randomize ports before seed is set
 ports <- list(hbport=ports[1L], ioport=ports[2L], shport=ports[3L], ctport=ports[4L], inport=ports[5L])
@@ -21,19 +24,31 @@ jclient <- JuniperKernel:::run_client(ports$hbport, ports$ioport, ports$shport, 
 
 JuniperKernel:::wait_for_hb(jclient)
 println("CLIENT<=>KERNEL connection established")
+println("=======================R UNIT SETUP DONE=======================")
+
+println("")
+println("")
 
 tryCatch(
   {
     # DEFINE TEST SUITE
     testSuite <- defineTestSuite( name="JuniperKernel unit tests"
-                                , dirs="/Users/saiello8/repos/JuniperKernel/inst/runits"  # system.file("runits", package = "JuniperKernel")
+                                , dirs=system.file("runits", package = "JuniperKernel")  # "C:/Users/spencer/repos/JuniperKernel/inst/runits"
                                 , testFuncRegexp = "^[Tt]est.+"
                                 )
 
     # RUN TESTS
+    println("=======================R UNIT TEST SUITE BEGIN=======================")
+    println("")
+    println("")
     tests <- runTestSuite(testSuite)
 
+
     # PRINT RESULTS
+    println("=======================R UNIT TEST SUITE END=======================")
+    println("")
+    println("")
+
     printTextProtocol(tests)
 
     # Return success or failure to R CMD CHECK
@@ -49,6 +64,9 @@ tryCatch(
       println(e)
     }
   , finally = {
+      println("")
+      println("")
+      println("=======================R UNIT CLEANUP=======================")
       # attempt a kernel shutdown
       tryCatch(println(process_terminate(kernelProc)), error=function(.){})
       # tryCatch(process_kill(kernelProc), error=function(.){})
