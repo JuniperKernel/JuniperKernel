@@ -4,6 +4,7 @@ Juniper Kernel <img src="./extras/juniper_logo.png" width=120, align="right" />
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/JuniperKernel)](https://CRAN.R-project.org/package=JuniperKernel)
 [![Travis](https://travis-ci.org/JuniperKernel/JuniperKernel.svg?branch=master)](https://travis-ci.org/JuniperKernel/JuniperKernel)
 [![Appveyor Build status](https://ci.appveyor.com/api/projects/status/gah4rq18ml06d6xp?svg=true)](https://ci.appveyor.com/project/spennihana/juniperkernel)
+[![Downloads](http://cranlogs.r-pkg.org/badges/JuniperKernel)](https://cran.rstudio.com/package=JuniperKernel)
 
 An [R](https://cran.r-project.org/) kernel for [Jupyter](https://jupyter.org) built with [Xeus](https://github.com/QuantStack/xeus) and [Rcpp](http://www.rcpp.org/).
 

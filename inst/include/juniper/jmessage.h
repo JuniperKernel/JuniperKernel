@@ -28,6 +28,7 @@
 #include <iostream>
 #include <sha256.h>
 #include <juniper/external.h>
+#include <juniper/utils.h>
 #include <Rcpp.h>
 
 #define VERSION "5.2"
@@ -127,8 +128,6 @@ private:
 
     // validate
     std::string hmac2dig = hmac<SHA256>(data.str(), _key);
-    // Rcpp::Rcout << "hmac2dig: " << hmac2dig << "; actual: " << _hmac << std::endl;
-    // Rcpp::Rcout << "hmac2dig.compare(actual)= " << hmac2dig.compare(_hmac) << std::endl;
     if( hmac2dig!=_hmac )
       throw("bad hmac digest");
     return *this;
@@ -143,15 +142,6 @@ private:
     data << s;
     return json::parse(s);
   }
-
-  static std::string read_str(const zmq::message_t& msg) {
-    std::stringstream ss;
-    const char* buf = msg.data<const char>();
-    size_t buflen = msg.size();
-    for(size_t i=0; i<buflen; ++i)
-      ss << static_cast<char>(buf[i]);
-    return ss.str();
-  }
   
   static zmq::message_t to_msg(const std::string& s) {
     return zmq::message_t(s.begin(), s.end());
@@ -159,7 +149,6 @@ private:
 
   // JMessage (this) -> multipart_t
   zmq::multipart_t to_multipart_t() {
-    std::stringstream s;
     zmq::multipart_t multi_msg;
     
     // add IDS

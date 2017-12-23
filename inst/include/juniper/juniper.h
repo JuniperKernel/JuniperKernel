@@ -56,6 +56,7 @@ class JuniperKernel {
 
     static JuniperKernel* make(const std::string& connection_file) {
       config conf = config::read_connection_file(connection_file);
+      conf.print_conf();
       JuniperKernel* jk = new JuniperKernel(conf);
       return jk;
     }
@@ -96,14 +97,9 @@ class JuniperKernel {
       _request_server->shutdown(); // try to send a signal out again
       _hbthread.join();
       _iothread.join();
-
-      if( _request_server )
-        delete _request_server;
-
-      if( _ctx ) {
-        _stdin     ->setsockopt(ZMQ_LINGER, 0); delete _stdin;
-        delete _ctx;
-      }
+      delete _request_server;
+      _stdin     ->setsockopt(ZMQ_LINGER, 0); delete _stdin;
+      delete _ctx;
     }
 
   private:

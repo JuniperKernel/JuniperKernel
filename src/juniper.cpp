@@ -28,7 +28,9 @@
 #include <juniper/juniper.h>
 #include <juniper/xbridge.h>
 #include <juniper/external.h>
+#include <jclient/jclient.h>
 #include <Rcpp.h>
+
 
 // init static vars now
 std::atomic<long long> JMessage::_ctr{0};
@@ -38,6 +40,17 @@ static void kernelFinalizer(SEXP jk) {
   if( jkernel ) {
     delete jkernel;
     R_ClearExternalPtr(jk);
+  }
+}
+
+static void testClientFinalizer(SEXP jtc) {
+  JupyterTestClient* jclient = reinterpret_cast<JupyterTestClient*>(R_ExternalPtrAddr(jtc));
+  if( jclient ) {
+    Rcpp::Rcout << "deleting test client" << std::endl;
+    delete jclient;
+    Rcpp::Rcout << "attempting to clear the external pointer" << std::endl;
+    R_ClearExternalPtr(jtc);
+    Rcpp::Rcout << "external pointer for test client cleared" << std::endl;
   }
 }
 
@@ -74,8 +87,8 @@ void boot_kernel(SEXP kernel) {
   JuniperKernel* jk = get_kernel(kernel);
   jk->start_bg_threads();
   jk->run();
-  delete jk;
-  delete _xm;
+  if( _xm!=nullptr )
+    delete _xm;
 }
 
 //' The XMock
@@ -143,4 +156,39 @@ void comm_request(const std::string type) {
   if( type=="open" ) xm.comm_manager().comm_open( xmsg);
   if( type=="close") xm.comm_manager().comm_close(xmsg);
   if( type=="msg"  ) xm.comm_manager().comm_msg(  xmsg); 
+}
+
+
+
+
+// FOR TESTING
+
+// [[Rcpp::export]]
+SEXP run_client(int hbport, int ioport, int shport, int ctport, int inport) {
+  JupyterTestClient* jclient = new JupyterTestClient(hbport, ioport, shport, ctport, inport);
+  return createExternalPointer<JupyterTestClient>(jclient, testClientFinalizer, "JupyterTestClient*");
+}
+
+static JupyterTestClient* get_client(SEXP jtc) {
+  return reinterpret_cast<JupyterTestClient*>(R_ExternalPtrAddr(jtc));
+}
+
+// [[Rcpp::export]]
+void client_exec_request(SEXP jtc, std::string payload) {
+  return get_client(jtc)->_shell.execute_request(payload);
+}
+
+// [[Rcpp::export]]
+std::string client_exec_reply(SEXP jtc) {
+  return get_client(jtc)->_shell.execute_reply();
+}
+
+// [[Rcpp::export]]
+void wait_for_hb(SEXP jtc) {
+  return get_client(jtc)->wait_for_hb();
+}
+
+// [[Rcpp::export]]
+std::string iopub_recv(SEXP jtc) {
+  return get_client(jtc)->_iomsg.recv();
 }

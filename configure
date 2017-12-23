@@ -15,26 +15,25 @@ elif [[ `uname` == 'Darwin' ]]; then
 fi
 sed -e"s|@LINKER@|"${LINKER}"|" src/Makevars.in > src/Makevars
 
-mkdir temp
-mkdir inst/zmq
-cd temp
-cp ../inst/zeromq-4.2.2.tar.gz .
-tar -xzf zeromq-4.2.2.tar.gz
-cd zeromq-4.2.2
-if [[ `uname` == 'Linux' ]]; then
-  ./configure CPPFLAGS=-DPIC CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-fPIC
-  make
-  cp src/.libs/libzmq.so.5.1.2 ../../inst/zmq/libzmq.so
-  cp src/.libs/libzmq.so.5.1.2 ../../inst/zmq/libzmq.so.5
-elif [[ `uname` == 'Darwin' ]]; then
-  ./configure CPPFLAGS=-DPIC CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-fPIC
-  make
-  cp src/.libs/libzmq.a ../../inst/zmq/
+if [ ! -f ./inst/zmq/libzmq.a ]; then
+  mkdir temp
+  mkdir inst/zmq
+  cd temp
+  cp ../inst/zeromq-4.2.2.tar.gz .
+  tar -xzf zeromq-4.2.2.tar.gz
+  cd zeromq-4.2.2
+  if [[ `uname` == 'Linux' ]]; then
+    ./configure CPPFLAGS=-DPIC CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-fPIC
+    make
+    cp src/.libs/libzmq.so.5.1.2 ../../inst/zmq/libzmq.so
+    cp src/.libs/libzmq.so.5.1.2 ../../inst/zmq/libzmq.so.5
+  elif [[ `uname` == 'Darwin' ]]; then
+    ./configure CPPFLAGS=-DPIC CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-fPIC
+    make
+    cp src/.libs/libzmq.a ../../inst/zmq/
+  fi
+  cd ../..
+  rm -rf temp
+  rm -rf inst/*gz inst/*zip
 fi
-
-cd ..
-cd ..
-rm -rf temp
-rm -rf inst/*zip
-rm -rf inst/*gz
 exit 0
