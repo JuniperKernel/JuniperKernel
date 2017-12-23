@@ -60,15 +60,15 @@ class RequestServer {
           _stream_err = listen_on(*_ctx, "tcp://*:*", zmq::socket_type::stream);
           _stream_out_port = read_port(_stream_out);
           _stream_err_port = read_port(_stream_err);
-          std::thread sout = stream_thread(_stream_out, true, _connected );
-          std::thread serr = stream_thread(_stream_err, false, _connected);
-          sout.detach();
-          serr.detach();
+          _sout = stream_thread(_stream_out, true, _connected );
+          _serr = stream_thread(_stream_err, false, _connected);
         }
 
     ~RequestServer() {
       _inproc_sig->setsockopt(ZMQ_LINGER, 0); delete _inproc_sig;
       _inproc_pub->setsockopt(ZMQ_LINGER, 0); delete _inproc_pub;
+      _sout.join();
+      _serr.join();
     }
 
     // handle all client requests here. Every request gets the same
@@ -110,6 +110,8 @@ class RequestServer {
     const Rcpp::Environment _jk;
     std::atomic<int> _connected;
 
+    std::thread _sout;
+    std::thread _serr;
     // R functions are pulled out of the JuniperKernel package environment.
     // For each msg_type, there's a corresponding R function with that name.
     // Example: for msg_type "kernel_info_request", there's an R method
@@ -133,10 +135,8 @@ class RequestServer {
         return *this;
       JMessage::reply(_cur_msg, jres["msg_type"], jres["content"]).send(sock);
       if( msg_type.compare("shutdown_request")==0 ) {
+        idle(); // publish idle before triggering socket deaths
         shutdown();
-        Rcpp::Environment base("package:base");
-        Rcpp::Function quit = base["quit"];
-        quit("no");
       }
       return *this;
     }

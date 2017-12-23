@@ -10,6 +10,7 @@ stopifnot(require(JuniperKernel, quietly=TRUE))
 
 source("launch_kernel.R")
 source("check_iopub.R")
+source("shutdown.R")
 
 println("=======================R UNIT SETUP=======================")
 # SETUP
@@ -33,7 +34,7 @@ tryCatch(
   {
     # DEFINE TEST SUITE
     testSuite <- defineTestSuite( name="JuniperKernel unit tests"
-                                , dirs=system.file("runits", package = "JuniperKernel")  # "C:/Users/spencer/repos/JuniperKernel/inst/runits"
+                                , dirs="C:/Users/spencer/repos/JuniperKernel/inst/runits" #system.file("runits", package = "JuniperKernel")  # "C:/Users/spencer/repos/JuniperKernel/inst/runits"
                                 , testFuncRegexp = "^[Tt]est.+"
                                 )
 
@@ -67,9 +68,11 @@ tryCatch(
       println("")
       println("")
       println("=======================R UNIT CLEANUP=======================")
-      # attempt a kernel shutdown
-      tryCatch(println(process_terminate(kernelProc)), error=function(.){})
-      # tryCatch(process_kill(kernelProc), error=function(.){})
+      if( !kernel_shutdown() )
+        tryCatch(println(process_terminate(kernelProc)), error=function(.){})
+      process_wait(kernelProc, timeout=3000L)  # timeout for the process to clean it self up after 3s
       tryCatch(print(kernelProc), error=function(.){})
+      stopifnot(process_return_code(kernelProc)==0L)
+      print("Successful kernel shutdown")
     }
 )

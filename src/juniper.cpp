@@ -87,8 +87,8 @@ void boot_kernel(SEXP kernel) {
   JuniperKernel* jk = get_kernel(kernel);
   jk->start_bg_threads();
   jk->run();
-  delete jk;
-  delete _xm;
+  if( _xm!=nullptr )
+    delete _xm;
 }
 
 //' The XMock

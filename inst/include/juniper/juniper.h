@@ -97,14 +97,9 @@ class JuniperKernel {
       _request_server->shutdown(); // try to send a signal out again
       _hbthread.join();
       _iothread.join();
-
-      if( _request_server )
-        delete _request_server;
-
-      if( _ctx ) {
-        _stdin     ->setsockopt(ZMQ_LINGER, 0); delete _stdin;
-        delete _ctx;
-      }
+      delete _request_server;
+      _stdin     ->setsockopt(ZMQ_LINGER, 0); delete _stdin;
+      delete _ctx;
     }
 
   private:
