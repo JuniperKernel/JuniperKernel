@@ -20,12 +20,12 @@ set "XEUS_URL=https://github.com/QuantStack/xeus/archive/%XEUS_TAR_FILE%"
 if not exist ".\inst\include" mkdir .\inst\include
 
 :: fetch zmq headers
-powershell -Command "Invoke-WebRequest %ZMQ_CPP_HEADER_URL% -OutFile .\inst\include\zmq.hpp"
-powershell -Command "Invoke-WebRequest %ZMQ_CPPADDON_HEADER_URL% -OutFile .\inst\include\zmq_addon.hpp"
-powershell -Command "Invoke-WebRequest %ZMQ_HEADERS_URL% -OutFile %ZMQ_HEADER_TAR_FILE%"
-C:\Rtools\bin\tar -xzf %ZMQ_HEADER_TAR_FILE%
-C:\Rtools\bin\mv include/*h .\inst\include
-C:\Rtools\bin\rm -rf %ZMQ_HEADER_TAR_FILE% include
+rem powershell -Command "Invoke-WebRequest %ZMQ_CPP_HEADER_URL% -OutFile .\inst\include\zmq.hpp"
+rem powershell -Command "Invoke-WebRequest %ZMQ_CPPADDON_HEADER_URL% -OutFile .\inst\include\zmq_addon.hpp"
+rem powershell -Command "Invoke-WebRequest %ZMQ_HEADERS_URL% -OutFile %ZMQ_HEADER_TAR_FILE%"
+rem C:\Rtools\bin\tar -xzf %ZMQ_HEADER_TAR_FILE%
+rem C:\Rtools\bin\mv include/*h .\inst\include
+rem C:\Rtools\bin\rm -rf %ZMQ_HEADER_TAR_FILE% include
 
 :: fetch xtl headers
 powershell -Command "Invoke-WebRequest %XTL_URL% -OutFile %XTL_TAR_FILE%"
