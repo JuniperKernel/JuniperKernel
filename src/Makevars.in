@@ -2,7 +2,9 @@
 CXX_STD      = CXX11
 
 # set include and linker options
-PKG_CPPFLAGS = -I../inst/include/ -I.
-PKG_LIBS     = -lzmq -L../inst/zmq @LINKER@
+# PKG_CPPFLAGS = -I../inst/include/ -I.
+# PKG_LIBS     = -lzmq -L../inst/zmq @LINKER@
+PKG_CPPFLAGS = -I../inst/include/ -I. @ZMQ_CPPFLAGS@
+PKG_LIBS     = @ZMQ_LDFLAGS@
 
 all: $(SHLIB)
