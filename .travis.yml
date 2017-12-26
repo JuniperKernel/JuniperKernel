@@ -3,7 +3,7 @@ sudo: required
 dist: trusty
 
 os:
-  - linux
+  # - linux
   - osx
 
 # whitelist
