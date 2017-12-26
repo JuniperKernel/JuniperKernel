@@ -20,12 +20,12 @@ set "XEUS_URL=https://github.com/QuantStack/xeus/archive/%XEUS_TAR_FILE%"
 if not exist ".\inst\include" mkdir .\inst\include
 
 :: fetch zmq headers
-rem powershell -Command "Invoke-WebRequest %ZMQ_CPP_HEADER_URL% -OutFile .\inst\include\zmq.hpp"
-rem powershell -Command "Invoke-WebRequest %ZMQ_CPPADDON_HEADER_URL% -OutFile .\inst\include\zmq_addon.hpp"
-rem powershell -Command "Invoke-WebRequest %ZMQ_HEADERS_URL% -OutFile %ZMQ_HEADER_TAR_FILE%"
-rem C:\Rtools\bin\tar -xzf %ZMQ_HEADER_TAR_FILE%
-rem C:\Rtools\bin\mv include/*h .\inst\include
-rem C:\Rtools\bin\rm -rf %ZMQ_HEADER_TAR_FILE% include
+powershell -Command "Invoke-WebRequest %ZMQ_CPP_HEADER_URL% -OutFile .\inst\include\zmq.hpp"
+powershell -Command "Invoke-WebRequest %ZMQ_CPPADDON_HEADER_URL% -OutFile .\inst\include\zmq_addon.hpp"
+powershell -Command "Invoke-WebRequest %ZMQ_HEADERS_URL% -OutFile %ZMQ_HEADER_TAR_FILE%"
+C:\Rtools\bin\tar -xzf %ZMQ_HEADER_TAR_FILE%
+C:\Rtools\bin\mv include/*h .\inst\include
+C:\Rtools\bin\rm -rf %ZMQ_HEADER_TAR_FILE% include
 
 :: fetch xtl headers
 powershell -Command "Invoke-WebRequest %XTL_URL% -OutFile %XTL_TAR_FILE%"
@@ -44,12 +44,6 @@ Rscript -e Rcpp::compileAttributes()
 if %ERRORLEVEL% EQU 1 exit 1
 
 Rscript -e roxygen2::roxygenize()
-if %ERRORLEVEL% EQU 1 exit 1
-
-Rscript -e "install.packages('devtools',repo='https://cran.r-project.org')"
-if %ERRORLEVEL% EQU 1 exit 1
-
-Rscript -e "devtools::install_github('snoweye/pbdZMQ')"
 if %ERRORLEVEL% EQU 1 exit 1
 
 R CMD build .
