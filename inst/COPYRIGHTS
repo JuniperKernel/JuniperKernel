@@ -17,20 +17,6 @@ Copyrights: Copyright (c) 2015 Stephan Brumme. All rights reserved.
 License:  see http://create.stephan-brumme.com/disclaimer.html
 Original Location: http://create.stephan-brumme.com/hash-library/
 
-File: inst/pbdZMQ-0.2-6.zip
-Copyrights: See https://cran.r-project.org/web/packages/pbdZMQ/index.html,
-https://github.com/cran/pbdZMQ/blob/master/DESCRIPTION, and files AUTHORS and COPYING
-in inst/pbdzmq_copyright for copyright information.
-License: GPL-3
-Original Location: https://github.com/cran/pbdZMQ/archive/0.2-6.zip
-
-File: inst/zeromq-4.2.2.tar.gz
-Copyrights: See files AUTHORS, COPYING, COPYING.LESSER, and MAINTAINERS
-in inst/zmq_copyright/ for the ZeroMQ source files in inst/zeromq-4.2.2.tar.gz
-which are under GPL-3.
-License: GPL-3
-Original Location: https://github.com/zeromq/libzmq/releases/download/v4.2.2/zeromq-4.2.2.tar.gz
-
 File: inst/extdata/Rlogo.svg, inst/extdata/logo-64x64.png
 Copyrights: (C) 2016 The R Foundation
 License: CC-BY-SA 4.0
