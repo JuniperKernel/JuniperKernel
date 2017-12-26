@@ -21,7 +21,6 @@
 #' @name JuniperKernel
 #' @import gdtools
 #' @import Rcpp
-#' @import pbdZMQ
 #' @useDynLib JuniperKernel, .registration = TRUE
 NULL
 

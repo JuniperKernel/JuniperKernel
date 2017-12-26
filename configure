@@ -4,11 +4,6 @@ R_HOME=$(R RHOME)
 RSCRIPT=${R_HOME}/bin/Rscript
 R_LIB=$(${RSCRIPT} -e 'cat(.Library)')
 
-ZMQ_CPPFLAGS=`${RSCRIPT} -e "pbdZMQ::get.zmq.cppflags()"`
-ZMQ_LDFLAGS=`${RSCRIPT} -e "pbdZMQ::get.zmq.ldflags()"`
-sed -e "s|@ZMQ_CPPFLAGS@|${ZMQ_CPPFLAGS}|" -e "s|@ZMQ_LDFLAGS@|${ZMQ_LDFLAGS}|" src/Makevars.in > src/Makevars
-exit 0
-
 # Decide OS
 # Essentially switch between osx and Linux; fail if windows
 SYS=''
