@@ -3,6 +3,7 @@ sudo: required
 dist: trusty
 
 os:
+  - linux
   - osx
 
 # whitelist
@@ -28,10 +29,12 @@ env:
     
 
 before_install:
-  # - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /usr/bin/g++ g++ /usr/bin/g++-6
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /usr/bin/g++ g++ /usr/bin/g++-6; fi
 
 script:
   - Rscript -e "devtools::install_github('snoweye/pbdZMQ@pbdZMQ_0.3-0')"
+  - Rscript -e "pbdZMQ::get.zmq.cppflags()"
+  - Rscript -e "pbdZMQ::get.zmq.ldflags()"
   - Rscript -e "pbdZMQ::test.load.zmq()"
   - g++ --version
   - make install
