@@ -26,8 +26,6 @@ env:
 
 before_install:
   - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /usr/bin/g++ g++ /usr/bin/g++-6
-  - Rscript -e "install.packages(devtools)"
-  - Rscript -e "devtools::install_github('snoweye/pbdZMQ')"
 script:
   - g++ --version
   - make install
