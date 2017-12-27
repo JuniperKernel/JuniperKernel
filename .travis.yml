@@ -4,7 +4,7 @@
 
 language: r
 sudo: required
-dist: trusty
+# dist: trusty
 
 os:
   # - linux
@@ -43,7 +43,8 @@ install:
   - ./travis-tool.sh install_deps
 
 script:
-  - Rscript -e "devtools::install_github('snoweye/pbdZMQ@pbdZMQ_0.3-0')"
+  - ./travis-tool.sh install_github snoweye/pbdZMQ@pbdZMQ_0.3-0
+  # - Rscript -e "devtools::install_github('snoweye/pbdZMQ@pbdZMQ_0.3-0')"
   # - g++ --version
   - make install
   # - make check
