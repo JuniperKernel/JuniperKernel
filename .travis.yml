@@ -7,7 +7,7 @@ sudo: required
 # dist: trusty
 
 os:
-  - linux
+  # - linux
   - osx
 
 # whitelist
@@ -46,7 +46,7 @@ script:
   - ./travis-tool.sh install_github snoweye/pbdZMQ
   # - g++ --version
   - make install
-  - make check
+  # - make check
   - ls -la
   - pwd
 
