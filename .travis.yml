@@ -1,3 +1,7 @@
+# See README.md for instructions, or for more configuration options,
+# see the wiki:
+#   https://github.com/craigcitro/r-travis/wiki
+
 language: r
 sudo: required
 dist: trusty
@@ -11,29 +15,36 @@ branches:
   only:
     - master
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - gcc-6
-      - g++-6
+# addons:
+#   apt:
+#     sources:
+#       - ubuntu-toolchain-r-test
+#     packages:
+#       - gcc-6
+#       - g++-6
 
-env:
-  global:
-    - _R_CHECK_FORCE_SUGGESTS_=FALSE
-    - CC=gcc-6
-    - CXX=g++-6
-    - CXX1X=g++-6
-    - CXX11=g++-6
+# env:
+#   global:
+#     - _R_CHECK_FORCE_SUGGESTS_=FALSE
+#     - CC=gcc-6
+#     - CXX=g++-6
+#     - CXX1X=g++-6
+#     - CXX11=g++-6
+
+# before_install:
+#   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /usr/bin/g++ g++ /usr/bin/g++-6; fi
     
-
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /usr/bin/g++ g++ /usr/bin/g++-6; fi
+  - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
+  - chmod 755 ./travis-tool.sh
+  - ./travis-tool.sh bootstrap
+
+install:
+  - ./travis-tool.sh install_deps
 
 script:
   - Rscript -e "devtools::install_github('snoweye/pbdZMQ@pbdZMQ_0.3-0')"
-  - g++ --version
+  # - g++ --version
   - make install
   # - make check
   - ls -la
@@ -57,3 +68,8 @@ after_failure:
 #  on:
 #    tags: true
 #    all_branches: true
+
+notifications:
+  email:
+    on_success: no
+    on_failure: no
