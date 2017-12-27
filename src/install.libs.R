@@ -13,7 +13,7 @@ if(length(files) > 0){
   ### Overwrite RPATH from the shared library installed to the destination.
   if(Sys.info()[['sysname']] == "Darwin"){
     cmd.int <- system("which install_name_tool", intern = TRUE)
-    md.ot <- system("which otool", intern = TRUE) 
+    cmd.ot <- system("which otool", intern = TRUE) 
     fn.JK.so <- file.path(dest, "JuniperKernel.so")
 
     if(file.exists(fn.JK.so)){
