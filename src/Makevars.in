@@ -6,8 +6,3 @@ PKG_CPPFLAGS = -I../inst/include/ -I. @ZMQ_CPPFLAGS@
 PKG_LIBS     = @ZMQ_LDFLAGS@
 
 all: $(SHLIB)
-  # linker fully resolves the zmq dylib to the library path used by the 
-  # shared object in the .Library/pbdZMQ/libs directory. Because of this,
-  # we have to mend the path in the JuniperKernel.so before it gets installed
-  # and loaded. The path is set to the absolute path of zmq dylib in pbdZMQ/libs.
-	@if command -v install_name_tool; then echo "patching zmq dylib"; install_name_tool -change @ZMQ_TEMP_LIB@ @ZMQLIB@ JuniperKernel.so; fi

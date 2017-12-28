@@ -2,18 +2,9 @@
 
 R_HOME=$(R RHOME)
 RSCRIPT=${R_HOME}/bin/Rscript
-R_LIB=$(${RSCRIPT} -e 'cat(.Library)')
-ZMQV=$(ls ${R_LIB}/pbdZMQ/libs | grep zmq)
 
 ZMQ_CPPFLAGS=`${RSCRIPT} -e "pbdZMQ::get.zmq.cppflags()"`
 ZMQ_LDFLAGS=`${RSCRIPT} -e "pbdZMQ::get.zmq.ldflags()"`
-ZMQLIB="${R_LIB}/pbdZMQ/libs/${ZMQV}"
-ZMQ_TEMP_LIB=""
 
-if [[ `uname` == 'Darwin' ]]; then
-  ZMQ_TEMP_LIB=`otool -L ${ZMQLIB} | grep zmq | grep var | awk -F' ' '{print $1}'`
-fi
-
-
-sed -e "s|@ZMQ_CPPFLAGS@|${ZMQ_CPPFLAGS}|" -e "s|@ZMQ_LDFLAGS@|${ZMQ_LDFLAGS}|" -e "s|@ZMQLIB@|${ZMQLIB}|" -e "s|@ZMQ_TEMP_LIB@|${ZMQ_TEMP_LIB}|" src/Makevars.in > src/Makevars
+sed -e "s|@ZMQ_CPPFLAGS@|${ZMQ_CPPFLAGS}|" -e "s|@ZMQ_LDFLAGS@|${ZMQ_LDFLAGS}|" src/Makevars.in > src/Makevars
 exit 0
