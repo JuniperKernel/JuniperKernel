@@ -4,10 +4,15 @@ ifeq "$(WIN)" "64"
 else
     FLV = i386
 endif
+R_SCMD = ${R_HOME}/bin${R_ARCH_BIN}/Rscript -e
+ZMQ_CPPFLAGS = $(shell ${R_SCMD} "pbdZMQ::get.zmq.cppflags(arch='/"${FLV}"')")
+ZMQ_LDFLAGS = $(shell ${R_SCMD} "pbdZMQ::get.zmq.ldflags(arch='/"${FLV}"')")
 
 CXX_STD = CXX11
-PKG_CPPFLAGS = -I../inst/include -I. -I../src
-PKG_LIBS = -lzmq -L${FLV}
+# PKG_CPPFLAGS = -I../inst/include -I. -I../src
+# PKG_LIBS = -lzmq -L${FLV}
+PKG_CPPFLAGS = -I../inst/include -I. ${ZMQ_CPPFLAGS}
+PKG_LIBS = ${ZMQ_LDFLAGS}
 
 ZMQ_VERSION = 4.2.2
 ZMQ_TAR_FILE= libzmq-${ZMQ_VERSION}-${FLV}.tar.gz
@@ -15,7 +20,8 @@ ZMQ_TAR_URL = https://github.com/JuniperKernel/zmq/raw/master/win${WIN}/${ZMQ_TA
 
 export
 
-all: clean buildzmq $(SHLIB)
+# all: clean buildzmq $(SHLIB)
+all: clean $(SHLIB)
 
 .Phony: clean
 clean:

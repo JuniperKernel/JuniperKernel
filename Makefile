@@ -47,7 +47,8 @@ build/JuniperKernel_$(PKG_VERSION).tar.gz: $(wildcard R/*R) $(wildcard src/*cpp)
 install: build/JuniperKernel_$(PKG_VERSION).tar.gz
 	@(cd build && R CMD INSTALL JuniperKernel_$(PKG_VERSION).tar.gz)
 
-headers: ./inst/include/zmq.h ./inst/include/xtl ./inst/include/xeus
+# headers: ./inst/include/zmq.h ./inst/include/xtl ./inst/include/xeus
+headers: ./inst/include/xtl ./inst/include/xeus
 
 ./inst/include/zmq.h:
 	@echo "Fetching zmq headers..."
