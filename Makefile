@@ -8,6 +8,8 @@ print-%  : ; @echo $*=$($*)
 
 PKG_VERSION=1.1.0.0
 
+ZMQ_TEMP_LIB=`otool -L /Library/Frameworks/R.framework/Resources/library/pbdZMQ/libs/libzmq.5.dylib | grep zmq | grep var | awk '{print $$1}'`
+
 R_BUILD_ARGS= --no-manual --no-build-vignettes
 R_CHECK_ARGS= --no-manual --no-build-vignettes --as-cran
 
