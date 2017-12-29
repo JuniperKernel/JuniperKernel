@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <zmq.h>
 #include <zmq.hpp>
-#include <json.hpp>
+#include <xeus/nl_json.hpp>
 #include <juniper/sockets.h>
 #include <juniper/utils.h>
 #include <juniper/jmessage.h>

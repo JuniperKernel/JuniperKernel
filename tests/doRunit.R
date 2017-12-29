@@ -34,7 +34,7 @@ tryCatch(
   {
     # DEFINE TEST SUITE
     testSuite <- defineTestSuite( name="JuniperKernel unit tests"
-                                , dirs="C:/Users/spencer/repos/JuniperKernel/inst/runits" #system.file("runits", package = "JuniperKernel")  # "C:/Users/spencer/repos/JuniperKernel/inst/runits"
+                                , dirs=system.file("runits", package = "JuniperKernel")  # "C:/Users/spencer/repos/JuniperKernel/inst/runits" #system.file("runits", package = "JuniperKernel")  # "C:/Users/spencer/repos/JuniperKernel/inst/runits"
                                 , testFuncRegexp = "^[Tt]est.+"
                                 )
 
@@ -68,8 +68,13 @@ tryCatch(
       println("")
       println("")
       println("=======================R UNIT CLEANUP=======================")
-      if( !kernel_shutdown() )
+      shutdown <- kernel_shutdown()
+      if( !shutdown ) {
+        println("Failed to shutdown...")
         tryCatch(println(process_terminate(kernelProc)), error=function(.){})
+      }
+      print("...proc wait...")
+      Sys.sleep(3)      
       process_wait(kernelProc, timeout=3000L)  # timeout for the process to clean it self up after 3s
       tryCatch(print(kernelProc), error=function(.){})
       stopifnot(process_return_code(kernelProc)==0L)

@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <json.hpp>
+#include <xeus/nl_json.hpp>
 #include <juniper/sockets.h>
 #include <jclient/iopub.h>
 #include <jclient/hb.h>

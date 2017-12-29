@@ -19,7 +19,7 @@
 
 #include <fstream>
 #include <string>
-#include <json.hpp>
+#include <xeus/nl_json.hpp>
 #include <zmq.hpp>
 // ERROR defined in zmq.hpp, but we want
 // the one from Rcpp

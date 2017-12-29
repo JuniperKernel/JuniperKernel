@@ -22,7 +22,7 @@
 #include <string>
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
-#include <json.hpp>
+#include <xeus/nl_json.hpp>
 #include <hmac.h>
 #include <ctime>
 #include <iostream>
