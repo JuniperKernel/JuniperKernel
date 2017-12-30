@@ -8,21 +8,12 @@ print-%  : ; @echo $*=$($*)
 
 PKG_VERSION=1.1.0.0
 
-ZMQ_TEMP_LIB=`otool -L /Library/Frameworks/R.framework/Resources/library/pbdZMQ/libs/libzmq.5.dylib | grep zmq | grep var | awk '{print $$1}'`
-
 R_BUILD_ARGS= --no-manual --no-build-vignettes
 R_CHECK_ARGS= --no-manual --no-build-vignettes --as-cran
 
 R_HOME=$(shell R RHOME)
 R=$(R_HOME)/bin/R
 RSCRIPT=$(R_HOME)/bin/Rscript
-
-#zmq bacon bits
-ZMQ_VERSION = 4.2.2
-ZMQ_HEADER_TAR_FILE = zmq-${ZMQ_VERSION}-headers.tar.gz
-ZMQ_HEADERS_URL = https://github.com/JuniperKernel/zmq/raw/master/headers/${ZMQ_HEADER_TAR_FILE}
-ZMQ_CPP_HEADER_URL = https://github.com/zeromq/cppzmq/raw/master/zmq.hpp
-ZMQ_CPPADDON_HEADER_URL = https://raw.githubusercontent.com/zeromq/cppzmq/master/zmq_addon.hpp
 
 #quantstack bacon bits
 # xtl
@@ -49,17 +40,7 @@ build/JuniperKernel_$(PKG_VERSION).tar.gz: $(wildcard R/*R) $(wildcard src/*cpp)
 install: build/JuniperKernel_$(PKG_VERSION).tar.gz
 	@(cd build && R CMD INSTALL JuniperKernel_$(PKG_VERSION).tar.gz)
 
-# headers: ./inst/include/zmq.h ./inst/include/xtl ./inst/include/xeus
 headers: ./inst/include/xtl ./inst/include/xeus
-
-./inst/include/zmq.h:
-	@echo "Fetching zmq headers..."
-	@[ -d ./inst/include ] || mkdir -p ./inst/include
-	@curl -skLO ${ZMQ_CPP_HEADER_URL}
-	@mv zmq.hpp ./inst/include
-	@curl -skLO ${ZMQ_CPPADDON_HEADER_URL}
-	@mv zmq_addon.hpp ./inst/include
-	@curl -skLO ${ZMQ_HEADERS_URL} && tar -xzf ${ZMQ_HEADER_TAR_FILE} && mv include/*h ./inst/include && rm -rf ${ZMQ_HEADER_TAR_FILE} include
 
 ./inst/include/xtl:
 	@echo "Fetching xtl headers..."

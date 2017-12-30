@@ -55,6 +55,7 @@ complete_request <- function(request_msg) {
   if( length(completions) > 0L ) completions <- c(completions, "__juniper_vec_ignore_hack__")  # hack to get single item vecs to parse as vecs and not scalars
   guess <- cc$.guessTokenFromLine(update = FALSE)
   matches <- unique(completions)
-  content <- list(status="ok", matches = matches[1L:min(50L, length(matches))], cursor_start=guess$start, cursor_end=guess$start + nchar(guess$token))
+  if( length(matches) > 0L ) matches <- matches[1L:min(50L, length(matches))]
+  content <- list(status="ok", matches=matches, cursor_start=guess$start, cursor_end=guess$start + nchar(guess$token))
   list(msg_type = "complete_reply", content=content)
 }
