@@ -14,7 +14,7 @@
 
 * `shutdown_request` messages now cause a clean shutdown (with exit 0). Before this fix, a `shutdown_request` would trigger a `q("no")` from within R before the shell, ctrl, and stdin sockets could clean themslves up. This would cause the application to "hang" when it attempted to destroy the `zmq::context_t`, and hence the kernel would need to be forcefully shutdown.
 * `is_complete_request` was missing an `else if` between the two `incomplete` checks resulting in an erroneous `invalid` state when a quote was missing.
-* Fixed Github issue #8 "Completion suggests “N” and “A” when there’s nothing to show": `complete_request` now returns an empty list `list()` when no matches are found (was retunging `NA`).
+* Fixed Github issue #8 "Completion suggests “N” and “A” when there’s nothing to show": `complete_request` now returns an empty list `list()` when no matches are found (was returning `NA`).
 
 #### NOTES
 
