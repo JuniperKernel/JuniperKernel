@@ -96,6 +96,8 @@ check_iopub_messages <- function(msg_type) {
   checkTrue(idle$content$execution_state=="idle")
   checkTrue(idle$parent_header$msg_type==msg_type)
 
+  # TODO: drain kernelProc to a file
+  process_read(kernelProc)
   invisible(msgs)
 }
 
