@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <zmq.hpp>
 #include <zmq_addon.hpp>
-#include <json.hpp>
+#include <xeus/nl_json.hpp>
 #include <juniper/conf.h>
 #include <juniper/sockets.h>
 #include <juniper/background.h>

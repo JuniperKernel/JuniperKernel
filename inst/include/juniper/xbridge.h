@@ -19,7 +19,7 @@
 
 #define XEUS_EXPORTS
 
-#include <json.hpp>
+#include <xeus/nl_json.hpp>
 #include <xeus/xjson.hpp>
 #include <xeus/xcomm.hpp>
 #include <xeus/xinterpreter.hpp>

@@ -20,7 +20,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <json.hpp>
+#include <xeus/nl_json.hpp>
 #include <juniper/conf.h>
 #include <zmq.h>
 #include <zmq.hpp>
