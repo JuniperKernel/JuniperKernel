@@ -49,8 +49,8 @@ is_complete_request <- function(request_msg) {
   status <- tryCatch(
     {parse(text=code);'complete'},
     error=function(e) {
-      if( grepl("INCOMPLETE_STRING"      , e$message) ) "incomplete"  # unmatched quote
-      if( grepl("unexpected end of input", e$message) ) "incomplete"  # unmatched (
+      if( grepl("INCOMPLETE_STRING"      , e$message) )      "incomplete"  # unmatched quote
+      else if( grepl("unexpected end of input", e$message) ) "incomplete"  # unmatched (
       else "invalid"
     }
   )
