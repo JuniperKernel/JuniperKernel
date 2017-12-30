@@ -1,6 +1,6 @@
 #!/bin/bash
 
-R_HOME=$(R RHOME)
+: ${R_HOME=`R RHOME`}
 RSCRIPT=${R_HOME}/bin/Rscript
 
 ZMQ_CPPFLAGS=`${RSCRIPT} -e "pbdZMQ::get.zmq.cppflags()"`
