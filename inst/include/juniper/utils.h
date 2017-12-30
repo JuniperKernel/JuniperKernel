@@ -17,7 +17,7 @@
 #ifndef juniper_juniper_utils_H
 #define juniper_juniper_utils_H
 #include <string>
-#include <json.hpp>
+#include <xeus/nl_json.hpp>
 #include <zmq.hpp>
 #include <Rcpp.h>
 

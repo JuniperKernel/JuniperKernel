@@ -5,7 +5,6 @@ test.KernelInfo <- function() {
   check_iopub_messages("kernel_info_request")
 
   content <- kinfo$content
-  checkTrue(content$banner=="R version 3.4.3 (2017-11-30)")
   checkTrue(content$implementation=="JuniperKernel")
   checkTrue(content$language_info$codemirror_mode=="r")
   checkTrue(content$language_info$file_extension==".R")

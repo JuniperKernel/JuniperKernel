@@ -56,7 +56,7 @@
 #include <fstream>
 #include <sstream>
 #include <cmath>
-#include <json.hpp>
+#include <xeus/nl_json.hpp>
 #include <juniper/juniper.h>
 
 double dbl_format(double x) { return std::abs(x) < 0.01 ? 0.00 : x; }

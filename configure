@@ -2,43 +2,9 @@
 
 R_HOME=$(R RHOME)
 RSCRIPT=${R_HOME}/bin/Rscript
-R_LIB=$(${RSCRIPT} -e 'cat(.Library)')
 
 ZMQ_CPPFLAGS=`${RSCRIPT} -e "pbdZMQ::get.zmq.cppflags()"`
 ZMQ_LDFLAGS=`${RSCRIPT} -e "pbdZMQ::get.zmq.ldflags()"`
+
 sed -e "s|@ZMQ_CPPFLAGS@|${ZMQ_CPPFLAGS}|" -e "s|@ZMQ_LDFLAGS@|${ZMQ_LDFLAGS}|" src/Makevars.in > src/Makevars
-exit 0
-
-# Decide OS
-# Essentially switch between osx and Linux; fail if windows
-SYS=''
-unamestr=`uname`
-if [[ `uname` == 'Linux' ]]; then
-   LINKER="-Wl,-R,'\$\$ORIGIN/../zmq'"
-elif [[ `uname` == 'Darwin' ]]; then
-   LINKER="-Wl,-rpath,${R_LIB}/JuniperKernel/zmq"
-fi
-sed -e"s|@LINKER@|"${LINKER}"|" src/Makevars.in > src/Makevars
-
-if [ ! -f ./inst/zmq/libzmq.a ]; then
-  mkdir temp
-  mkdir inst/zmq
-  cd temp
-  cp ../inst/zeromq-4.2.2.tar.gz .
-  tar -xzf zeromq-4.2.2.tar.gz
-  cd zeromq-4.2.2
-  if [[ `uname` == 'Linux' ]]; then
-    ./configure CPPFLAGS=-DPIC CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-fPIC
-    make
-    cp src/.libs/libzmq.so.5.1.2 ../../inst/zmq/libzmq.so
-    cp src/.libs/libzmq.so.5.1.2 ../../inst/zmq/libzmq.so.5
-  elif [[ `uname` == 'Darwin' ]]; then
-    ./configure CPPFLAGS=-DPIC CFLAGS=-fPIC CXXFLAGS=-fPIC LDFLAGS=-fPIC
-    make
-    cp src/.libs/libzmq.a ../../inst/zmq/
-  fi
-  cd ../..
-  rm -rf temp
-  rm -rf inst/*gz inst/*zip
-fi
 exit 0
