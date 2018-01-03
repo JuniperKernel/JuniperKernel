@@ -1,4 +1,4 @@
-File: inst/include/gdevice.h
+File: inst/include/juniper/gdevice.h
 Copyrights:
   (C) 2002 T Jake Luciani: SVG device, based on PicTex device
   (C) 2008 Tony Plate: Line type support from RSVGTipsDevice package
@@ -7,12 +7,12 @@ Copyrights:
 License: GNU General Public License
 Original Location: r-lib/svglite github location at https://github.com/r-lib/svglite/tree/master/src
 
-File inst/include/json.hpp, inst/nl_json.hpp
+File: inst/nl_json.hpp
 Copyrights: Copyright (c) 2013-2017 Niels Lohmann <http://nlohmann.me>.
 License: Licensed under the MIT License <http://opensource.org/licenses/MIT>.
-Original Location: https://github.com/nlohmann/json/releases/download/v2.1.1/json.hpp
+Original Location: https://github.com/nlohmann/json/releases/download/v3.0.1/json.hpp
 
-File: inst/include/hmac.h, inst/incluide/sha256.h:
+File: inst/include/hmac.h, inst/incluide/sha256.h
 Copyrights: Copyright (c) 2015 Stephan Brumme. All rights reserved.
 License:  see http://create.stephan-brumme.com/disclaimer.html
 Original Location: http://create.stephan-brumme.com/hash-library/
