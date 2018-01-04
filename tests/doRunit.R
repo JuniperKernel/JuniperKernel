@@ -114,7 +114,7 @@ recv_msgs <- function() {
 
   # if we didn't get any message, don't count it
   if( nzchar(msg) )
-  msgs <- c(msgs, msg)
+    msgs <- c(msgs, msg)
 
   # Optimistically poll for the idle message. iopub_recv races with all
   # message writers, so intermittently the queue will be empty and produce

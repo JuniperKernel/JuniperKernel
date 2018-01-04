@@ -1,6 +1,6 @@
 **If you are viewing this file on CRAN, please check latest news on GitHub [here](https://github.com/JuniperKernel/JuniperKernel/blob/master/NEWS.md).**
 
-### Changes in v1.2.0.0 (in development as v1.1.0.0)
+### Changes in v1.2.0.0
 
 #### NEW FEATURES
 
