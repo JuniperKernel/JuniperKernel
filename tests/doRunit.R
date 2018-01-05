@@ -232,11 +232,12 @@ tryCatch(
     if( errs$nErr      > 0L ) stop("TEST HAD ERRORS!")
     if( errs$nTestFunc < 1L ) stop("NO TEST FUNCTIONS RUN!")
 
-    print("ALL TESTS PASSED")
+    print("ALL TESTS PASS")
   }
   , error = function(e) {
       println("ERROR")
       println(e)
+      stop("FAIL")
     }
   , finally = {
       println("")
