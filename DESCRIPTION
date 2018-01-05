@@ -22,8 +22,7 @@ Imports: utils,
          gdtools (>= 0.1.6),
          pbdZMQ (>= 0.3-0),
          data.table,
-         methods,
-         subprocess
+         methods
 Suggests: RUnit, roxygen2
 Collate: 'booter.R'
          'comm_close.R'

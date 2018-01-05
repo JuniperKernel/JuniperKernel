@@ -32,6 +32,7 @@ script:
   - g++ --version
   - make install
   - make check
+  - make test
   - ls -la
   - pwd
 

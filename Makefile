@@ -64,6 +64,12 @@ check: build/JuniperKernel_$(PKG_VERSION).tar.gz
 	@$(R) CMD check $(R_CHECK_ARGS) build/JuniperKernel_$(PKG_VERSION).tar.gz
 	@$(R) -f scripts/r_cmd_check_validate.R
 
+test: build/JuniperKernel_$(PKG_VERSION).tar.gz
+	@echo "running R CMD check"
+	@$(R) CMD INSTALL build/JuniperKernel_$(PKG_VERSION).tar.gz
+	@${RSCRIPT} -e "install.packages('subprocess', repos='http://cran.rstudio.com')"
+	@$(R) -f tests/doRunit.R
+
 .PHONY: clean
 clean:
 	rm -rf build
