@@ -7,6 +7,7 @@
 1. Remove `subprocess` dependency as it is unavailable on Solaris.
 2. Jupyter protocol tests are done in CI only.
 3. configure pulls in the paths by hand from the installed pbdZMQ package.
+4. include zeromq headers
 
 ### Changes in v1.2.0.0
 
