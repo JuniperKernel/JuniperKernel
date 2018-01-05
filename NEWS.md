@@ -1,5 +1,13 @@
 **If you are viewing this file on CRAN, please check latest news on GitHub [here](https://github.com/JuniperKernel/JuniperKernel/blob/master/NEWS.md).**
 
+### Changes in v1.2.1.0
+
+#### PATCHES
+
+1. Remove `subprocess` dependency as it is unavailable on Solaris.
+2. Jupyter protocol tests are done in CI only.
+3. configure pulls in the paths by hand from the installed pbdZMQ package.
+
 ### Changes in v1.2.0.0
 
 #### NEW FEATURES
