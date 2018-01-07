@@ -5,6 +5,11 @@ RSCRIPT=${R_HOME}/bin/Rscript
 PBD_ZMQ=`${RSCRIPT} -e "cat(system.file(package='pbdZMQ'))"`
 
 ZMQ_CPPFLAGS="-I${PBD_ZMQ}/zmq/include"
+
+echo `ls ${PBD_ZMQ}`
+echo `ls ${PBD_ZMQ}/zmq`
+echo `ls ${PBD_ZMQ}/zmq/include`
+
 ZMQ_LDFLAGS="-L${PBD_ZMQ}/libs -lzmq"
 if [[ `uname` == 'Darwin' ]]; then
   ZMQ_LDFLAGS=`${RSCRIPT} -e "pbdZMQ::get.zmq.ldflags()"`
