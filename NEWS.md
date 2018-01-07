@@ -1,6 +1,18 @@
 **If you are viewing this file on CRAN, please check latest news on GitHub [here](https://github.com/JuniperKernel/JuniperKernel/blob/master/NEWS.md).**
 
-### Changes in v1.2.0.0 (in development as v1.1.0.0)
+### Changes in  v1.4.0.0 (in development as v1.3.0.0)
+
+
+### Changes in v1.2.1.0
+
+#### PATCHES
+
+1. Remove `subprocess` dependency as it is unavailable on Solaris.
+2. Jupyter protocol tests are done in CI only.
+3. configure pulls in the paths by hand from the installed pbdZMQ package.
+4. include zeromq headers
+
+### Changes in v1.2.0.0
 
 #### NEW FEATURES
 
@@ -12,7 +24,9 @@
 
 #### BUG FIXES
 
-* `shutdown_request` messages now cause a clean shutdown (with exit 0). Before this fix, a `shutdown_request` would trigger a `q("no")` from within R before the shell, ctrl, and stdin sockets could clean themslves up. This would cause the application to "hang" when it attempted to destroy the `zmq::context_t`, and hence the kernel would need to be forcefully shutdown. 
+* `shutdown_request` messages now cause a clean shutdown (with exit 0). Before this fix, a `shutdown_request` would trigger a `q("no")` from within R before the shell, ctrl, and stdin sockets could clean themslves up. This would cause the application to "hang" when it attempted to destroy the `zmq::context_t`, and hence the kernel would need to be forcefully shutdown.
+* `is_complete_request` was missing an `else if` between the two `incomplete` checks resulting in an erroneous `invalid` state when a quote was missing.
+* Fixed Github issue #8 "Completion suggests “N” and “A” when there’s nothing to show": `complete_request` now returns an empty list `list()` when no matches are found (was returning `NA`).
 
 #### NOTES
 
