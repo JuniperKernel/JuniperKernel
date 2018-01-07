@@ -6,6 +6,7 @@ dist: trusty
 branches:
   only:
     - master
+    - osx
 
 addons:
   apt:
