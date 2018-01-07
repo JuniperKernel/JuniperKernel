@@ -1,10 +1,14 @@
 #!/bin/bash
 
-R_HOME=$(R RHOME)
+: ${R_HOME=`R RHOME`}
 RSCRIPT=${R_HOME}/bin/Rscript
+PBD_ZMQ=`${RSCRIPT} -e "cat(system.file(package='pbdZMQ'))"`
 
-ZMQ_CPPFLAGS=`${RSCRIPT} -e "pbdZMQ::get.zmq.cppflags()"`
-ZMQ_LDFLAGS=`${RSCRIPT} -e "pbdZMQ::get.zmq.ldflags()"`
+ZMQ_CPPFLAGS="-I${PBD_ZMQ}/zmq/include"
+ZMQ_LDFLAGS="-L${PBD_ZMQ}/libs -lzmq"
+if [[ `uname` == 'Darwin' ]]; then
+  ZMQ_LDFLAGS=`${RSCRIPT} -e "pbdZMQ::get.zmq.ldflags()"`
+fi
 
 sed -e "s|@ZMQ_CPPFLAGS@|${ZMQ_CPPFLAGS}|" -e "s|@ZMQ_LDFLAGS@|${ZMQ_LDFLAGS}|" src/Makevars.in > src/Makevars
 exit 0

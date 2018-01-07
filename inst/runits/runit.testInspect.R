@@ -4,7 +4,14 @@ test.inspect1 <- function() {
   JuniperKernel:::client_exec_request(jclient, payload)
   reply <- jsonlite::fromJSON(JuniperKernel:::client_exec_reply(jclient))
   check_iopub_messages("inspect_request")
+  checkTrue(reply$content$found)
+  checkTrue(reply$content$status=="ok")
+  checkTrue(reply$parent_header$msg_type=="inspect_request")
 
+  checkTrue(all(names(reply$content$data) == c("text/html",  "text/latex", "text/plain")))
+  checkTrue(grepl("<h2>Fitting Linear Models</h2>", reply$content$data$`text/html`))
+  checkTrue(grepl("\\\\HeaderA\\{lm\\}\\{Fitting Linear Models\\}\\{lm\\}\n\\\\keyword\\{regression\\}\\{lm\\}", reply$content$data$`text/latex`))
+  checkTrue(grepl("lm                    package:stats                    R Documentation", reply$content$data$`text/plain`))
 }
 
 test.inspect2 <- function() {
@@ -16,7 +23,14 @@ test.inspect2 <- function() {
   JuniperKernel:::client_exec_request(jclient, payload)
   reply <- jsonlite::fromJSON(JuniperKernel:::client_exec_reply(jclient))
   check_iopub_messages("inspect_request")
+  checkTrue(reply$content$found)
+  checkTrue(reply$content$status=="ok")
+  checkTrue(reply$parent_header$msg_type=="inspect_request")
 
+  checkTrue(all(names(reply$content$data) == c("text/html",  "text/latex", "text/plain")))
+  checkTrue(grepl("<h2>Concatenate Strings</h2>", reply$content$data$`text/html`))
+  checkTrue(grepl("\\\\HeaderA\\{paste\\}\\{Concatenate Strings\\}\\{paste\\}", reply$content$data$`text/latex`))
+  checkTrue(grepl("paste                   package:base                   R Documentation", reply$content$data$`text/plain`))
 }
 
 test.inspect3 <- function() {
@@ -25,5 +39,11 @@ test.inspect3 <- function() {
   JuniperKernel:::client_exec_request(jclient, payload)
   reply <- jsonlite::fromJSON(JuniperKernel:::client_exec_reply(jclient))
   check_iopub_messages("inspect_request")
+  checkTrue(reply$content$found)
+  checkTrue(reply$content$status=="ok")
+  checkTrue(reply$parent_header$msg_type=="inspect_request")
 
+  checkTrue(all(names(reply$content$data) == c("text/html", "text/plain")))
+  # checkTrue(gsub('`', '\'', reply$content$data$`text/html`)=="<h1>Class\n:</h1>\n'NULL'\n\n<h1>Help\n:</h1>\nNo documentation for 'asdf' in specified packages and libraries:\nyou could try '??asdf'\n\n")
+  # checkTrue(gsub('`', '\'', reply$content$data$`text/plain`)=="Class\n[1] \"NULL\"\n\nPrinted (data frames are truncated)\nNULL\n\nHelp\nNo documentation for 'asdf' in specified packages and libraries:\nyou could try '??asdf'\n\n")
 }
