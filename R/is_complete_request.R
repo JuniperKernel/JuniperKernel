@@ -17,7 +17,7 @@
 
 #' Handler for the is_complete_request Message Type
 #'
-#' @title Complete Handler
+#' @title Is Complete Handler
 #' @param request_msg
 #'   A list passed in from \code{doRequest} representing the
 #'   deserialized \code{is_complete_request} message JSON.

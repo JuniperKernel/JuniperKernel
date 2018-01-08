@@ -17,7 +17,7 @@
 
 #' Handler for the comm_info_request Message Type
 #'
-#' @title Inspect Handler
+#' @title Comm Info Request
 #' @param request_msg
 #'   A list passed in from \code{doRequest} representing the
 #'   deserialized \code{comm_info_request} message JSON.

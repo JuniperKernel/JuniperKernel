@@ -15,22 +15,17 @@
 # You should have received a copy of the GNU General Public License
 # along with JuniperKernel.  If not, see <http://www.gnu.org/licenses/>.
 
-#' Handler for the inspect_request Message Type
+#' Handler for the comm_open Message Type
 #'
-#' @title Inspect Handler
+#' @title Comm Open
 #' @param request_msg
 #'   A list passed in from \code{doRequest} representing the
-#'   deserialized \code{inspect_request} message JSON.
+#'   deserialized \code{comm_open} message JSON.
 #'
-#' @return
-#'   A list having names \code{msg_type} and \code{content}. The
-#'   \code{msg_type} is \code{inspect_reply}, which corresponds
-#'   to the \code{inspect_request} message. The \code{content} field
-#'   complies with the Jupyter wire message protocol specification
-#'   for \code{inspect_reply} messages.
+#' @return NULL
 #'
 #' @author Spencer Aiello
-#' @references \url{http://jupyter-client.readthedocs.io/en/latest/messaging.html#introspection}
+#' @references \url{http://jupyter-client.readthedocs.io/en/latest/messaging.html#opening-a-comm}
 #'
 #' @examples
 #' \dontrun{
