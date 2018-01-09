@@ -249,8 +249,9 @@ the zeromq architecture can be abstracted away from the code-exec'ing one.
 
 
 # Version Notes
-Release versions will be of the form <odd>.<even>.<patch>.0
-Dev versions will be of the form <odd>.<odd>.<patch>.<dev>
+Release versions will be of the form `<odd>.<even>.<patch>.0`
+
+Dev versions will be of the form `<odd>.<odd>.<patch>.<dev>`
 
 For example:  
   1.0.0.0 is a release version
