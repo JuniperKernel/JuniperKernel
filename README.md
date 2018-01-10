@@ -8,6 +8,8 @@ Juniper Kernel <img src="./extras/juniper_logo.png" width=120, align="right" />
 
 An [R](https://cran.r-project.org/) kernel for [Jupyter](https://jupyter.org) built with [Xeus](https://github.com/QuantStack/xeus) and [Rcpp](http://www.rcpp.org/).
 
+The development of JuniperKernel is sponsored by [Bloomberg](https://www.techatbloomberg.com/).
+
 ## Install from CRAN
 
 ```
