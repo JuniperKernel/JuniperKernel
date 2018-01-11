@@ -1,9 +1,13 @@
 **If you are viewing this file on CRAN, please check latest news on GitHub [here](https://github.com/JuniperKernel/JuniperKernel/blob/master/NEWS.md).**
 
-### Changes in  v1.4.0.0 (in development as v1.3.0.0)
+### Changes in v1.2.2.0
 
+#### PATCHES
 
-### Changes in v1.2.1.0
+1. Point to pbdZMQ R package version 0.3-1. This enables external zeromq dependencies to be found
+   included/linked correctly.
+
+### Changes in v1.2.1.0 (on CRAN 01/05/2018)
 
 #### PATCHES
 
@@ -12,7 +16,7 @@
 3. configure pulls in the paths by hand from the installed pbdZMQ package.
 4. include zeromq headers
 
-### Changes in v1.2.0.0
+### Changes in v1.2.0.0 (on CRAN 01/04/2018)
 
 #### NEW FEATURES
 
@@ -35,4 +39,4 @@
   pbdR core team for making this happen.
 
 
-### v1.0.0.0 released to CRAN in Dec. 2017
+### v1.0.0.0 released to CRAN on 12/19/2017
