@@ -29,7 +29,6 @@ before_build:
   - cinst pandoc
 
 cache:
-  - C:\RLibrary
   - C:\Program Files (x86)\Pandoc\
 
 build_script:
