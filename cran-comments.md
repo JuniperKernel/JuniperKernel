@@ -1,14 +1,6 @@
-## JuniperKernel 1.2.0.0 Submission
+## JuniperKernel 1.2.2.0 Submission
 In this version we have:
-  * Added a NEWS.md
-  * Removed 
-  * Added an additional set of tests (included with the package in inst/runits)
-  * Updated the COPYRIGHTS file and DESCRIPTION file to credit the xeus, xtl, and json
-    dependency authors.
-  * Removed the static zeromq sources 'inst/pbdZMQ-0.2-6.zip' and 'inst/zeromq-4.2.2.tar.gz'
-  * Created a dependency on the 'pbdZMQ' package for ZeroMQ headers and dynamic libraries.
-  * No longer compiling with flag -fPIC.
-  * Made the configure script more portable
+* This is a patch submission to update the 'pbdZMQ' dependency to the latest version.
 
 ## Test environments
 * local OS X install, R 3.4.3
