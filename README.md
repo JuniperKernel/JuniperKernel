@@ -8,6 +8,8 @@ Juniper Kernel <img src="./extras/juniper_logo.png" width=120, align="right" />
 
 An [R](https://cran.r-project.org/) kernel for [Jupyter](https://jupyter.org) built with [Xeus](https://github.com/QuantStack/xeus) and [Rcpp](http://www.rcpp.org/).
 
+The development of JuniperKernel is sponsored by [Bloomberg](https://www.techatbloomberg.com/).
+
 ## Install from CRAN
 
 ```
@@ -249,8 +251,13 @@ the zeromq architecture can be abstracted away from the code-exec'ing one.
 
 
 # Version Notes
-Release versions will be of the form <odd>.<even>.<patch>.0
-Dev versions will be of the form <odd>.<odd>.<patch>.<dev>
+Release versions will be of the form `<odd/even>.<even>.<patch>.0`
+
+Dev versions will be of the form `<odd/even>.<odd/even>.<patch>.<dev>`
+
+The major version always increments.
+
+`<patch>` numbers increment always and dev versions will match patched versions.
 
 For example:  
   1.0.0.0 is a release version

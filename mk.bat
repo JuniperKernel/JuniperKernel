@@ -1,11 +1,11 @@
 ::quantstack bacon bits
 :: xtl
-set "XTL_VERSION=0.3.8"
+set "XTL_VERSION=0.4.0"
 set "XTL_TAR_FILE=%XTL_VERSION%.tar.gz"
 set "XTL_URL=https://github.com/QuantStack/xtl/archive/%XTL_TAR_FILE%"
 
 :: xeus
-set "XEUS_VERSION=0.8.1"
+set "XEUS_VERSION=0.9.0"
 set "XEUS_TAR_FILE=%XEUS_VERSION%.tar.gz"
 set "XEUS_URL=https://github.com/QuantStack/xeus/archive/%XEUS_TAR_FILE%"
 
@@ -31,8 +31,11 @@ if %ERRORLEVEL% EQU 1 exit 1
 Rscript -e roxygen2::roxygenize()
 if %ERRORLEVEL% EQU 1 exit 1
 
-:: Rscript -e "install.packages('devtools',repo='https://cran.r-project.org')"
-:: if %ERRORLEVEL% EQU 1 exit 1
+Rscript -e "install.packages('devtools',repo='https://cran.r-project.org')"
+if %ERRORLEVEL% EQU 1 exit 1
+
+Rscript -e "devtools::install_github('snoweye/pbdZMQ')"
+if %ERRORLEVEL% EQU 1 exit 1
 
 Rscript -e "install.packages('subprocess',repo='https://cran.r-project.org')"
 if %ERRORLEVEL% EQU 1 exit 1

@@ -17,12 +17,12 @@ RSCRIPT=$(R_HOME)/bin/Rscript
 
 #quantstack bacon bits
 # xtl
-XTL_VERSION = 0.3.8
+XTL_VERSION = 0.4.0
 XTL_TAR_FILE = ${XTL_VERSION}.tar.gz
 XTL_URL = https://github.com/QuantStack/xtl/archive/${XTL_TAR_FILE}
 
 # xeus
-XEUS_VERSION = 0.8.1
+XEUS_VERSION = 0.9.0
 XEUS_TAR_FILE = ${XEUS_VERSION}.tar.gz
 XEUS_URL = https://github.com/QuantStack/xeus/archive/${XEUS_TAR_FILE}
 

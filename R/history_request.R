@@ -17,7 +17,7 @@
 
 #' Handler for the history_request Message Type
 #'
-#' @title Inspect Handler
+#' @title History Request Handler
 #' @param request_msg
 #'   A list passed in from \code{doRequest} representing the
 #'   deserialized \code{history_request} message JSON.
