@@ -20,7 +20,7 @@
 .onLoad <- function(lib, pkg) {
   pbdZMQ::overwrite.shpkg.rpath(mylib = lib, mypkg = pkg, linkingto = "pbdZMQ",
                                 shlib = "zmq")
-  library.dynam("JuniperKernel", pkgname, libname)
+  library.dynam("JuniperKernel", pkg, lib)
   invisible()
 } # End of .onLoad().
 
