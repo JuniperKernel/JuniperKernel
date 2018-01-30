@@ -123,6 +123,7 @@ recv_msgs <- function() {
   # Note that even if the previous poll produced no messages read, then
   # this loop tries One More Time. And, on each non-zero length message
   # the retry mechanism is reset.
+  # NB: There's another race here with the stdout/stderr writers; see below...
   ntries <- 30L
   notIdle <- TRUE
   while( notIdle ) {
@@ -134,8 +135,8 @@ recv_msgs <- function() {
       # check if we got the idle message (which is the last message)
       jmsg <- jsonlite::fromJSON(msg)
       if( !is.null(jmsg$content$execution_state) &&
-      jmsg$content$execution_state=="idle" ) {
-        notIdle <- FALSE
+          jmsg$content$execution_state=="idle" ) {
+            notIdle <- FALSE
       }
     } else {
       # Poll the iopub message queue until the "idle" message arrives.
@@ -152,7 +153,27 @@ recv_msgs <- function() {
       Sys.sleep(.10)
     }
   }
-  msgs
+
+  # Racey stdout/stderr writers and the 'idle' writer. We need to poll again for
+  # any racey messages coming in from iopub. These may lag or lead the idle. If
+  # they lead, then the above loop has all of the messages in order and we do no
+  # further work. If these messages LAG then we've got to poll and resort the
+  # messages so that the idle is last.
+  #
+  # Use a similar polling heuristic to retrieve the stragglers.
+  ntries <- 5L
+  theIdle <- msgs[length(msgs)]
+  msgs <- msgs[-length(msgs)]  # drop the idle
+  while( ntries > 0L ) {
+    msg <- JuniperKernel:::iopub_recv(jclient)
+    if( nzchar(msg) ) {
+      msgs <- c(msgs, msg)
+    } else {
+      ntries <- ntries - 1L
+      Sys.sleep(.01)
+    }
+  }
+  c(msgs, theIdle)
 }
 
 # perform a "safe" kernel shutdown
