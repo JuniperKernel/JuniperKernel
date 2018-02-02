@@ -1,6 +1,10 @@
 **If you are viewing this file on CRAN, please check latest news on GitHub [here](https://github.com/JuniperKernel/JuniperKernel/blob/master/NEWS.md).**
 
-### Changes in v1.4.0.0 (in dev as v1.3.0.0)
+### Changes in v1.2.3.0
+
+#### PATCHES
+
+1. Provides an `.onLoad` implementation that will search for a externally installed zeromq library. This method is provided by Wei-Chen Chen (@snoweye).
 
 ### Changes in v1.2.2.0 (on CRAN 01/16/2018)
 
