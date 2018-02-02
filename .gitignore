@@ -29,5 +29,3 @@ src/*gz
 inst/include/xtl
 inst/include/xeus
 src/Makevars
-.travis.yml
-appveyor.yml

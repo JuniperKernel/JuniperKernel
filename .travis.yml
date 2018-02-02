@@ -6,8 +6,6 @@ dist: trusty
 branches:
   only:
     - master
-    - osx
-    - osx_static
 
 addons:
   apt:
@@ -30,7 +28,7 @@ before_install:
   - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 60 --slave /usr/bin/g++ g++ /usr/bin/g++-6
 
 script:
-  - Rscript -e "devtools::install_github('snoweye/pbdZMQ')"
+  - Rscript -e "devtools::install_github('RBigData/pbdZMQ')"
   - g++ --version
   - make install
   - make check
