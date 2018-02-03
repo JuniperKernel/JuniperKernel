@@ -4,7 +4,8 @@
 
 #### PATCHES
 
-1. Provides an `.onLoad` implementation that will search for a externally installed zeromq library. This method is provided by Wei-Chen Chen (@snoweye).
+
+1. Point to pbdZMQ R package version 0.3-2. Provides an `.onLoad` implementation that will search for a externally installed zeromq library. This method is provided by Wei-Chen Chen (@snoweye).
 
 ### Changes in v1.2.2.0 (on CRAN 01/16/2018)
 
