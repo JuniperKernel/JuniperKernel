@@ -108,7 +108,7 @@ class RequestServer {
     int _stream_out_port;
     int _stream_err_port;
     const Rcpp::Environment _jk;
-    std::atomic<int> _connected;
+    mutable std::atomic<int> _connected;
 
     std::thread _sout;
     std::thread _serr;
@@ -126,7 +126,22 @@ class RequestServer {
       // boot listener threads; execute request; join listeners
       Rcpp::List res = do_request(Rcpp::wrap(handler), from_json_r(req));
       json jres = from_list_r(res);
-      while( _connected.load() ) {}
+
+      // This is pretty broken; basically R will close its socketConnection successfully
+      // but this won't get picked up by a zmq::socket::stream. So just bail if we've been
+      // polling for too long waiting for the disconnects to come through. There's a TODO
+      // here to read from a temp file that holds the status of the closed connection. See
+      // request.R for more details.
+      int ntries=0;
+      int breakcnt=0;
+      int MAXBREAKS=5;
+      while( _connected.load() ) {
+        if( ntries++ % 10000000 == 0 ) breakcnt++;
+        if( breakcnt > MAXBREAKS ) {
+          Rcpp::Rcout << "WARNING: R socketConnection disconnects not detected." << std::endl;
+          _connected = 0;
+        }
+      }
       // comms don't reply (except for comm_info_request)
       if( msg_type=="comm_open" || msg_type=="comm_close" || msg_type=="comm_msg" )
         return *this;
