@@ -1,4 +1,4 @@
-## JuniperKernel 1.2.2.0 Submission
+## JuniperKernel 1.2.3.0 Submission
 In this version we have:
 * This is a patch submission to update the 'pbdZMQ' dependency to the latest version.
 

@@ -126,7 +126,7 @@ class RequestServer {
       // boot listener threads; execute request; join listeners
       Rcpp::List res = do_request(Rcpp::wrap(handler), from_json_r(req));
       json jres = from_list_r(res);
-      /* do { std::this_thread::sleep_for(std::chrono::milliseconds(250)); } */while( _connected.load() ) {}
+      while( _connected.load() ) {}
       // comms don't reply (except for comm_info_request)
       if( msg_type=="comm_open" || msg_type=="comm_close" || msg_type=="comm_msg" )
         return *this;
@@ -135,6 +135,7 @@ class RequestServer {
         idle(); // publish idle before triggering socket deaths
         shutdown();
       }
+      Rcpp::Rcout << "returning" << std::endl;
       return *this;
     }
 

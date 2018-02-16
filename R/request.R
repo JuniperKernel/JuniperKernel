@@ -66,8 +66,8 @@
 #'
 #' @export
 doRequest <- function(handler, request_msg) {
-  out <- socketConnection("localhost", port=request_msg$stream_out_port)
-  err <- socketConnection("localhost", port=request_msg$stream_err_port)
+  out <- socketConnection("localhost", port=request_msg$stream_out_port, blocking=TRUE, open='w')
+  err <- socketConnection("localhost", port=request_msg$stream_err_port, blocking=TRUE, open='w')
   sink(out, type="output")
   sink(err, type="message")
   aliases <- list(system=list(sans="Arial", serif="Times", mono="Courier", symbol="Symbol"), user=list())
