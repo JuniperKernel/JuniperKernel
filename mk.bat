@@ -24,6 +24,7 @@ powershell -Command "Invoke-WebRequest %XEUS_URL% -OutFile %XEUS_TAR_FILE%"
 C:\Rtools\bin\tar -xzf %XEUS_TAR_FILE%
 C:\Rtools\bin\mv xeus-%XEUS_VERSION%\include\xeus .\inst\include
 C:\Rtools\bin\rm -rf xeus-%XEUS_VERSION% %XEUS_TAR_FILE%
+C:\Rtools\bin\cp .\inst\nl_json.hpp .\inst\include\xeus\nl_json.hpp
 
 Rscript -e Rcpp::compileAttributes()
 if %ERRORLEVEL% EQU 1 exit 1
