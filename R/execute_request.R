@@ -63,8 +63,20 @@ execute_request <- function(request_msg) {
       return("ok")
     }
     , error=function(e) {
-        message(e, "\n")
+        if( e$call!="eval(parse(text = code), envir = .GlobalEnv)" )
+          message(e, "\n")
+        else
+          message(e$message, "\n")
+        .setGlobal('.Last.error', e, 1L)
         return("error")
+      }
+    , warning=function(w) {
+        if( w$call!="eval(parse(text = code), envir = .GlobalEnv)" )
+          message(w, "\n")
+        else
+          message(w$message, "\n")
+        .setGlobal('.Last.warning', w, 1L)
+        return("ok")
       }
     , interrupt = function(.) return("abort")
   )

@@ -150,7 +150,6 @@ class RequestServer {
         idle(); // publish idle before triggering socket deaths
         shutdown();
       }
-      Rcpp::Rcout << "returning" << std::endl;
       return *this;
     }
 
