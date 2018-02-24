@@ -13,17 +13,18 @@ set "XEUS_URL=https://github.com/QuantStack/xeus/archive/%XEUS_TAR_FILE%"
 if not exist ".\inst\include" mkdir .\inst\include
 
 :: fetch xtl headers
-powershell -Command "Invoke-WebRequest %XTL_URL% -OutFile %XTL_TAR_FILE%"
+powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest %XTL_URL% -OutFile %XTL_TAR_FILE%"
 C:\Rtools\bin\tar -xzf %XTL_TAR_FILE%
 C:\Rtools\bin\mv xtl-%XTL_VERSION%\include\xtl .\inst\include
 C:\Rtools\bin\rm -rf xtl-%XTL_VERSION% %XTL_TAR_FILE%
 
 
 :: fetch xeus headers
-powershell -Command "Invoke-WebRequest %XEUS_URL% -OutFile %XEUS_TAR_FILE%"
+powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest %XEUS_URL% -OutFile %XEUS_TAR_FILE%"
 C:\Rtools\bin\tar -xzf %XEUS_TAR_FILE%
 C:\Rtools\bin\mv xeus-%XEUS_VERSION%\include\xeus .\inst\include
 C:\Rtools\bin\rm -rf xeus-%XEUS_VERSION% %XEUS_TAR_FILE%
+
 C:\Rtools\bin\cp .\inst\nl_json.hpp .\inst\include\xeus\nl_json.hpp
 
 Rscript -e Rcpp::compileAttributes()
