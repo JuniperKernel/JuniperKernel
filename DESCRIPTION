@@ -22,7 +22,8 @@ Imports: utils,
          gdtools (>= 0.1.6),
          pbdZMQ (>= 0.3-2),
          data.table,
-         methods
+         methods,
+         RInside
 Suggests: RUnit, roxygen2
 Collate: 'booter.R'
          'comm_close.R'
@@ -41,7 +42,7 @@ Collate: 'booter.R'
          'request.R'
          'shutdown_request.R'
          'zzz.R'
-LinkingTo: Rcpp, gdtools
+LinkingTo: Rcpp, gdtools, RInside
 Description: Provides a full implementation of the 'Jupyter' <http://jupyter.org/> messaging protocol in C++ by leveraging 'Rcpp' and 'Xeus' <https://github.com/QuantStack/xeus>.
              'Jupyter' supplies an interactive computing environment and a messaging protocol defined over 'ZeroMQ' for multiple programming languages. This package implements
              the 'Jupyter' kernel interface so that 'R' is exposed to this interactive computing environment. 'ZeroMQ' functionality is provided by the 'pbdZMQ' package.

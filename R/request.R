@@ -89,5 +89,45 @@ doRequest <- function(handler, request_msg) {
         # write(line,file=.tmpStatusFile(),append=TRUE)
         grDevices::dev.off(dev)
       }
+    , interrupt = function(e){ stop("USER INTERRUPT") }
   )
+}
+
+
+#' Another Top-level Request Driver for R
+#'
+#' @title Handle Jupyter Requests2
+#' @param handler_name
+#'   An R method that handles the message type of
+#'   \code{request_msg}. This function is passed in
+#'   by the \code{RequestServer}, which handles all of
+#'   generic message handling such as validation and
+#'   routing. This handler is one of c('kernel_info_request',
+#'   'execute_request', 'inspect_request', 'complete_request',
+#'   'history_request', 'is_complete_request', 'comm_info_request',
+#'   'comm_open', 'comm_close', 'comm_msg', 'shutdown_request').
+#'
+#' @param request_json
+#'   A list passed in from \code{RequestServer} representing the
+#'   deserialized message JSON.
+#'
+#' @return A list having names \code{msg_type} and \code{content}. The
+#'   \code{msg_type} is the reply type corresponding to the
+#'   \code{request_msg}'s message type. For example, a
+#'   \code{kernel_info_request} message produces a list with
+#'   \code{msg_type=kernel_info_reply}. The \code{content} field
+#'   of this list is dictated by the Jupyter wire message protocol.
+#'   Note that the full reply to a Jupyter client is managed by the
+#'   RequestServer.
+#'
+#' @details
+#'   See \code{doRequest}.
+#'
+#' @author Spencer Aiello
+#'
+#' @export
+doRequest2 <- function(handler_name, request_json) {
+  handler <- getExportedValue('JuniperKernel', handler_name)
+  request_msg <- jsonlite::fromJSON(request_json)
+  doRequest(handler, request_msg)
 }

@@ -12,6 +12,8 @@ PBD_ZMQ=`${RSCRIPT} -e "cat(system.file(package='pbdZMQ'))"`
 ZMQ_CPPFLAGS=`${RSCRIPT} -e "pbdZMQ::get.zmq.cppflags()"`
 ZMQ_LDFLAGS=`${RSCRIPT} -e "pbdZMQ::get.zmq.ldflags()"`
 
+RIN_LDPATH=`${RSCRIPT} -e "RInside:::LdFlags()"`
+
 echo " "
 echo "************** Results of JuniperKernel package configure **************"
 echo " "
@@ -19,9 +21,10 @@ echo ">> RSCRIPT = ${RSCRIPT}"
 echo ">> PBD_ZMQ = ${PBD_ZMQ}"
 echo ">> ZMQ_CPPFLAGS = ${ZMQ_CPPFLAGS}"
 echo ">> ZMQ_LDFLAGS = ${ZMQ_LDFLAGS}"
+echo ">> RIN_LDPATH = ${RIN_LDPATH}"
 echo " "
 echo "************************************************************************"
 echo " "
 
-sed -e "s|@ZMQ_CPPFLAGS@|${ZMQ_CPPFLAGS}|" -e "s|@ZMQ_LDFLAGS@|${ZMQ_LDFLAGS}|" src/Makevars.in > src/Makevars
+sed -e "s|@ZMQ_CPPFLAGS@|${ZMQ_CPPFLAGS}|" -e "s|@ZMQ_LDFLAGS@|${ZMQ_LDFLAGS}|" -e "s|@RIN_LDPATH@|${RIN_LDPATH}|" src/Makevars.in > src/Makevars
 exit 0

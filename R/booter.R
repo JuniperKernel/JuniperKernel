@@ -69,5 +69,8 @@ bootKernel <- function() {
   if( !file.exists(userConnFile) )
     stop("Connection file does not exist: ", userConnFile)
 
-  boot_kernel(.JUNIPER$kernel <- init_kernel(userConnFile))
+  tryCatch(
+    boot_kernel(.JUNIPER$kernel <- init_kernel(userConnFile))
+  , interrupt = function(e){ stop("booter user interrupt; bye bye") }
+  )
 }

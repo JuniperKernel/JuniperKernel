@@ -27,13 +27,15 @@
 #include <juniper/conf.h>
 #include <juniper/jmessage.h>
 #include <juniper/utils.h>
+#include <RInside.h>
 
 // Every incoming message has a type, which tells the server which handler
 // the message should be passed to for further execution.
 class RequestServer {
   public:
     mutable JMessage _cur_msg;  // messages are handled 1 at a time; keep a ref
-    RequestServer(zmq::context_t& ctx, const std::string& key):
+    RequestServer(zmq::context_t& ctx, const std::string& key, RInside* rin=nullptr):
+      _rin(rin),
       _ctx(&ctx),
       _key(key),
       _jk("package:JuniperKernel"),
@@ -99,6 +101,7 @@ class RequestServer {
     const RequestServer& idle() const { iopub("status", {{"execution_state", "idle"}}); return *this; }
 
   private:
+    RInside* _rin;
     zmq::context_t* const _ctx;
     const std::string _key;   // hmac key
     zmq::socket_t* _inproc_pub;
@@ -121,6 +124,13 @@ class RequestServer {
       std::string msg_type = req["header"]["msg_type"];
       req["stream_out_port"] = _stream_out_port;  // stitch the stdout port into the client request
       req["stream_err_port"] = _stream_err_port;  // stitch the stderr into the client request
+
+      if( _rin ) {
+        std::cout << "rin not null" << std::endl;
+      } else {
+        std::cout << "rin is null" << std::endl;
+      }
+
       Rcpp::Function handler = _jk[msg_type];
       Rcpp::Function do_request = _jk["doRequest"];
       // boot listener threads; execute request; join listeners

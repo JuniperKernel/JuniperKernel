@@ -3,6 +3,8 @@ CXX_STD      = CXX11
 
 # set include and linker options
 PKG_CPPFLAGS = -I../inst/include/ -I. @ZMQ_CPPFLAGS@
-PKG_LIBS     = @ZMQ_LDFLAGS@
+PKG_LIBS     = @ZMQ_LDFLAGS@ -L@RIN_LDPATH@
 
 all: $(SHLIB)
+
+jkrun: jkrun.cpp

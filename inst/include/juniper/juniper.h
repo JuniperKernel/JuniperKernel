@@ -31,11 +31,13 @@
 #include <juniper/background.h>
 #include <juniper/requests.h>
 #include <juniper/external.h>
+#include <RInside.h>
 
 class JuniperKernel {
   public:
     const RequestServer* _request_server;
-    JuniperKernel(const config& conf):
+    JuniperKernel(const config& conf, RInside* rin=nullptr):
+      _rin(rin),
       _ctx(new zmq::context_t(1)),
 
       // these are the 3 incoming Jupyter channels
@@ -46,7 +48,7 @@ class JuniperKernel {
       _cntrlport(conf.control_port),
       _key(conf.key),
       _sig_scheme(conf.signature_scheme) {
-        _request_server = new RequestServer(*_ctx, _key);
+        _request_server = new RequestServer(*_ctx, _key, _rin);
         char sep = (conf.transport=="tcp") ? ':' : '-';
         _endpoint = conf.transport + "://" + conf.ip + sep;
 
@@ -102,6 +104,8 @@ class JuniperKernel {
     }
 
   private:
+    RInside* _rin;
+
     // context is shared by all threads, cause there
     // ain't no GIL to stop us now! ...we can build this thing together!
     zmq::context_t* const _ctx;

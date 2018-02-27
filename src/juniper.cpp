@@ -30,7 +30,7 @@
 #include <juniper/external.h>
 #include <jclient/jclient.h>
 #include <Rcpp.h>
-
+#include <RInside.h>
 
 // init static vars now
 std::atomic<long long> JMessage::_ctr{0};
@@ -90,6 +90,16 @@ void boot_kernel(SEXP kernel) {
   if( _xm!=nullptr )
     delete _xm;
 }
+
+//' Run With RInside
+//'
+//' Run the kernel with an embedded R interpreter.
+//'
+//' @author Spencer Aiello
+//'
+//' @export
+//' [[Rcpp::export]]
+void launch_kernel()
 
 //' The XMock
 //'
