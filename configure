@@ -12,7 +12,7 @@ PBD_ZMQ=`${RSCRIPT} -e "cat(system.file(package='pbdZMQ'))"`
 ZMQ_CPPFLAGS=`${RSCRIPT} -e "pbdZMQ::get.zmq.cppflags()"`
 ZMQ_LDFLAGS=`${RSCRIPT} -e "pbdZMQ::get.zmq.ldflags()"`
 
-RIN_LDPATH=`${RSCRIPT} -e "RInside:::LdFlags()"`
+RIN_LDPATH=`${RSCRIPT} -e "cat(RInside:::RInsideLdPath())"`
 
 echo " "
 echo "************** Results of JuniperKernel package configure **************"

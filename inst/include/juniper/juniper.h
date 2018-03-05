@@ -56,9 +56,9 @@ class JuniperKernel {
         init_socket(_stdin, _endpoint + conf.stdin_port);
     }
 
-    static JuniperKernel* make(const std::string& connection_file) {
+    static JuniperKernel* make(const std::string& connection_file, RInside* rin=nullptr) {
       config conf = config::read_connection_file(connection_file);
-      JuniperKernel* jk = new JuniperKernel(conf);
+      JuniperKernel* jk = new JuniperKernel(conf, rin);
       return jk;
     }
 

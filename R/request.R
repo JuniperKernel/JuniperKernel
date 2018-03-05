@@ -127,6 +127,11 @@ doRequest <- function(handler, request_msg) {
 #'
 #' @export
 doRequest2 <- function(handler_name, request_json) {
+  print("got request")
+  print("handler_name: ")
+  print(handler_name)
+  print("request_json")
+  print(request_json)
   handler <- getExportedValue('JuniperKernel', handler_name)
   request_msg <- jsonlite::fromJSON(request_json)
   doRequest(handler, request_msg)

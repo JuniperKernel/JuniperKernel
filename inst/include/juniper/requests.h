@@ -125,16 +125,26 @@ class RequestServer {
       req["stream_out_port"] = _stream_out_port;  // stitch the stdout port into the client request
       req["stream_err_port"] = _stream_err_port;  // stitch the stderr into the client request
 
+      Rcpp::List res;
       if( _rin ) {
         std::cout << "rin not null" << std::endl;
+        std::string doReq = "JuniperKernel::doRequest2(";
+        SEXP ans;
+        std::string rreq = doReq + "\"" + msg_type + "\"" + "," + "\"" + ("zoooo") + "\"" + ")";
+        std::cout << "rreq: " << rreq << std::endl;
+        _rin->parseEvalQ("print('attempting doRequest2')");
+        _rin->parseEvalQ(rreq);
+//        std::cout << "ec: " << ec << std::endl;
+//        Rcpp::List res2(ans);
+//        res=res2;
       } else {
         std::cout << "rin is null" << std::endl;
+        Rcpp::Function handler = _jk[msg_type];
+        Rcpp::Function do_request = _jk["doRequest"];
+        // boot listener threads; execute request; join listeners
+        res = do_request(Rcpp::wrap(handler), from_json_r(req));
       }
 
-      Rcpp::Function handler = _jk[msg_type];
-      Rcpp::Function do_request = _jk["doRequest"];
-      // boot listener threads; execute request; join listeners
-      Rcpp::List res = do_request(Rcpp::wrap(handler), from_json_r(req));
       json jres = from_list_r(res);
 
       // This is pretty broken; basically R will close its socketConnection successfully

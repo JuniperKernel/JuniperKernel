@@ -67,10 +67,16 @@ static JuniperKernel* get_kernel(SEXP kernel) {
   return reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(kernel));
 }
 
+static RInside* get_rinside(SEXP rinside) {
+  if( rinside==R_NilValue ) return nullptr;
+  return reinterpret_cast<RInside*>(R_ExternalPtrAddr(rinside));
+}
+
 xmock* _xm;
 // [[Rcpp::export]]
-SEXP init_kernel(const std::string& connection_file) {
-  JuniperKernel* jk = JuniperKernel::make(connection_file);
+SEXP init_kernel(const std::string& connection_file, SEXP rinside) {
+  RInside* rin = get_rinside(rinside);
+  JuniperKernel* jk = JuniperKernel::make(connection_file, rin);
 
   _xm = new xmock();
   _xm->_jk=jk;  // mocked interpreter needs pointer to the kernel
@@ -90,16 +96,6 @@ void boot_kernel(SEXP kernel) {
   if( _xm!=nullptr )
     delete _xm;
 }
-
-//' Run With RInside
-//'
-//' Run the kernel with an embedded R interpreter.
-//'
-//' @author Spencer Aiello
-//'
-//' @export
-//' [[Rcpp::export]]
-void launch_kernel()
 
 //' The XMock
 //'

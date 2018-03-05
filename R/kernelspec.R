@@ -24,8 +24,8 @@
 # INSTALL HELPERS
 
 .argv <- function() {
-  exec <- file.path(R.home('bin'), 'R')
-  c(exec, '--slave', '-e', 'JuniperKernel::bootKernel()', '--args', '{connection_file}')
+  exec <- file.path(R.home('library'), 'JuniperKernel', 'extdata', 'jkrun')
+  c(exec, '--args', '{connection_file}')
 }
 
 .stopIfJupyterMissing <- function() {

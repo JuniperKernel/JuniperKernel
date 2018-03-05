@@ -50,9 +50,13 @@
 #' }
 #'
 #' @export
-bootKernel <- function() {
+bootKernel <- function(connection_file=NULL) {
   require(JuniperKernel)  # attach the package to the search path so we can call methods from Rcpp
-  argv <- commandArgs(trailingOnly=TRUE)
+  cmdArgv <- commandArgs(trailingOnly=TRUE)
+
+  argv <- connection_file
+  if( is.null(connection_file) )
+    argv <- cmdArgv
 
   if( length(argv)==0L )
     stop("Missing command line arguments. Juniper kernel installation may be corrupt.")
@@ -70,7 +74,7 @@ bootKernel <- function() {
     stop("Connection file does not exist: ", userConnFile)
 
   tryCatch(
-    boot_kernel(.JUNIPER$kernel <- init_kernel(userConnFile))
-  , interrupt = function(e){ stop("booter user interrupt; bye bye") }
+    boot_kernel(.JUNIPER$kernel <- init_kernel(userConnFile, `__rin__`))
+  , interrupt = function(e){ stop("booter user interrupt; bye") }
   )
 }

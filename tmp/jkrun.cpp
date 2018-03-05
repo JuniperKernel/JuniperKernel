@@ -12,15 +12,16 @@ SEXP createExternalPointer(T* p, finalizerT finalizer, const char* pname) {
 static void rinsideFinalizer(SEXP rin) {
   RInside* rinside = reinterpret_cast<RInside*>(R_ExternalPtrAddr(rin));
   if( rinside ) {
-    delete rinside;
     R_ClearExternalPtr(rin);
   }
 }
 
 int main(int argc, char* argv[]) {
-  RInside* R = new RInside(argc, argv);
-  SEXP rin = createExternalPointer<RInside>(R, rinsideFinalizer, "RInside*");
-  R->assign(rin, "__rin__");
-  R->parseEvalQ("JuniperKernel::bootKernel()");
+  RInside R(argc, argv, true, true);
+  SEXP rin = createExternalPointer<RInside>(&R, rinsideFinalizer, "RInside*");
+  R.assign(rin, "__rin__");
+  std::string boot = "JuniperKernel::bootKernel(";
+  std::string conn = std::string(*(++argv));
+  R.parseEvalQ(boot + "\"" + conn + "\"" + ")");
   exit(0);
 }
