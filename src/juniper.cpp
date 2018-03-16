@@ -14,6 +14,9 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with JuniperKernel.  If not, see <http://www.gnu.org/licenses/>.
+#include <zmq.h>
+#include <zmq.hpp>
+#include <zmq_addon.hpp>
 #include <string>
 #include <thread>
 #include <fstream>
@@ -26,8 +29,6 @@
 #include <juniper/utils.h>
 #include <xeus/xkernel.hpp>
 #include <juniper/gdevice.h>
-#include <zmq.h>
-#include <zmq.hpp>
 #include <Rcpp.h>
 
 

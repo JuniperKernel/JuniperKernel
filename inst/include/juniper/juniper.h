@@ -17,16 +17,10 @@
 #ifndef juniper_juniper_juniper_H
 #define juniper_juniper_juniper_H
 
-#ifdef ERROR
-#undef ERROR
-#endif
-#include <Rcpp.h>
-#include <zmq_addon.hpp>
-
 #define LINGER 1000 // number of millis to linger for
 #define INPROC_SIG "inproc://controller"  // the death signaller from xeus
 
-#include <zmq.hpp>
+#include <Rcpp.h>
 #include <iostream>
 #include <atomic>
 #include <string>

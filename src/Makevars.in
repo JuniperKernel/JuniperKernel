@@ -2,7 +2,7 @@
 CXX_STD      = CXX11
 
 # set include and linker options
-PKG_CPPFLAGS = -I../inst/include/ -I. -I./xeus/include @ZMQ_CPPFLAGS@
+PKG_CPPFLAGS = -I../inst/include/ -I. -I./xeus/include @ZMQ_CPPFLAGS@ -I./include
 PKG_LIBS     = @ZMQ_LDFLAGS@
 all: libxeus.so set_pkg_libs $(SHLIB)
 
