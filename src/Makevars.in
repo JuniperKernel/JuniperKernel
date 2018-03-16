@@ -7,7 +7,7 @@ PKG_LIBS     = @ZMQ_LDFLAGS@
 all: libxeus.so set_pkg_libs $(SHLIB)
 
 set_pkg_libs:
-	$(eval PKG_LIBS = @ZMQ_LDFLAGS@ -L. -lxeus
+	$(eval PKG_LIBS := @ZMQ_LDFLAGS@ -L. -lxeus)
 
 export
 libxeus.so:
