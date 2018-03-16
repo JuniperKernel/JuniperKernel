@@ -1,6 +1,6 @@
 ### Modified from Rserve/src/install.libs.R
 ### For libs
-files <- c("JuniperKernel.so", "JuniperKernel.so.dSYM", "JuniperKernel.dylib",
+files <- c("libxeus.so", "JuniperKernel.so", "JuniperKernel.so.dSYM", "JuniperKernel.dylib",
            "JuniperKernel.dll", "symbols.rds")
 files <- files[file.exists(files)]
 if(length(files) > 0){

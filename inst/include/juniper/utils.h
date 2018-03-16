@@ -17,7 +17,7 @@
 #ifndef juniper_juniper_utils_H
 #define juniper_juniper_utils_H
 #include <string>
-#include <xeus/nl_json.hpp>
+#include <nlohmann/json.hpp>
 #include <zmq.hpp>
 #include <Rcpp.h>
 
@@ -126,32 +126,5 @@ static SEXP from_json_r(json j) {
     return Rcpp::wrap(res);
   }
   return j_to_sexp(j, !j.is_array());
-}
-
-static std::string msg_t_to_string(const zmq::message_t& msg) {
-  std::stringstream ss;
-  const char* chars = msg.data<char>();
-  size_t sz = msg.size();
-  for(size_t i=0; i<sz; ++i)
-    ss << chars[i];
-  return ss.str();
-}
-
-static int read_port(zmq::socket_t* sock) {
-  char endpoint[32];
-  size_t sz = sizeof(endpoint);
-  sock->getsockopt(ZMQ_LAST_ENDPOINT, &endpoint, &sz);
-  std::string ep(endpoint);
-  std::string port(ep.substr(ep.find(":", ep.find(":")+1)+1));
-  return stoi(port);
-}
-
-static std::string read_str(const zmq::message_t& msg) {
-  std::stringstream ss;
-  const char* buf = msg.data<const char>();
-  size_t buflen = msg.size();
-  for(size_t i=0; i<buflen; ++i)
-    ss << static_cast<char>(buf[i]);
-  return ss.str();
 }
 #endif // #ifndef juniper_juniper_utils_H

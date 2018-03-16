@@ -17,109 +17,114 @@
 #ifndef juniper_juniper_juniper_H
 #define juniper_juniper_juniper_H
 
+#ifdef ERROR
+#undef ERROR
+#endif
+#include <Rcpp.h>
+#include <zmq_addon.hpp>
+
+#define LINGER 1000 // number of millis to linger for
+#define INPROC_SIG "inproc://controller"  // the death signaller from xeus
+
+#include <zmq.hpp>
+#include <iostream>
+#include <atomic>
 #include <string>
 #include <thread>
-#include <fstream>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <zmq.hpp>
-#include <zmq_addon.hpp>
-#include <xeus/nl_json.hpp>
-#include <juniper/conf.h>
+#include <xeus/xguid.hpp>
+#include <xeus/xinterpreter.hpp>
+#include <juniper/utils.h>
 #include <juniper/sockets.h>
-#include <juniper/background.h>
-#include <juniper/requests.h>
-#include <juniper/external.h>
+#include <RInside.h>
 
-class JuniperKernel {
+using xeus::xinterpreter;
+using xeus::xjson;
+using xeus::xjson_node;
+using xeus::xhistory_arguments;
+
+class JadesInterpreter: public xinterpreter {
   public:
-    const RequestServer* _request_server;
-    JuniperKernel(const config& conf):
+    JadesInterpreter():
       _ctx(new zmq::context_t(1)),
+      _connected(0),
+      _jk("package:JadesKernel")
+        {}
 
-      // these are the 3 incoming Jupyter channels
-      _stdin(new zmq::socket_t(*_ctx, zmq::socket_type::router)),
-      _hbport(conf.hb_port),
-      _ioport(conf.iopub_port),
-      _shellport(conf.shell_port),
-      _cntrlport(conf.control_port),
-      _key(conf.key),
-      _sig_scheme(conf.signature_scheme) {
-        _request_server = new RequestServer(*_ctx, _key);
-        char sep = (conf.transport=="tcp") ? ':' : '-';
-        _endpoint = conf.transport + "://" + conf.ip + sep;
-
-        // socket setup
-        init_socket(_stdin, _endpoint + conf.stdin_port);
+    ~JadesInterpreter() {
+      if( _ctx )
+        delete _ctx;
     }
 
-    static JuniperKernel* make(const std::string& connection_file) {
-      config conf = config::read_connection_file(connection_file);
-      JuniperKernel* jk = new JuniperKernel(conf);
-      return jk;
+    void configure_impl(){}
+
+    xjson R_perform(const std::string& request_type, xjson& req) {
+      Rcpp::Function handler = _jk[request_type];
+      Rcpp::Function do_request = _jk["doRequest"];
+      Rcpp::List res = do_request(Rcpp::wrap(handler), from_json_r(req));
+      return from_list_r(res);
     }
 
-    // start the background threads
-    // called as part of the kernel boot sequence
-    void start_bg_threads() {
-      _hbthread = start_hb_thread(*_ctx, _endpoint + _hbport);
-      _iothread = start_io_thread(*_ctx, _endpoint + _ioport);
+    xjson execute_request_impl(
+      int execution_counter,
+      const std::string& code,
+      bool silent,
+      bool store_history,
+      const xjson_node* /* user_expressions */,
+      bool allow_stdin) {
+        Rcpp::Rcout << "EXECUTING CODE: " << code << std::endl;
+        xjson req;
+        req["code"] = code;
+        req["execution_counter"] = execution_counter;
+        return R_perform("execute_request", req);
     }
 
-    // runs in the main the thread, polls shell and controller
-     void run() const {
-       zmq::socket_t* cntrl = listen_on(*_ctx, _endpoint + _cntrlport, zmq::socket_type::router);
-       zmq::socket_t* shell = listen_on(*_ctx, _endpoint + _shellport, zmq::socket_type::router);
-       const RequestServer& server = *_request_server;
-       const std::string key = _key;
-       std::function<bool()> handlers[] = {
-         [&cntrl, &key, &server]() {
-           zmq::multipart_t msg;
-           msg.recv(*cntrl);
-           server.serve(msg, *cntrl);
-           return true;
-         },
-         [&shell, &key, &server]() {
-           zmq::multipart_t msg;
-           msg.recv(*shell);
-           server.serve(msg, *shell);
-           return true;
-         }
-       };
-       zmq::socket_t* sock[2] = {cntrl, shell};
-       poll(*_ctx, sock, handlers, 2);
-     }
+    xjson complete_request_impl(
+      const std::string& code,
+      int cursor_pos) {
+        xjson req;
+        req["code"] = code;
+        req["cursor_pos"] = cursor_pos;
+        return R_perform("complete_request", req);
+    }
 
-    ~JuniperKernel() {
-      // set linger to 0 on all sockets; destroy sockets; finally destoy ctx
-      _request_server->shutdown(); // try to send a signal out again
-      _hbthread.join();
-      _iothread.join();
-      delete _request_server;
-      _stdin     ->setsockopt(ZMQ_LINGER, 0); delete _stdin;
-      delete _ctx;
+    xjson inspect_request_impl(
+      const std::string& code,
+      int cursor_pos,
+      int detail_level) {
+        xjson req;
+        req["code"] = code;
+        req["cursor_pos"] = cursor_pos;
+        req["detail_level"] = detail_level;
+        return R_perform("inspect_request", req);
+    }
+
+    xjson history_request_impl(const xhistory_arguments& args) {
+      xjson req;
+      Rcpp::Rcout << "history request is unimpl." << std::endl;
+      return R_perform("history_request", req);
+    }
+
+    xjson is_complete_request_impl(const std::string& code) {
+      xjson req;
+      req["code"] = code;
+      return R_perform("is_complete_request", req);
+    }
+
+    xjson kernel_info_request_impl() {
+      xjson req;
+      return R_perform("kernel_info_request", req);
+    }
+
+    void input_reply_impl(const std::string& value) {
+      Rcpp::Rcout << "Received input_reply" << std::endl;
+      Rcpp::Rcout << "value: " << value << std::endl;
     }
 
   private:
-    // context is shared by all threads, cause there
-    // ain't no GIL to stop us now! ...we can build this thing together!
     zmq::context_t* const _ctx;
-
-    // jupyter stdin
-    zmq::socket_t*  const _stdin;
-
-    //misc
-    std::string _endpoint;
-    const std::string _hbport;
-    const std::string _ioport;
-    const std::string _shellport;
-    const std::string _cntrlport;
-    const std::string _key;
-    const std::string _sig_scheme;
-
-    std::thread _hbthread;
-    std::thread _iothread;
+//    RInside* const _rin;
+    std::atomic<int> _connected;
+    const Rcpp::Environment _jk;
 };
 
 #endif // ifndef juniper_juniper_juniper_H

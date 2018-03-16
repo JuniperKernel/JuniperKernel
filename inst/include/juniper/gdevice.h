@@ -56,7 +56,7 @@
 #include <fstream>
 #include <sstream>
 #include <cmath>
-#include <xeus/nl_json.hpp>
+#include <nlohmann/json.hpp>
 #include <juniper/juniper.h>
 
 double dbl_format(double x) { return std::abs(x) < 0.01 ? 0.00 : x; }
@@ -89,7 +89,7 @@ typedef std::shared_ptr<SvgStream> SvgStreamPtr;
 
 class JKDesc {
 public:
-  JuniperKernel* _jk;
+  xeus::xkernel* _jk;
   SvgStreamPtr stream;
   int pageno;
   std::string clipid;  // ID for the clip path
@@ -99,7 +99,7 @@ public:
   Rcpp::List user_aliases;
   XPtrCairoContext cc;
 
-  JKDesc(JuniperKernel* jk, bool standalone_, Rcpp::List aliases_):
+  JKDesc(xeus::xkernel* jk, bool standalone_, Rcpp::List aliases_):
     _jk(jk),
     stream(new SvgStream()),
     pageno(0),
@@ -406,7 +406,8 @@ void svg_close(pDevDesc dd) {
     std::string result;
     std::remove_copy(svg.begin(), svg.end(), std::back_inserter(result), '\n');
     display_data["data"]["image/svg+xml"] = result;
-    svgd->_jk->_request_server->display_data(display_data);
+    xeus::get_interpreter().display_data(display_data, xjson(), xjson());
+//    svgd->_jk->_request_server->display_data(display_data);
   }
   svgd->stream->clear();
   delete(svgd);
@@ -590,7 +591,7 @@ void svg_raster(unsigned int *raster, int w, int h, double x, double y, double w
   stream->write('\n');
 }
 
-pDevDesc svg_driver_new(JuniperKernel* jk, int bg, double width, double height, double pointsize, bool standalone, Rcpp::List& aliases) {
+pDevDesc svg_driver_new(xeus::xkernel* jk, int bg, double width, double height, double pointsize, bool standalone, Rcpp::List& aliases) {
   pDevDesc dd = (DevDesc*) calloc(1, sizeof(DevDesc));
   if (dd == NULL) return dd;
   dd->startfill = bg;
@@ -650,7 +651,7 @@ pDevDesc svg_driver_new(JuniperKernel* jk, int bg, double width, double height, 
   return dd;
 }
 
-void makeDevice(JuniperKernel* jk, std::string bg_, double width, double height, double pointsize, bool standalone, Rcpp::List& aliases) {
+void makeDevice(xeus::xkernel* jk, std::string bg_, double width, double height, double pointsize, bool standalone, Rcpp::List& aliases) {
   int bg = R_GE_str2col(bg_.c_str());
   R_GE_checkVersionOrDie(R_GE_version);
   R_CheckDeviceAvailable();

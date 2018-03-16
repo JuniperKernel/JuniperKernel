@@ -5,7 +5,7 @@
 .Rhistory
 scripts
 extras
-Makefile$
+^Makefile
 ^\.idea
 ^.*\.iml$
 README\.md$
