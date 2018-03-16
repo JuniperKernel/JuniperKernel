@@ -20,6 +20,10 @@
 #define LINGER 1000 // number of millis to linger for
 #define INPROC_SIG "inproc://controller"  // the death signaller from xeus
 
+#ifdef ERROR
+#undef ERROR
+#endif
+
 #include <Rcpp.h>
 #include <iostream>
 #include <atomic>
