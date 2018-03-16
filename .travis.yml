@@ -29,6 +29,8 @@ before_install:
 
 script:
   - Rscript -e "devtools::install_github('RBigData/pbdZMQ')"
+  - ls -la `R RHOME`/etc
+  - cat `R RHOME`/etc/Makeconf
   - g++ --version
   - make install
   - make check
@@ -39,8 +41,6 @@ script:
 before_deploy:
   - ls -la
   - pwd
-  - ls -la `R RHOME`/etc
-  - cat `R RHOME`/etc/Makeconf
 
 after_failure:
   - cat ./JuniperKernel.Rcheck/00install.out
