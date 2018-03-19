@@ -14,6 +14,9 @@ Examples of behavior that contributes to creating a positive environment include
 * Focusing on what is best for the community
 * Showing empathy towards other community members
 
+
+* ABOVE ALL: Do not button push! You may be frustrated by code. You maybe frustrated by people. Do not give into this frustration! Please be respectful and curteous to your fellow developers, contributors, users, and everyone else in the community.
+
 Examples of unacceptable behavior by participants include:
 
 * The use of sexualized language or imagery and unwelcome sexual attention or advances
