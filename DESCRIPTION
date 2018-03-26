@@ -36,7 +36,6 @@ Collate: 'booter.R'
          'kernelspec.R'
          'RcppExports.R'
          'request.R'
-         'shutdown_request.R'
          'zzz.R'
 LinkingTo: Rcpp, gdtools, RInside
 Description: Provides a full implementation of the 'Jupyter' <http://jupyter.org/> messaging protocol in C++ by leveraging 'Rcpp' and 'Xeus' <https://github.com/QuantStack/xeus>.

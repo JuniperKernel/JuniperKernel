@@ -41,14 +41,14 @@
 #'
 #' @export
 inspect_request <- function(request_msg) {
-  code <- request_msg$content$code
+  code <- request_msg$code
   notFound <- list(msg_type="inspect_reply", content=list(status="ok", found=FALSE, metadata=list()))
 
   if( !nzchar(code) )
     return(notFound)
 
   code <- gsub("\n", ";", code)
-  start <- cursor <- request_msg$content$cursor_pos
+  start <- cursor <- request_msg$cursor_pos
 
   # The token we try to perform an inspect upon consists
   # of the characters from position P up to and including the current cursor

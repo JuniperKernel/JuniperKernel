@@ -43,23 +43,10 @@ using xeus::xhistory_arguments;
 class JadesInterpreter: public xinterpreter {
   public:
     JadesInterpreter():
-      _ctx(new zmq::context_t(1)),
-      _connected(0),
       _jk("package:JuniperKernel")
         {}
 
-    ~JadesInterpreter() {
-      if( _ctx )
-        delete _ctx;
-    }
-
-    void configure_impl(){}
-//      auto handle_comm_opened = [](xeus::xcomm&& comm, const xeus::xmessage&) {
-//          std::cout << "Comm opened for target: " << comm.target().name() << std::endl;
-//      };
-//      comm_manager().register_comm_target("jk_target", handle_comm_opened);
-//      using function_type = std::function<void(xeus::xcomm&&, const xeus::xmessage&)>;
-//    }
+    void configure_impl(){ register_interpreter(this); }
 
     xjson R_perform(const std::string& request_type, xjson& req) {
       Rcpp::Function handler = _jk[request_type];
@@ -127,9 +114,7 @@ class JadesInterpreter: public xinterpreter {
     }
 
   private:
-    zmq::context_t* const _ctx;
 //    RInside* const _rin;
-    std::atomic<int> _connected;
     const Rcpp::Environment _jk;
 };
 

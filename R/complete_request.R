@@ -40,9 +40,9 @@
 #'
 #' @export
 complete_request <- function(request_msg) {
-  code <- request_msg$content$code
+  code <- request_msg$code
   code <- gsub("\n", ";", code)
-  cursor <- request_msg$content$cursor_pos
+  cursor <- request_msg$cursor_pos
 
   cc <- getNamespace("utils")
   # see ?rcompgen Unexported API
