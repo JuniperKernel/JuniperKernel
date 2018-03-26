@@ -129,7 +129,7 @@ inspect_request <- function(request_msg) {
     }
   }
 
-  list(msg_type = "inspect_reply", content = list(status="ok", found=length(data)!=0L, data=data, metadata=list()))
+  list(status="ok", found=length(data)!=0L, data=data)
 }
 
 .reserved <- c( 'if' = `if`

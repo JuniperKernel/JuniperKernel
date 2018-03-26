@@ -26,10 +26,6 @@ Imports: utils,
          RInside
 Suggests: RUnit, roxygen2
 Collate: 'booter.R'
-         'comm_close.R'
-         'comm_info_request.R'
-         'comm_msg.R'
-         'comm_open.R'
          'complete_request.R'
          'execute_request.R'
          'history_request.R'

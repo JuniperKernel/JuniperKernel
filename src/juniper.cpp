@@ -52,50 +52,25 @@ SEXP createExternalPointer(T* p, finalizerT finalizer, const char* pname) {
   return ptr;
 }
 
-
-static void kernelFinalizer(SEXP jk) {
-  xeus::xkernel* jkernel = reinterpret_cast<xeus::xkernel*>(R_ExternalPtrAddr(jk));
-  if( jkernel ) {
-    delete jkernel;
-    R_ClearExternalPtr(jk);
-  }
-}
-
-static xeus::xkernel* get_kernel(SEXP kernel) {
-  return reinterpret_cast<xeus::xkernel*>(R_ExternalPtrAddr(kernel));
-}
-
 // [[Rcpp::export]]
-SEXP init_kernel(const std::string& connection_file) {
+void boot_kernel(const std::string& connection_file) {
   xeus::xconfiguration config = xeus::load_configuration(connection_file);
   using interpreter_ptr = std::unique_ptr<JadesInterpreter>;
   interpreter_ptr interpreter = interpreter_ptr(new JadesInterpreter());
-  xeus::xkernel* jk = new xeus::xkernel(config, "juniper_kernel", std::move(interpreter));
-
-  // even if boot_kernel is exceptional and we don't run delete jk
-  // this finalizer will be run on R's exit.
-  // if the poller's never get a signal, then deletion will be blocked on join
-  // until a forced shutdown comes in from a jupyter client
-  return createExternalPointer<xeus::xkernel>(jk, kernelFinalizer, "xeus::xkernel*");
+  xeus::xkernel jk(config, "juniper_kernel", std::move(interpreter));
+  jk.start();
 }
 
 // [[Rcpp::export]]
-void boot_kernel(SEXP kernel) {
-  xeus::xkernel* jk = get_kernel(kernel);
-  jk->start();
-  delete jk;
-}
-
-// [[Rcpp::export]]
-void jk_device(SEXP kernel, std::string bg, double width, double height, double pointsize, bool standalone, Rcpp::List aliases) {
-  makeDevice(get_kernel(kernel), bg, width, height, pointsize, standalone, aliases);
+void jk_device(std::string bg, double width, double height, double pointsize, bool standalone, Rcpp::List aliases) {
+  makeDevice(bg, width, height, pointsize, standalone, aliases);
 }
 
 // [[Rcpp::export]]
 void publish_execute_result(int execution_counter, Rcpp::List data) {
   xjson pub_data = from_list_r(data);
   Rcpp::Rcout << "PUBLISHING EXEC RESULT: " << pub_data << std::endl;
-  xeus::get_interpreter().publish_execution_result(execution_counter, std::move(pub_data), xjson());
+  xeus::get_interpreter().publish_execution_result(execution_counter, std::move(pub_data), xeus::xjson::object());
 }
 
 

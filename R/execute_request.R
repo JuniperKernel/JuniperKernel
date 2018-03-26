@@ -40,17 +40,14 @@
 #'
 #' @export
 execute_request <- function(request_msg) {
-  content <- request_msg$content
-  rebroadcast_input(.kernel(), content$code, cnt <- .getAndIncCnt())  # increase count no matter what
-  status <- .tryEval(content$code, cnt)
-  content <- list(status=status, execution_count=cnt)
+  status <- .tryEval(request_msg$code, request_msg$execution_count)
+  content <- list(status=status, execution_count=request_msg$execution_count)
 
   if( status=="ok" ) {
     content$payload = list()
     content$user_expressions=list()
   }
-
-  list(msg_type = "execute_reply", content = content)
+  content
 }
 
 .tryEval <- function(code, cnt) {
@@ -84,8 +81,7 @@ execute_request <- function(request_msg) {
 
 # build and send the content of an execute_result iopub message.
 .execute_result <- function(result, cnt) {
-  content <- list(data=.mimeBundle(result), execution_count=cnt, metadata=list("__ignored__"=""))
-  execute_result(.kernel(), content)
+  publish_execute_result(cnt, .mimeBundle(result))
 }
 
 

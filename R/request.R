@@ -66,20 +66,20 @@
 #'
 #' @export
 doRequest <- function(handler, request_msg) {
-  out <- socketConnection("localhost", port=request_msg$stream_out_port, blocking=TRUE, open='w')
-  err <- socketConnection("localhost", port=request_msg$stream_err_port, blocking=TRUE, open='w')
-  sink(out, type="output")
-  sink(err, type="message")
+  # out <- socketConnection("localhost", port=request_msg$stream_out_port, blocking=TRUE, open='w')
+  # err <- socketConnection("localhost", port=request_msg$stream_err_port, blocking=TRUE, open='w')
+  # sink(out, type="output")
+  # sink(err, type="message")
   aliases <- list(system=list(sans="Arial", serif="Times", mono="Courier", symbol="Symbol"), user=list())
-  jk_device(.kernel(), "white", 10, 5, 12, FALSE, aliases)
+  jk_device("white", 10, 5, 12, FALSE, aliases)
   dev <- grDevices::dev.cur()
   tryCatch(
       return(handler(request_msg))
     , finally={
-        sink(type="message");
-        sink(type="output" );
-        err_status <- close(err);
-        out_status <- close(out);
+        # sink(type="message");
+        # sink(type="output" );
+        # err_status <- close(err);
+        # out_status <- close(out);
 
         # TODO: write the statuses to a file; backend will read this file
         #       in case it couldn't detect a zero message disconnect

@@ -40,5 +40,5 @@
 #'
 #' @export
 shutdown_request <- function(request_msg) {
-  list( msg_type="shutdown_reply", content=list(restart=request_msg$content$restart))
+  list(restart=request_msg$content$restart)
 }

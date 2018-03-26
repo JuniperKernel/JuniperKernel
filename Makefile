@@ -29,7 +29,9 @@ build/JuniperKernel_$(PKG_VERSION).tar.gz: $(wildcard R/*R) $(wildcard src/*cpp)
 install: build/JuniperKernel_$(PKG_VERSION).tar.gz
 	@(cd build && R CMD INSTALL JuniperKernel_$(PKG_VERSION).tar.gz)
 
-xeus: $(wildcard src/xeus/**/*)
+xeus: src/xeus
+
+src/xeus:
 	@echo "Fetching xeus..."
 	@(cd src && git clone https://github.com/JuniperKernel/xeus.git)
 

@@ -45,7 +45,7 @@ class JadesInterpreter: public xinterpreter {
     JadesInterpreter():
       _ctx(new zmq::context_t(1)),
       _connected(0),
-      _jk("package:JadesKernel")
+      _jk("package:JuniperKernel")
         {}
 
     ~JadesInterpreter() {
@@ -54,12 +54,20 @@ class JadesInterpreter: public xinterpreter {
     }
 
     void configure_impl(){}
+//      auto handle_comm_opened = [](xeus::xcomm&& comm, const xeus::xmessage&) {
+//          std::cout << "Comm opened for target: " << comm.target().name() << std::endl;
+//      };
+//      comm_manager().register_comm_target("jk_target", handle_comm_opened);
+//      using function_type = std::function<void(xeus::xcomm&&, const xeus::xmessage&)>;
+//    }
 
     xjson R_perform(const std::string& request_type, xjson& req) {
       Rcpp::Function handler = _jk[request_type];
       Rcpp::Function do_request = _jk["doRequest"];
       Rcpp::List res = do_request(Rcpp::wrap(handler), from_json_r(req));
-      return from_list_r(res);
+      xjson p = from_list_r(res);
+      Rcpp::Rcout << "RES: " << p << std::endl;
+      return p;
     }
 
     xjson execute_request_impl(

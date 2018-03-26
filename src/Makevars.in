@@ -14,3 +14,6 @@ libxeus.so:
 	@echo "Creating libxeus.so"
 	$(MAKE) -C xeus libxeus.so
 	@cp xeus/libxeus.so .
+
+#run: run.cpp
+#	@test -x /usr/bin/strip && strip $^
