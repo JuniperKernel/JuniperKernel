@@ -27,7 +27,6 @@
 #include <xeus/xjson.hpp>
 #include <juniper/juniper.h>
 #include <juniper/utils.h>
-#include <xeus/xkernel.hpp>
 #include <juniper/gdevice.h>
 #include <Rcpp.h>
 
@@ -54,11 +53,7 @@ SEXP createExternalPointer(T* p, finalizerT finalizer, const char* pname) {
 
 // [[Rcpp::export]]
 void boot_kernel(const std::string& connection_file) {
-  xeus::xconfiguration config = xeus::load_configuration(connection_file);
-  using interpreter_ptr = std::unique_ptr<JadesInterpreter>;
-  interpreter_ptr interpreter = interpreter_ptr(new JadesInterpreter());
-  xeus::xkernel jk(config, "juniper_kernel", std::move(interpreter));
-  jk.start();
+  Rcpp::Rcout << "UNIMPL" << std::endl;
 }
 
 // [[Rcpp::export]]
@@ -67,9 +62,8 @@ void jk_device(std::string bg, double width, double height, double pointsize, bo
 }
 
 // [[Rcpp::export]]
-void publish_execute_result(int execution_counter, Rcpp::List data) {
-  xjson pub_data = from_list_r(data);
-  Rcpp::Rcout << "PUBLISHING EXEC RESULT: " << pub_data << std::endl;
+void publish_execute_result(int execution_counter, std::string data) {
+  xjson pub_data = xjson::parse(data);
   xeus::get_interpreter().publish_execution_result(execution_counter, std::move(pub_data), xeus::xjson::object());
 }
 

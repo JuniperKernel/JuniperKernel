@@ -52,10 +52,10 @@ complete_request <- function(request_msg) {
   cc$.completeToken()
 
   completions <- cc$.CompletionEnv$comps
-  if( length(completions) > 0L ) completions <- c(completions, "__juniper_vec_ignore_hack__")  # hack to get single item vecs to parse as vecs and not scalars
   guess <- cc$.guessTokenFromLine(update = FALSE)
   matches <- unique(completions)
   if( length(matches) > 0L ) matches <- matches[1L:min(50L, length(matches))]
+  if( length(matches)==1L  ) matches <- list(matches)
   content <- list(status="ok", matches=matches, cursor_start=guess$start, cursor_end=guess$start + nchar(guess$token))
-  content
+  jsonlite::toJSON(content, auto_unbox=TRUE)
 }

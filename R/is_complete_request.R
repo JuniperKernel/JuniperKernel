@@ -56,5 +56,5 @@ is_complete_request <- function(request_msg) {
   )
   content <- list(status=status)
   if( status=='incomplete') content <- list(status=status, indent='')
-  content
+  jsonlite::toJSON(content, auto_unbox=TRUE)
 }

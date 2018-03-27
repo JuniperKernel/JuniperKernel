@@ -42,18 +42,47 @@ using xeus::xhistory_arguments;
 
 class JadesInterpreter: public xinterpreter {
   public:
-    JadesInterpreter():
-      _jk("package:JuniperKernel")
-        {}
+    JadesInterpreter(RInside* rin):
+      _rin(rin),
+      _ctx(new zmq::context_t(1)),
+      _connected(0) {
+        _sout_sock = listen_on(*_ctx, "tcp://*:*", zmq::socket_type::stream);
+        _serr_sock = listen_on(*_ctx, "tcp://*:*", zmq::socket_type::stream);
+        _sout_port = read_port(_sout_sock);
+        _serr_port = read_port(_serr_sock);
+        _sout_thread = stream_thread(_sout_sock, true, _connected, _ctx);
+        _serr_thread = stream_thread(_serr_sock, false, _connected,_ctx);
+      }
+
+    ~JadesInterpreter() {
+      if( _ctx ) delete _ctx;
+      _sout_thread.join();
+      _serr_thread.join();
+    }
 
     void configure_impl(){ register_interpreter(this); }
 
     xjson R_perform(const std::string& request_type, xjson& req) {
-      Rcpp::Function handler = _jk[request_type];
-      Rcpp::Function do_request = _jk["doRequest"];
-      Rcpp::List res = do_request(Rcpp::wrap(handler), from_json_r(req));
-      xjson p = from_list_r(res);
-      Rcpp::Rcout << "RES: " << p << std::endl;
+      req["stream_out_port"] = _sout_port;
+      req["stream_err_port"] = _serr_port;
+      SEXP ans;
+      Rcpp::List req_msg = from_json_r(req);
+      (*_rin)["__jk_req_msg__"] = req_msg;
+      (*_rin)["__jk_req_type__"] = request_type;
+      _rin->parseEval("JuniperKernel::doRequest()", ans);
+      std::string res = Rcpp::as<std::string>(ans);
+      xjson p = xjson::parse(res);
+
+      int ntries=0;
+      int breakcnt=0;
+      int MAXBREAKS=5;
+      while( _connected.load() ) {
+        if( ntries++ % 10000000 == 0 ) breakcnt++;
+        if( breakcnt > MAXBREAKS ) {
+          Rcpp::Rcout << "WARNING: R socketConnection disconnects not detected." << std::endl;
+          _connected = 0;
+        }
+      }
       return p;
     }
 
@@ -64,7 +93,6 @@ class JadesInterpreter: public xinterpreter {
       bool store_history,
       const xjson_node* /* user_expressions */,
       bool allow_stdin) {
-        Rcpp::Rcout << "EXECUTING CODE: " << code << std::endl;
         xjson req;
         req["code"] = code;
         req["execution_counter"] = execution_counter;
@@ -93,7 +121,6 @@ class JadesInterpreter: public xinterpreter {
 
     xjson history_request_impl(const xhistory_arguments& args) {
       xjson req;
-      Rcpp::Rcout << "history request is unimpl." << std::endl;
       return R_perform("history_request", req);
     }
 
@@ -109,13 +136,63 @@ class JadesInterpreter: public xinterpreter {
     }
 
     void input_reply_impl(const std::string& value) {
-      Rcpp::Rcout << "Received input_reply" << std::endl;
-      Rcpp::Rcout << "value: " << value << std::endl;
     }
 
   private:
-//    RInside* const _rin;
-    const Rcpp::Environment _jk;
+    RInside* const _rin;
+    zmq::context_t* const _ctx;
+
+    zmq::socket_t* _sout_sock;
+    zmq::socket_t* _serr_sock;
+    int _sout_port;
+    int _serr_port;
+    std::thread _sout_thread;
+    std::thread _serr_thread;
+    mutable std::atomic<int> _connected;
+
+
+    std::thread stream_thread(
+      zmq::socket_t* sock,
+      const bool out,
+      std::atomic<int>& connected,
+      zmq::context_t* ctx
+    ) const {
+      std::thread out_thread([sock, out, &connected, ctx]() {  // full fence membar
+        short conn=false;
+        std::function<bool()> handlers[] = {
+          [sock, out, &connected, &conn, ctx]() {
+            zmq::multipart_t msg;
+            msg.recv(*sock);
+
+            // connect/disconnect logic
+            // in either case it's a two-frame multipart message:
+            //   frame 1: identity
+            //   frame 2: empty
+            // the first time getting these two frames means we're
+            // getting connected to by a socket having identity found in
+            // frame1. the second time means the socket having that
+            // identity disconnected. Our expectation is that we shall
+            // only ever have a single connection; and when it dies, we also
+            // die (AKA signal death to the poller by returning false).
+            if( msg[1].size()==0 ) {
+              if( !conn++ )
+                connected.fetch_add(1);
+                else {
+                  conn=false;
+                  connected.fetch_sub(1);
+                }
+              return true;
+            }
+            // read the message and publish to stdout
+            xeus::get_interpreter().publish_stream(out?"stdout":"stderr", msg_t_to_string(msg[1]));
+            return true;
+          }
+        };
+        zmq::socket_t* socket[1] = {sock};
+        poll(*ctx, socket, handlers, 1);
+      });
+      return out_thread;
+    }
 };
 
 #endif // ifndef juniper_juniper_juniper_H

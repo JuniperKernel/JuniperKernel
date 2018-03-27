@@ -129,7 +129,7 @@ inspect_request <- function(request_msg) {
     }
   }
 
-  list(status="ok", found=length(data)!=0L, data=data)
+  jsonlite::toJSON(list(status="ok", found=length(data)!=0L, data=data), auto_unbox=TRUE)
 }
 
 .reserved <- c( 'if' = `if`

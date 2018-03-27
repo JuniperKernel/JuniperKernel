@@ -38,5 +38,5 @@ NULL
   # loop over the available mimetypes using repr package
   data <- lapply(repr::mime2repr, function(mimeFun) mimeFun(Robj))
   # keep non-NULL results (NULL when no such mime repr exists)
-  Filter(Negate(is.null), data)
+  jsonlite::toJSON(Filter(Negate(is.null), data), auto_unbox=TRUE)
 }

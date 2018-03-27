@@ -4,16 +4,18 @@ CXX_STD      = CXX11
 # set include and linker options
 PKG_CPPFLAGS = -I../inst/include/ -I. -I./xeus/include @ZMQ_CPPFLAGS@ -I./include
 PKG_LIBS     = @ZMQ_LDFLAGS@
-all: libxeus.so set_pkg_libs $(SHLIB)
+export
+
+all: libxeus.so set_pkg_libs run $(SHLIB)
 
 set_pkg_libs:
 	$(eval PKG_LIBS := @ZMQ_LDFLAGS@ -L. -lxeus)
 
-export
 libxeus.so:
 	@echo "Creating libxeus.so"
 	$(MAKE) -C xeus libxeus.so
 	@cp xeus/libxeus.so .
 
-#run: run.cpp
-#	@test -x /usr/bin/strip && strip $^
+run:
+	$(MAKE) -C jk_main
+	@cp jk_main/run .

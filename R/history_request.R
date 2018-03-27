@@ -34,5 +34,5 @@
 #' @export
 history_request <- function(request_msg) {
   message("unimpl")
-  list()
+  ""
 }

@@ -47,7 +47,7 @@ execute_request <- function(request_msg) {
     content$payload = list()
     content$user_expressions=list()
   }
-  content
+  jsonlite::toJSON(content, auto_unbox=TRUE)
 }
 
 .tryEval <- function(code, cnt) {

@@ -53,5 +53,5 @@ kernel_info_request <- function(request_msg) {
   , language_info = linfo
   , banner = version$version.string
   )
-  content
+  jsonlite::toJSON(content, auto_unbox=TRUE)
 }

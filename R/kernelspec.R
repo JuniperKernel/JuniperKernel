@@ -24,8 +24,8 @@
 # INSTALL HELPERS
 
 .argv <- function() {
-  exec <- file.path(R.home('bin'), 'R')
-  c(exec, '--slave', '-e', 'JuniperKernel::bootKernel()', '--args', '{connection_file}')
+  exec <- .mainRunner()
+  c(exec, '-f', '{connection_file}')
 }
 
 .stopIfJupyterMissing <- function() {
@@ -33,6 +33,16 @@
   if( rc ) {
     stop("jupyter not found; ensure jupyter is installed.")
   }
+}
+
+.mainRunner <- function() {
+  libs.path <- {
+    if (nzchar(.Platform$r_arch))
+      system.file("libs", .Platform$r_arch, package = "JuniperKernel")
+    else
+      system.file("libs", package = "JuniperKernel")
+  }
+  file.path(libs.path, 'run')
 }
 
 .writeSpec <- function(displayName) {
