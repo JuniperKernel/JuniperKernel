@@ -9,10 +9,7 @@ LDLIBS = $(ALL_LIBS) $(RINSIDE) -L.. -lxeus
 SRC = run.cpp
 PRG = $(SRC:.cpp=)
 
-
 all: $(PRG)
-	@strip $^
-
 
 clean:
 	rm -vf $(PRG)
