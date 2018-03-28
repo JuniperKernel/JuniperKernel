@@ -22,4 +22,4 @@ libxeus.dll:
 
 run:
 	$(MAKE) -C jk_main -f Makefile.win
-	@cp jk_main\run.exe .
+	@cp jk_main/run.exe .
