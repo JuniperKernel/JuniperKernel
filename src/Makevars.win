@@ -15,9 +15,6 @@ export
 
 all: libxeus.dll run $(SHLIB)
 
-set_pkg_libs:
-	$(eval PKG_lIBS:=$${ZMQ_LDFLAGS} -L. -lxeus)
-
 libxeus.dll:
 	@echo "Creating libxeus.dll"
 	$(MAKE) -C xeus -f Makefile.win libxeus.dll
