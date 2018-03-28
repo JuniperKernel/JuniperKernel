@@ -11,7 +11,7 @@ PRG = $(SRC:.cpp=)
 
 
 all: $(PRG)
-	@test -x /usr/bin/strip && strip $^
+	@strip $^
 
 
 clean:
