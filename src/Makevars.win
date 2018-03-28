@@ -20,8 +20,8 @@ set_pkg_libs:
 
 libxeus.dll:
 	@echo "Creating libxeus.dll"
-	$(MAKE) -C xeus/Makefile.win libxeus.dll
+	$(MAKE) -C xeus -f Makefile.win libxeus.dll
 	@cp xeus/libxeus.dll .
 
 run:
-	$(MAKE) -C jk_main/Makefile.win
+	$(MAKE) -C jk_main -f Makefile.win
