@@ -13,15 +13,15 @@ PKG_CPPFLAGS = -DXEUS_EXPORTS  -I../inst/include -I. ${ZMQ_CPPFLAGS} -I./xeus/in
 PKG_LIBS = ${ZMQ_LDFLAGS}
 export
 
-all: libxeus.dll set_pkg_libs run$(SHLIB)
+all: libxeus.dll set_pkg_libs run $(SHLIB)
 
 set_pkg_libs:
 	$(eval PKG_lIBS:=$${ZMQ_LDFLAGS} -L. -lxeus)
 
 libxeus.dll:
 	@echo "Creating libxeus.dll"
-	$(MAKE) -C xeus libxeus.dll
+	$(MAKE) -C xeus/Makefile.win libxeus.dll
 	@cp xeus/libxeus.dll .
 
 run:
-	$(MAKE) -C jk_main
+	$(MAKE) -C jk_main/Makefile.win
