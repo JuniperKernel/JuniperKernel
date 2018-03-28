@@ -1,5 +1,4 @@
-
-R_SCM = ${R_HOME}/bin${R_ARCH_BIN}/Rscript -e
+R_SCMD = ${R_HOME}/bin${R_ARCH_BIN}/Rscript -e
 
 RINSIDE = $(shell ${R_SCMD} "RInside:::LdFlags()")
 
