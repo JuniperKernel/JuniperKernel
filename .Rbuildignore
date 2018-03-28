@@ -26,3 +26,9 @@ LICENSE$
 LICENSE
 ^LICENSE$
 ^LICENSE
+docs
+example
+CMakeLists.txt
+readthedocs\.yml$
+xeusConfig\.cmake\.in$
+\.ipynb_checkpoints

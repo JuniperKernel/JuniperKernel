@@ -1,14 +1,14 @@
-CPPFLAGS := $(ALL_CPPFLAGS) -I../xeus/include -I../../inst/include/
-CXXFLAGS := $(ALL_CPPFLAGS) -I../xeus/include -I../../inst/include/
-LDLIBS := $(ALL_LIBS) @RINSIDE@ -L.. -lxeus
-sources :=    $(wildcard *.cpp)
-programs :=     $(sources:.cpp=)
+CPPFLAGS = $(ALL_CPPFLAGS) -I../xeus/include -I../../inst/include/
+CXXFLAGS = $(ALL_CPPFLAGS) -I../xeus/include -I../../inst/include/
+LDLIBS = $(ALL_LIBS) @RINSIDE@ -L.. -lxeus
+SRC = run.cpp
+PRG = $(SRC:.cpp=)
 
 
-all: $(programs)
+all: $(PRG)
 	@test -x /usr/bin/strip && strip $^
 
 
 clean:
-	rm -vf $(programs)
+	rm -vf $(PRG)
 	rm -vrf *.dSYM

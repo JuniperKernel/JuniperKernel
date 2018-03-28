@@ -14,6 +14,9 @@ ZMQ_LDFLAGS=`${RSCRIPT} -e "pbdZMQ::get.zmq.ldflags()"`
 
 RINSIDE=`${RSCRIPT} -e "RInside:::LdFlags()"`
 
+XEUS_CPP_FILES=`${RSCRIPT} -e "cat(file.path('src', list.files('src/xeus/src', pattern='*cpp$')))"`
+XEUS_OBJ_FILES=`${RSCRIPT} -e "cat(gsub('cpp', 'o', file.path('src', list.files('src/xeus/src', pattern='*cpp$'))))"`
+
 echo " "
 echo "************** Results of JuniperKernel package configure **************"
 echo " "
@@ -28,4 +31,5 @@ echo " "
 
 sed -e "s|@ZMQ_CPPFLAGS@|${ZMQ_CPPFLAGS}|" -e "s|@ZMQ_LDFLAGS@|${ZMQ_LDFLAGS}|" src/Makevars.in > src/Makevars
 sed -e "s|@RINSIDE@|${RINSIDE}|" src/jk_main/Makefile.in > src/jk_main/Makefile
+sed -e "s|@XEUS_CPP_FILES@|${XEUS_CPP_FILES}|" -e "s|@XEUS_OBJ_FILES@|${XEUS_OBJ_FILES}|" src/xeus/Makefile.in > src/xeus/Makefile
 exit 0
