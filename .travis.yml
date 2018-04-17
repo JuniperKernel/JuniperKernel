@@ -34,7 +34,7 @@ script:
   - g++ --version
   - make install
   - make check
-  - make test
+#  - make test
   - ls -la
   - pwd
 

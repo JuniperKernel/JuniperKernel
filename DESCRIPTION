@@ -1,7 +1,7 @@
 Package: JuniperKernel
 Title: Kernel for 'Jupyter'
-Version: 1.2.3.0
-Date: 2018-01-15
+Version: 3.0.0.1
+Date: 2018-03-28
 Authors@R: c(
   person("Spencer Aiello",   role=c("aut", "cre", "cph"), email="spnrpa@gmail.com"),
   person("Wei-Chen Chen",    role="ctb"),
@@ -25,10 +25,6 @@ Imports: utils,
          methods
 Suggests: RUnit, roxygen2
 Collate: 'booter.R'
-         'comm_close.R'
-         'comm_info_request.R'
-         'comm_msg.R'
-         'comm_open.R'
          'complete_request.R'
          'execute_request.R'
          'history_request.R'
@@ -39,7 +35,6 @@ Collate: 'booter.R'
          'kernelspec.R'
          'RcppExports.R'
          'request.R'
-         'shutdown_request.R'
          'zzz.R'
 LinkingTo: Rcpp, gdtools
 Description: Provides a full implementation of the 'Jupyter' <http://jupyter.org/> messaging protocol in C++ by leveraging 'Rcpp' and 'Xeus' <https://github.com/QuantStack/xeus>.

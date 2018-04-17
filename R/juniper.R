@@ -27,14 +27,8 @@ NULL
 
 # global package environment
 .JUNIPER <- new.env(parent=emptyenv())
-.JUNIPER$execution_count <- 1L
 
 .kernel <- function() .JUNIPER$kernel
-.getAndIncCnt <- function() {
-  cnt <- .JUNIPER$execution_count
-  .JUNIPER$execution_count <- cnt + 1L
-  cnt
-}
 
 .mimeBundle <- function(Robj) {
   # from the docs (http://jupyter-client.readthedocs.io/en/latest/messaging.html#display-data):
@@ -44,5 +38,5 @@ NULL
   # loop over the available mimetypes using repr package
   data <- lapply(repr::mime2repr, function(mimeFun) mimeFun(Robj))
   # keep non-NULL results (NULL when no such mime repr exists)
-  Filter(Negate(is.null), data)
+  jsonlite::toJSON(Filter(Negate(is.null), data), auto_unbox=TRUE)
 }

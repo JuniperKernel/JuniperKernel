@@ -9,7 +9,13 @@ ZMQ_CPPFLAGS = $(shell ${R_SCMD} "pbdZMQ::get.zmq.cppflags(arch='/"${FLV}"')")
 ZMQ_LDFLAGS = $(shell ${R_SCMD} "pbdZMQ::get.zmq.ldflags(arch='/"${FLV}"')")
 
 CXX_STD = CXX11
-PKG_CPPFLAGS = -I../inst/include -I. ${ZMQ_CPPFLAGS}
-PKG_LIBS = ${ZMQ_LDFLAGS}
+PKG_CPPFLAGS = -DXEUS_EXPORTS  -I../inst/include -I. ${ZMQ_CPPFLAGS} -I./xeus/include -I./include
+PKG_LIBS = ${ZMQ_LDFLAGS} -L. -lxeus
+export
 
-all: $(SHLIB)
+all: libxeus.dll $(SHLIB)
+
+libxeus.dll:
+	@echo "Creating libxeus.dll"
+	$(MAKE) -C xeus -f Makefile.win libxeus.dll
+	@cp xeus/libxeus.dll .

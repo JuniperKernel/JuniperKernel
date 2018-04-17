@@ -39,19 +39,20 @@
 #'
 #' @export
 kernel_info_request <- function(request_msg) {
-  linfo <- list ( name = "R"
+  linfo <- list(
+    name = "R"
   , codemirror_mode = "r"
   , pygments_lexer = "r"
   , mimetype = "text/x-r-source"
   , file_extension = ".R"
   , version = paste(version$major, version$minor, sep=".")
   )
-  content <- list( protocol_version = "5.2"
+  content <- list(
+    protocol_version = "5.3"
   , implementation   = "JuniperKernel"
   , implementation_version = as.character(utils::packageVersion("JuniperKernel"))
   , language_info = linfo
   , banner = version$version.string
   )
-
-  list(msg_type = "kernel_info_reply", content = content)
+  jsonlite::toJSON(content, auto_unbox=TRUE)
 }

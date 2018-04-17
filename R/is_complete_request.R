@@ -45,7 +45,7 @@
 #'
 #' @export
 is_complete_request <- function(request_msg) {
-  code <- request_msg$content$code
+  code <- request_msg$code
   status <- tryCatch(
     {parse(text=code);'complete'},
     error=function(e) {
@@ -56,5 +56,5 @@ is_complete_request <- function(request_msg) {
   )
   content <- list(status=status)
   if( status=='incomplete') content <- list(status=status, indent='')
-  list(msg_type = "is_complete_reply", content=content)
+  jsonlite::toJSON(content, auto_unbox=TRUE)
 }

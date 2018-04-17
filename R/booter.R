@@ -69,5 +69,5 @@ bootKernel <- function() {
   if( !file.exists(userConnFile) )
     stop("Connection file does not exist: ", userConnFile)
 
-  boot_kernel(.JUNIPER$kernel <- init_kernel(userConnFile))
+  boot_kernel(userConnFile)
 }

@@ -1,6 +1,6 @@
 ### Modified from Rserve/src/install.libs.R
 ### For libs
-files <- c("JuniperKernel.so", "JuniperKernel.so.dSYM", "JuniperKernel.dylib",
+files <- c("libxeus.so", "libxeus.dll", "run", "run.exe", "JuniperKernel.so", "JuniperKernel.so.dSYM", "JuniperKernel.dylib",
            "JuniperKernel.dll", "symbols.rds")
 files <- files[file.exists(files)]
 if(length(files) > 0){
@@ -23,6 +23,20 @@ if(length(files) > 0){
       cat("\nBefore install_name_tool (in install.libs.R):\n")
       print(rpath)
     }
+
+    lxeus.path <- file.path(dest, "libxeus.so")
+    cmd.lxeus <- paste(cmd.int, " -change ", " libxeus.so ", lxeus.path, fn.JK.so)
+    print(cmd.lxeus)
+    print(system(cmd.lxeus))
+    rpath <- system(paste(cmd.ot, " -L ", fn.JK.so, sep = ""), intern = TRUE)
+    cat("\nAfter install_name_tool (in install.libs.R):\n")
+    print(rpath)
+
+    cat("\nFix up run")
+    run.so <- file.path(dest, "run")
+
+    cmd.lxeus <- paste(cmd.int, " -change ", " libxeus.so ", lxeus.path, run.so)
+    print(cmd.lxeus)
+    print(system(cmd.lxeus))
   }
 }
-

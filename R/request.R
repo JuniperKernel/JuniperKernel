@@ -18,19 +18,6 @@
 #' Top-level Request Driver for R
 #'
 #' @title Handle Jupyter Requests
-#' @param handler
-#'   An R method that handles the message type of
-#'   \code{request_msg}. This function is passed in
-#'   by the \code{RequestServer}, which handles all of
-#'   generic message handling such as validation and
-#'   routing. This handler is one of c('kernel_info_request',
-#'   'execute_request', 'inspect_request', 'complete_request',
-#'   'history_request', 'is_complete_request', 'comm_info_request',
-#'   'comm_open', 'comm_close', 'comm_msg', 'shutdown_request').
-#'
-#' @param request_msg
-#'   A list passed in from \code{RequestServer} representing the
-#'   deserialized message JSON.
 #'
 #' @return A list having names \code{msg_type} and \code{content}. The
 #'   \code{msg_type} is the reply type corresponding to the
@@ -59,9 +46,7 @@
 #'
 #' @examples
 #' \dontrun{
-#'   handler <- execute_request
-#'   request_msg <- list(stream_out_port=54321, stream_err_port=54322, list(code="rnorm(1000)"))
-#'   doRequest(handler, request_msg)
+#'   doRequest()
 #' }
 #'
 #' @export
@@ -71,10 +56,16 @@ doRequest <- function(handler, request_msg) {
   sink(out, type="output")
   sink(err, type="message")
   aliases <- list(system=list(sans="Arial", serif="Times", mono="Courier", symbol="Symbol"), user=list())
-  jk_device(.kernel(), "white", 10, 5, 12, FALSE, aliases)
+  jk_device("white", 10, 5, 12, FALSE, aliases)
   dev <- grDevices::dev.cur()
   tryCatch(
+    {
+      handler <- get(handler, envir=as.environment('package:JuniperKernel'))
       return(handler(request_msg))
+    }
+    , error=function(e) { message(e, "\n") }
+    , warning=function(w) { message(e$message, "\n") }
+    , interrupt=function(.) { message("aborting...\n") }
     , finally={
         sink(type="message");
         sink(type="output" );

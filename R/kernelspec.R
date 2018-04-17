@@ -43,6 +43,7 @@
   spec <- list( argv = .argv()
               , display_name = displayName
               , language = 'R'
+              , interrupt_mode = 'message'
               )
   fc <- file(specPath)
   writeLines(jsonlite::toJSON(spec, pretty=TRUE, auto_unbox=TRUE), specPath)
