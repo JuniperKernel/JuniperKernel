@@ -52,6 +52,7 @@
 #' @export
 bootKernel <- function() {
   require(JuniperKernel)  # attach the package to the search path so we can call methods from Rcpp
+  require(pbdZMQ)
   argv <- commandArgs(trailingOnly=TRUE)
 
   if( length(argv)==0L )
@@ -69,5 +70,23 @@ bootKernel <- function() {
   if( !file.exists(userConnFile) )
     stop("Connection file does not exist: ", userConnFile)
 
-  boot_kernel(.JUNIPER$kernel <- init_kernel(userConnFile))
+  cfg <- boot_kernel(.JUNIPER$kernel <- init_kernel(userConnFile))
+  .mainLoop(cfg)
+}
+
+.setHandover <- function(s) {
+  pbdZMQ::zmq.setsockopt(s, .pbd_env$ZMQ.SO$ROUTER_HANDOVER, 1L)
+  s
+}
+
+.mainLoop <- function(cfg) {
+  ctx <- pbdZMQ::zmq.ctx.new()
+  ctl <- .setHandover(pbdZMQ::zmq.socket(ctx, .pbd_env$ZMQ.ST$ROUTER))
+  sin <- .setHandover(pbdZMQ::zmq.socket(ctx, .pbd_env$ZMQ.ST$ROUTER))
+  shl <- .setHandover(pbdZMQ::zmq.socket(ctx, .pbd_env$ZMQ.ST$ROUTER))
+
+
+  while( TRUE ) {
+
+  }
 }

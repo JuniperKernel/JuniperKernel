@@ -53,6 +53,7 @@ private:
 };
 
 extern xmock* _xm;
+extern SEXP R_xm;
 // setup the mocked xeus interpreter
 inline xinterpreter& xeus::get_interpreter() { return *_xm; }
 xmock& get_xmock() { return static_cast<xmock&>(get_interpreter()); }
