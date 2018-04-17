@@ -33,7 +33,9 @@
 #include <xeus/xinterpreter.hpp>
 #include <juniper/utils.h>
 #include <juniper/sockets.h>
-#include <RInside.h>
+#include <Rinterface.h>
+#include <Rinternals.h>
+#include <Rembedded.h>
 
 using xeus::xinterpreter;
 using xeus::xjson;
@@ -42,8 +44,8 @@ using xeus::xhistory_arguments;
 
 class JadesInterpreter: public xinterpreter {
   public:
-    JadesInterpreter(RInside* rin):
-      _rin(rin),
+    JadesInterpreter():
+      _jk("package:JuniperKernel"),
       _ctx(new zmq::context_t(1)),
       _connected(0) {
         _sout_sock = listen_on(*_ctx, "tcp://*:*", zmq::socket_type::stream);
@@ -65,12 +67,8 @@ class JadesInterpreter: public xinterpreter {
     xjson R_perform(const std::string& request_type, xjson& req) {
       req["stream_out_port"] = _sout_port;
       req["stream_err_port"] = _serr_port;
-      SEXP ans;
-      Rcpp::List req_msg = from_json_r(req);
-      (*_rin)["__jk_req_msg__"] = req_msg;
-      (*_rin)["__jk_req_type__"] = request_type;
-      _rin->parseEval("JuniperKernel::doRequest()", ans);
-      std::string res = Rcpp::as<std::string>(ans);
+      Rcpp::Function do_request = _jk["doRequest"];
+      std::string res = Rcpp::as<std::string>(do_request(request_type, from_json_r(req)));
       xjson p = xjson::parse(res);
 
       int ntries=0;
@@ -135,11 +133,25 @@ class JadesInterpreter: public xinterpreter {
       return R_perform("kernel_info_request", req);
     }
 
+    void interrupt_request_impl() {
+      #ifdef _WIN32
+      UserBreak = 1;
+      #else
+      try {
+        /* pass */
+      } catch( const std::exception& x ) {
+        std::cout << x.what() << std::endl;
+      } catch( ... ) {
+        std::cout << "unknown exception";
+      }
+      #endif
+    }
+
     void input_reply_impl(const std::string& value) {
     }
 
   private:
-    RInside* const _rin;
+    const Rcpp::Environment _jk;
     zmq::context_t* const _ctx;
 
     zmq::socket_t* _sout_sock;

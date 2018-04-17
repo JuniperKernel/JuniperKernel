@@ -48,7 +48,8 @@ kernel_info_request <- function(request_msg) {
   , version = paste(version$major, version$minor, sep=".")
   )
   content <- list(
-    implementation   = "JuniperKernel"
+    protocol_version = "5.3"
+  , implementation   = "JuniperKernel"
   , implementation_version = as.character(utils::packageVersion("JuniperKernel"))
   , language_info = linfo
   , banner = version$version.string

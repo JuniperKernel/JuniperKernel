@@ -6,7 +6,7 @@ PKG_CPPFLAGS = -I../inst/include/ -I. -I./xeus/include @ZMQ_CPPFLAGS@ -I./includ
 PKG_LIBS     = @ZMQ_LDFLAGS@
 export
 
-all: libxeus.so set_pkg_libs run $(SHLIB)
+all: libxeus.so set_pkg_libs $(SHLIB)
 
 set_pkg_libs:
 	$(eval PKG_LIBS := @ZMQ_LDFLAGS@ -L. -lxeus)
@@ -15,7 +15,3 @@ libxeus.so:
 	@echo "Creating libxeus.so"
 	$(MAKE) -C xeus libxeus.so
 	@cp xeus/libxeus.so .
-
-run:
-	$(MAKE) -C jk_main
-	@cp jk_main/run .

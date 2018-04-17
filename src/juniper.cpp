@@ -25,35 +25,20 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <xeus/xjson.hpp>
+#include <xeus/xkernel.hpp>
 #include <juniper/juniper.h>
 #include <juniper/utils.h>
 #include <juniper/gdevice.h>
 #include <Rcpp.h>
 
 
-//static void testClientFinalizer(SEXP jtc) {
-//  JupyterTestClient* jclient = reinterpret_cast<JupyterTestClient*>(R_ExternalPtrAddr(jtc));
-//  if( jclient ) {
-//    Rcpp::Rcout << "deleting test client" << std::endl;
-//    delete jclient;
-//    Rcpp::Rcout << "attempting to clear the external pointer" << std::endl;
-//    R_ClearExternalPtr(jtc);
-//    Rcpp::Rcout << "external pointer for test client cleared" << std::endl;
-//  }
-//}
-
-typedef void(*finalizerT)(SEXP);
-template<typename T>
-SEXP createExternalPointer(T* p, finalizerT finalizer, const char* pname) {
-  SEXP ptr;
-  ptr = Rcpp::Shield<SEXP>(R_MakeExternalPtr(reinterpret_cast<void*>(p),Rf_install(pname),R_NilValue));
-  R_RegisterCFinalizerEx(ptr, finalizer, TRUE);
-  return ptr;
-}
-
 // [[Rcpp::export]]
 void boot_kernel(const std::string& connection_file) {
-  Rcpp::Rcout << "UNIMPL" << std::endl;
+  xeus::xconfiguration config = xeus::load_configuration(connection_file);
+  using interpreter_ptr = std::unique_ptr<JadesInterpreter>;
+  interpreter_ptr interpreter = interpreter_ptr(new JadesInterpreter());
+  xeus::xkernel jk(config, "juniper_kernel", std::move(interpreter));
+  jk.start();
 }
 
 // [[Rcpp::export]]

@@ -50,9 +50,7 @@
 #' }
 #'
 #' @export
-doRequest <- function() {
-  handler <- get("__jk_req_type__")
-  request_msg <- get("__jk_req_msg__")
+doRequest <- function(handler, request_msg) {
   out <- socketConnection("localhost", port=request_msg$stream_out_port, blocking=TRUE, open='w')
   err <- socketConnection("localhost", port=request_msg$stream_err_port, blocking=TRUE, open='w')
   sink(out, type="output")
@@ -65,6 +63,9 @@ doRequest <- function() {
       handler <- get(handler, envir=as.environment('package:JuniperKernel'))
       return(handler(request_msg))
     }
+    , error=function(e) { message(e, "\n") }
+    , warning=function(w) { message(e$message, "\n") }
+    , interrupt=function(.) { message("aborting...\n") }
     , finally={
         sink(type="message");
         sink(type="output" );
