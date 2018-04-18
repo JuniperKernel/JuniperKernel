@@ -62,8 +62,6 @@ static void xmockFinalizer(SEXP xm) {
   }
 }
 
-static void zmqCtxFinalizer(SEXP ctx) {/*noop*/}
-
 static JuniperKernel* get_kernel(SEXP kernel) {
   return reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(kernel));
 }
@@ -72,7 +70,6 @@ xmock* _xm;
 SEXP R_xm;
 // [[Rcpp::export]]
 SEXP init_kernel(const std::string& connection_file) {
-  zmq::
   JuniperKernel* jk = JuniperKernel::make(connection_file);
 
   _xm = new xmock();
@@ -89,9 +86,7 @@ SEXP init_kernel(const std::string& connection_file) {
 // [[Rcpp::export]]
 SEXP boot_kernel(SEXP kernel) {
   JuniperKernel* jk = get_kernel(kernel);
-  void* zmq_ctx = jk->start_bg_threads();
-  return createExternalPointer<void>(zmq_ctx, zmqCtxFinalizer, "void*");
-//  jk->run();
+  return jk->start_bg_threads();
 }
 
 //' The XMock
@@ -107,6 +102,18 @@ SEXP the_xmock() {
   if( _xm )
     return R_xm;
   Rcpp::stop("no xmock available.");
+}
+
+// [[Rcpp::export]]
+SEXP sock_handler(SEXP kernel, std::string sockName) {
+  JuniperKernel* jk = get_kernel(kernel);
+  return jk->recv(sockName);
+}
+
+// [[Rcpp::export]]
+void post_handle(SEXP kernel, Rcpp::List res, std::string sockName) {
+  JuniperKernel* jk = get_kernel(kernel);
+  jk->post_handle(res, sockName);
 }
 
 // [[Rcpp::export]]

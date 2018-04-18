@@ -79,9 +79,29 @@ class RequestServer {
     //  4. a zmq::multipart_t is returned containing the 'content' and 'msg_type' fields
     //  5. send the multipart_t over the socket
     //  6. 'idle' is published over iopub
-    void serve(zmq::multipart_t& request, zmq::socket_t& sock) const {
+    SEXP serve(zmq::multipart_t& request, zmq::socket_t& sock) const {
       _cur_msg = JMessage::read(request, _key);  // read and validate
-      busy().handle(sock).idle();
+      return busy().handle();
+    }
+
+    void post_handle(Rcpp::List res, zmq::socket_t& sock) const {
+      json req = _cur_msg.get();
+      std::string msg_type = req["header"]["msg_type"];
+
+      // comms don't reply (except for comm_info_request)
+      if( msg_type=="comm_open" || msg_type=="comm_close" || msg_type=="comm_msg" ) {
+        idle();
+        return;
+      }
+
+      json jres = from_list_r(res);
+
+      JMessage::reply(_cur_msg, jres["msg_type"], jres["content"]).send(sock);
+      if( msg_type.compare("shutdown_request")==0 ) {
+        idle(); // publish idle before triggering socket deaths
+        shutdown();
+      }
+      idle();
     }
 
     void stream_out(const std::string& o) const { iopub("stream", {{"name", "stdout"}, {"text", o}}); }
@@ -116,41 +136,14 @@ class RequestServer {
     // For each msg_type, there's a corresponding R function with that name.
     // Example: for msg_type "kernel_info_request", there's an R method
     // called "kernel_info_request" that's exported in the JuniperKernel.
-    const RequestServer& handle(zmq::socket_t& sock) const {
+    const SEXP handle() const {
       json req = _cur_msg.get();
       std::string msg_type = req["header"]["msg_type"];
+      std::cout << "message: " << msg_type << std::endl;
       req["stream_out_port"] = _stream_out_port;  // stitch the stdout port into the client request
       req["stream_err_port"] = _stream_err_port;  // stitch the stderr into the client request
-      Rcpp::Function handler = _jk[msg_type];
-      Rcpp::Function do_request = _jk["doRequest"];
-      // boot listener threads; execute request; join listeners
-      Rcpp::List res = do_request(Rcpp::wrap(handler), from_json_r(req));
-      json jres = from_list_r(res);
-
-      // This is pretty broken; basically R will close its socketConnection successfully
-      // but this won't get picked up by a zmq::socket::stream. So just bail if we've been
-      // polling for too long waiting for the disconnects to come through. There's a TODO
-      // here to read from a temp file that holds the status of the closed connection. See
-      // request.R for more details.
-      int ntries=0;
-      int breakcnt=0;
-      int MAXBREAKS=5;
-      while( _connected.load() ) {
-        if( ntries++ % 10000000 == 0 ) breakcnt++;
-        if( breakcnt > MAXBREAKS ) {
-          Rcpp::Rcout << "WARNING: R socketConnection disconnects not detected." << std::endl;
-          _connected = 0;
-        }
-      }
-      // comms don't reply (except for comm_info_request)
-      if( msg_type=="comm_open" || msg_type=="comm_close" || msg_type=="comm_msg" )
-        return *this;
-      JMessage::reply(_cur_msg, jres["msg_type"], jres["content"]).send(sock);
-      if( msg_type.compare("shutdown_request")==0 ) {
-        idle(); // publish idle before triggering socket deaths
-        shutdown();
-      }
-      return *this;
+      req["message_type"] = msg_type;
+      return from_json_r(req);
     }
 
     std::thread stream_thread(zmq::socket_t* sock, const bool out, std::atomic<int>& connected) const {

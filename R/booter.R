@@ -74,19 +74,45 @@ bootKernel <- function() {
   .mainLoop(cfg)
 }
 
-.setHandover <- function(s) {
-  pbdZMQ::zmq.setsockopt(s, .pbd_env$ZMQ.SO$ROUTER_HANDOVER, 1L)
-  s
+.mainLoop <- function(cfg) {
+  print("BEGINNING MAIN LOOP")
+  print(cfg)
+  # socket order
+  CONTROL <- 1L
+  SHELL   <- 2L
+  socks <- c(cfg$ctl, cfg$shl)
+  while( TRUE ) {
+    r <- tryCatch(
+            zmq.poll( socks
+                    , rep(.pbd_env$ZMQ.PO$POLLIN, 2L)
+                    , MC = ZMQ.MC(check.eintr = TRUE)
+                    )
+          , interrupt = function(.) 'SIGINT'
+          )
+    print("ret: ")
+    print(r)
+    if( length(r)==1L && r=='SIGINT' ) next
+
+    if( .hasMsg(CONTROL) ) .handle('control')
+    if( .hasMsg(SHELL  ) ) .handle('shell')
+  }
 }
 
-.mainLoop <- function(cfg) {
-  ctx <- pbdZMQ::zmq.ctx.new()
-  ctl <- .setHandover(pbdZMQ::zmq.socket(ctx, .pbd_env$ZMQ.ST$ROUTER))
-  sin <- .setHandover(pbdZMQ::zmq.socket(ctx, .pbd_env$ZMQ.ST$ROUTER))
-  shl <- .setHandover(pbdZMQ::zmq.socket(ctx, .pbd_env$ZMQ.ST$ROUTER))
+.handle <- function(sockName) {
+  req <- sock_handler(.kernel(), sockName)
+
+  print("---------------------------------------------------------")
+  print("---------------------------------------------------------")
+  print(req)
+  print("---------------------------------------------------------")
+  print("---------------------------------------------------------")
+
+  handler <- get(req$message_type, envir=as.environment('package:JuniperKernel'))
+  res <- doRequest(handler, req)
+  post_handle(.kernel(), res, sockName)
+}
 
 
-  while( TRUE ) {
-
-  }
+.hasMsg <- function(i) {
+  bitwAnd(zmq.poll.get.revents(i), .pbd_env$ZMQ.PO$POLLIN)
 }
