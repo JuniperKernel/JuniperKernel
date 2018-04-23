@@ -75,8 +75,6 @@ bootKernel <- function() {
 }
 
 .mainLoop <- function(cfg) {
-  print("BEGINNING MAIN LOOP")
-  print(cfg)
   # socket order
   CONTROL <- 1L
   SHELL   <- 2L
@@ -89,27 +87,22 @@ bootKernel <- function() {
                     )
           , interrupt = function(.) 'SIGINT'
           )
-    print("ret: ")
-    print(r)
     if( length(r)==1L && r=='SIGINT' ) next
 
-    if( .hasMsg(CONTROL) ) .handle('control')
-    if( .hasMsg(SHELL  ) ) .handle('shell')
+    sockName <- ""
+    if( .hasMsg(CONTROL) && !.handle('control') )
+      break
+    if( .hasMsg(SHELL  ) && !.handle('shell')   )
+      break
   }
 }
 
 .handle <- function(sockName) {
-  req <- sock_handler(.kernel(), sockName)
-
-  print("---------------------------------------------------------")
-  print("---------------------------------------------------------")
-  print(req)
-  print("---------------------------------------------------------")
-  print("---------------------------------------------------------")
-
+  req <- sock_recv(.kernel(), sockName)
   handler <- get(req$message_type, envir=as.environment('package:JuniperKernel'))
   res <- doRequest(handler, req)
   post_handle(.kernel(), res, sockName)
+  req$message_type!='shutdown_request'
 }
 
 

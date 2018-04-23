@@ -47,6 +47,8 @@ std::thread start_io_thread(zmq::context_t& ctx, const std::string& endpoint) {
   std::thread iothread([&ctx, endpoint]() {
     zmq::socket_t* io = listen_on(ctx, endpoint, zmq::socket_type::pub);  // bind to the iopub endpoint
     zmq::socket_t* pubsub = subscribe_to(ctx, INPROC_PUB); // subscription to internal publisher
+    zmq::socket_t* outsub = subscribe_to(ctx, INPROC_OUT_PUB);
+    zmq::socket_t* errsub = subscribe_to(ctx, INPROC_ERR_PUB);
     std::function<bool()> handlers[] = {
       // msg forwarding
       [&pubsub, &io]() {
@@ -56,14 +58,25 @@ std::thread start_io_thread(zmq::context_t& ctx, const std::string& endpoint) {
         // topic, and we forward them to the client here.
         zmq::multipart_t msg;
         msg.recv(*pubsub);
-        // std::cout << "iopub msg: " << msg.str() << std::endl;
+        msg.send(*io);
+        return true;
+      },
+      [&outsub, &io]() {
+        zmq::multipart_t msg;
+        msg.recv(*outsub);
+        msg.send(*io);
+        return true;
+      },
+      [&errsub, &io]() {
+        zmq::multipart_t msg;
+        msg.recv(*errsub);
         msg.send(*io);
         return true;
       },
       [] { assert(false); return false; /* only here to keep handler same shape as sockets*/ }
     };
-    zmq::socket_t* sock[2] = {pubsub, io};
-    poll(ctx, sock, handlers, 2);
+    zmq::socket_t* sock[4] = {pubsub, outsub, errsub, io};
+    poll(ctx, sock, handlers, 4);
   });
   return iothread;
 }

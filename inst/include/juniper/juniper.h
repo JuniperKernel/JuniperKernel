@@ -89,11 +89,9 @@ class JuniperKernel {
     }
 
     SEXP recv(const std::string& sockName) {
-      std::cout << "JK RECV: " << sockName << std::endl;
       zmq::socket_t* sock = sockName.compare("control")==0 ? _cntrl: _shell;
       zmq::multipart_t msg;
       msg.recv(*sock);
-      std::cout << "serving up request!!!" << std::endl;
       return _request_server->serve(msg, *sock);
     }
 

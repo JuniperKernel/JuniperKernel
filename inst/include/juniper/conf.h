@@ -32,6 +32,8 @@
 #define LINGER 1000 // number of millis to linger for
 #define INPROC_PUB "inproc://pub"
 #define INPROC_SIG "inproc://sig"
+#define INPROC_OUT_PUB "inproc://outpub"
+#define INPROC_ERR_PUB "inproc://errpub"
 
 using nlohmann::json;
 struct config {

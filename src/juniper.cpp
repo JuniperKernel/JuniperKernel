@@ -105,7 +105,7 @@ SEXP the_xmock() {
 }
 
 // [[Rcpp::export]]
-SEXP sock_handler(SEXP kernel, std::string sockName) {
+SEXP sock_recv(SEXP kernel, std::string sockName) {
   JuniperKernel* jk = get_kernel(kernel);
   return jk->recv(sockName);
 }
@@ -114,16 +114,6 @@ SEXP sock_handler(SEXP kernel, std::string sockName) {
 void post_handle(SEXP kernel, Rcpp::List res, std::string sockName) {
   JuniperKernel* jk = get_kernel(kernel);
   jk->post_handle(res, sockName);
-}
-
-// [[Rcpp::export]]
-void stream_stdout(SEXP kernel, const std::string& output) {
-  get_kernel(kernel)->_request_server->stream_out(output);
-}
-
-// [[Rcpp::export]]
-void stream_stderr(SEXP kernel, const std::string& err) {
-  get_kernel(kernel)->_request_server->stream_err(err);
 }
 
 // [[Rcpp::export]]
