@@ -1,4 +1,4 @@
-# Copyright (C) 2017  Spencer Aiello
+# Copyright (C) 2017-2018  Spencer Aiello
 #
 # This file is part of JuniperKernel.
 #
@@ -28,6 +28,7 @@ NULL
 # global package environment
 .JUNIPER <- new.env(parent=emptyenv())
 .JUNIPER$execution_count <- 1L
+.JUNIPER$jkdopts <- NULL
 
 .kernel <- function() .JUNIPER$kernel
 .getAndIncCnt <- function() {

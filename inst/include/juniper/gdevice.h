@@ -18,7 +18,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// Copyright (C) 2017  Spencer Aiello
+// Copyright (C) 2017-2018  Spencer Aiello
 //
 //   This is a fork of the svglite c++ source with customized callbacks for JuniperKernel.
 //   To differentiate, the device description class is renamed to JKDesc from SVGDesc.

@@ -1,4 +1,4 @@
-# Copyright (C) 2017  Spencer Aiello
+# Copyright (C) 2017-2018  Spencer Aiello
 #
 # This file is part of JuniperKernel.
 #
@@ -70,8 +70,15 @@ doRequest <- function(handler, request_msg) {
   err <- socketConnection("localhost", port=request_msg$stream_err_port, blocking=TRUE, open='w')
   sink(out, type="output")
   sink(err, type="message")
-  aliases <- list(system=list(sans="Arial", serif="Times", mono="Courier", symbol="Symbol"), user=list())
-  jk_device(.kernel(), "white", 10, 5, 12, FALSE, aliases)
+  if( is.null(.JUNIPER$jkdopts) )
+    JuniperKernel::jk_device_settings()
+  jk_device( .kernel()
+            , .JUNIPER$jkdopts$bg
+            , .JUNIPER$jkdopts$w
+            , .JUNIPER$jkdopts$h
+            , .JUNIPER$jkdopts$ps
+            , FALSE
+            , .JUNIPER$jkdopts$aliases)
   dev <- grDevices::dev.cur()
   tryCatch(
       return(handler(request_msg))
