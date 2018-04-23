@@ -1,4 +1,4 @@
-# Copyright (C) 2017  Spencer Aiello
+# Copyright (C) 2017-2018  Spencer Aiello
 #
 # This file is part of JuniperKernel.
 #
@@ -70,24 +70,32 @@ doRequest <- function(handler, request_msg) {
   err <- socketConnection("localhost", port=request_msg$stream_err_port, blocking=TRUE, open='w')
   sink(out, type="output")
   sink(err, type="message")
-  aliases <- list(system=list(sans="Arial", serif="Times", mono="Courier", symbol="Symbol"), user=list())
-  jk_device(.kernel(), "white", 10, 5, 12, FALSE, aliases)
-  dev <- grDevices::dev.cur()
+  dev <- {
+    if( is.null(.JUNIPER$jkdopts) )
+      JuniperKernel::jk_device_settings()
+
+    if( .JUNIPER$jkdopts$device_off ) {
+      NULL
+    } else {
+      jk_device( .kernel()
+                , .JUNIPER$jkdopts$bg
+                , .JUNIPER$jkdopts$w
+                , .JUNIPER$jkdopts$h
+                , .JUNIPER$jkdopts$ps
+                , FALSE
+                , .JUNIPER$jkdopts$aliases)
+      grDevices::dev.cur()
+    }
+  }
   tryCatch(
       return(handler(request_msg))
     , finally={
-        sink(type="message");
-        sink(type="output" );
-        err_status <- close(err);
-        out_status <- close(out);
-
-        # TODO: write the statuses to a file; backend will read this file
-        #       in case it couldn't detect a zero message disconnect
-        # if( is.null(err_status) ) err_status <- 0
-        # if( is.null(out_status) ) out_status <- 0
-        # line <- paste0(c(err_status, out_status), sep="\n")
-        # write(line,file=.tmpStatusFile(),append=TRUE)
-        grDevices::dev.off(dev)
+        sink(type="message")
+        sink(type="output" )
+        close(err)
+        close(out)
+        if(!is.null(dev) )
+          grDevices::dev.off(dev)
       }
   )
 }

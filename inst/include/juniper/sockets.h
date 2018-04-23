@@ -1,4 +1,4 @@
-// Copyright (C) 2017  Spencer Aiello
+// Copyright (C) 2017-2018  Spencer Aiello
 //
 // This file is part of JuniperKernel.
 //
@@ -23,8 +23,10 @@
 #include <zmq_addon.hpp>
 #include <juniper/conf.h>
 
-zmq::socket_t* init_socket(zmq::socket_t* socket, const std::string& endpoint) {
+zmq::socket_t* init_socket(zmq::socket_t* socket, const std::string& endpoint, bool handover=false) {
   socket->setsockopt(ZMQ_LINGER, LINGER);
+  if( handover )
+    socket->setsockopt(ZMQ_ROUTER_HANDOVER, 1);
   socket->bind(endpoint);
   return socket;
 }
@@ -36,9 +38,9 @@ zmq::socket_t* subscribe_to(zmq::context_t& context, const std::string& topic) {
   return sub;
 }
 
-zmq::socket_t* listen_on(zmq::context_t& context, const std::string& endpoint, zmq::socket_type type) {
+zmq::socket_t* listen_on(zmq::context_t& context, const std::string& endpoint, zmq::socket_type type, bool handover=false) {
   zmq::socket_t* sock = new zmq::socket_t(context, type);
-  return init_socket(sock, endpoint);
+  return init_socket(sock, endpoint, handover);
 }
 
 // Polling logic + teardown on signal in a single place. Functional

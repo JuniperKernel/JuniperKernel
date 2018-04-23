@@ -1,4 +1,4 @@
-# Copyright (C) 2017  Spencer Aiello
+# Copyright (C) 2017-2018  Spencer Aiello
 #
 # This file is part of JuniperKernel.
 #
@@ -45,6 +45,17 @@ launch_kernel <- function(ports) {
   }
   kernelProc
 }
+
+proc_dump <- function(proc) {
+  stdouterr <- process_read(proc)
+  txt <- paste0("  stdout: \n", paste0(stdouterr$stdout, collapse="\n"), "\n"
+               , "  stderr: \n", paste0(stdouterr$stderr, collapse="\n"), "\n"
+               )
+  print("~~~~~~~~~~~~~~ proc out/err ~~~~~~~~~~~~~~")
+  print(txt)
+  print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+}
+
 
 write_connection_file <- function(ports) {
   connInfo <- list( "control_port"    = ports$ctport
@@ -268,11 +279,16 @@ tryCatch(
       if( !shutdown ) {
         println("Failed to shutdown...")
         tryCatch(println(process_terminate(kernelProc)), error=function(.){})
+      } else {
+        println("Shutdown reply received")
       }
       print("...proc wait...")
-      Sys.sleep(3)      
+      proc_dump(kernelProc)
+      Sys.sleep(3)
       process_wait(kernelProc, timeout=3000L)  # timeout for the process to clean it self up after 3s
+      proc_dump(kernelProc)
       tryCatch(print(kernelProc), error=function(.){})
+      proc_dump(kernelProc)
       stopifnot(process_return_code(kernelProc)==0L)
       print("Successful kernel shutdown")
     }

@@ -6,7 +6,7 @@
 #        > VARIABLE = value_of_variable
 print-%  : ; @echo $*=$($*)
 
-PKG_VERSION=1.2.3.0
+PKG_VERSION=1.4.0.0
 
 R_BUILD_ARGS= --no-manual --no-build-vignettes
 R_CHECK_ARGS= --no-manual --no-build-vignettes --as-cran
@@ -87,6 +87,6 @@ clean:
 	rm -rf src/._*
 	rm -rf src/x64
 	rm -rf inst/._*
-	rm -rf *.ipynb*
+	rm -rf *ipynb*
 	rm -rf inst/libs
 	rm -rf src-*

@@ -1,4 +1,4 @@
-// Copyright (C) 2017  Spencer Aiello
+// Copyright (C) 2017-2018  Spencer Aiello
 //
 // This file is part of JuniperKernel.
 //
@@ -62,18 +62,19 @@ static void xmockFinalizer(SEXP xm) {
   }
 }
 
-
 static JuniperKernel* get_kernel(SEXP kernel) {
   return reinterpret_cast<JuniperKernel*>(R_ExternalPtrAddr(kernel));
 }
 
 xmock* _xm;
+SEXP R_xm;
 // [[Rcpp::export]]
 SEXP init_kernel(const std::string& connection_file) {
   JuniperKernel* jk = JuniperKernel::make(connection_file);
 
   _xm = new xmock();
   _xm->_jk=jk;  // mocked interpreter needs pointer to the kernel
+  R_xm = createExternalPointer<xmock>(_xm, xmockFinalizer, "xmock*");
 
   // even if boot_kernel is exceptional and we don't run delete jk
   // this finalizer will be run on R's exit and a cleanup will trigger then
@@ -83,12 +84,9 @@ SEXP init_kernel(const std::string& connection_file) {
 }
 
 // [[Rcpp::export]]
-void boot_kernel(SEXP kernel) {
+SEXP boot_kernel(SEXP kernel) {
   JuniperKernel* jk = get_kernel(kernel);
-  jk->start_bg_threads();
-  jk->run();
-  if( _xm!=nullptr )
-    delete _xm;
+  return jk->start_bg_threads();
 }
 
 //' The XMock
@@ -101,19 +99,21 @@ void boot_kernel(SEXP kernel) {
 //' @export
 // [[Rcpp::export]]
 SEXP the_xmock() {
-  if( _xm==nullptr )
-    Rcpp::stop("no xmock available.");
-  return createExternalPointer<xmock>(_xm, xmockFinalizer, "xmock*");
+  if( _xm )
+    return R_xm;
+  Rcpp::stop("no xmock available.");
 }
 
 // [[Rcpp::export]]
-void stream_stdout(SEXP kernel, const std::string& output) {
-  get_kernel(kernel)->_request_server->stream_out(output);
+SEXP sock_recv(SEXP kernel, std::string sockName) {
+  JuniperKernel* jk = get_kernel(kernel);
+  return jk->recv(sockName);
 }
 
 // [[Rcpp::export]]
-void stream_stderr(SEXP kernel, const std::string& err) {
-  get_kernel(kernel)->_request_server->stream_err(err);
+void post_handle(SEXP kernel, Rcpp::List res, std::string sockName) {
+  JuniperKernel* jk = get_kernel(kernel);
+  jk->post_handle(res, sockName);
 }
 
 // [[Rcpp::export]]

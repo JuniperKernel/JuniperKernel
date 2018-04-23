@@ -1,4 +1,4 @@
-# Copyright (C) 2017  Spencer Aiello
+# Copyright (C) 2017-2018  Spencer Aiello
 #
 # This file is part of JuniperKernel.
 #
@@ -105,17 +105,6 @@ inspect_request <- function(request_msg) {
   printInfo <- .mimeBundle(Robj)
   helpInfo  <- .mimeBundle(helpObj)
 
-  .addPageSection <- function(bundle, title, content) {
-    templates <- list('text/plain' = '%s\n', 'text/html' = '<h1>%s:</h1>\n')
-    for( mime in names(templates) ) {
-      data <- content[[mime]]
-      if( !is.null(data) ) {
-        title <- sprintf(templates[[mime]], title)
-        bundle[[mime]] <- paste0(bundle[[mime]], title, data, '\n', sep='\n')
-      }
-    }
-    bundle
-  }
   # bundle up the info
   data <- {
     if( is(Robj, 'function') )

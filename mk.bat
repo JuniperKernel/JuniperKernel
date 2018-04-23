@@ -36,9 +36,6 @@ if %ERRORLEVEL% EQU 1 exit 1
 Rscript -e "install.packages('devtools',repo='https://cran.r-project.org')"
 if %ERRORLEVEL% EQU 1 exit 1
 
-Rscript -e "devtools::install_github('snoweye/pbdZMQ')"
-if %ERRORLEVEL% EQU 1 exit 1
-
 Rscript -e "install.packages('subprocess',repo='https://cran.r-project.org')"
 if %ERRORLEVEL% EQU 1 exit 1
 

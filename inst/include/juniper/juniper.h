@@ -1,4 +1,4 @@
-// Copyright (C) 2017  Spencer Aiello
+// Copyright (C) 2017-2018  Spencer Aiello
 //
 // This file is part of JuniperKernel.
 //
@@ -62,34 +62,43 @@ class JuniperKernel {
 
     // start the background threads
     // called as part of the kernel boot sequence
-    void start_bg_threads() {
+    SEXP start_bg_threads() {
       _hbthread = start_hb_thread(*_ctx, _endpoint + _hbport);
       _iothread = start_io_thread(*_ctx, _endpoint + _ioport);
+      Rcpp::List cfg(2);
+      Rcpp::StringVector names(2);
+      _cntrl = listen_on(*_ctx, _endpoint + _cntrlport, zmq::socket_type::router, true);
+      _shell = listen_on(*_ctx, _endpoint + _shellport, zmq::socket_type::router, true);
+      names(0) = "ctl";
+      names(1) = "shl";
+      cfg[0] = makeExternalSocketPtr(_cntrl);
+      cfg[1] = makeExternalSocketPtr(_shell);
+      cfg.attr("names") = names;
+      return Rcpp::wrap(cfg);
     }
 
-    // runs in the main the thread, polls shell and controller
-     void run() const {
-       zmq::socket_t* cntrl = listen_on(*_ctx, _endpoint + _cntrlport, zmq::socket_type::router);
-       zmq::socket_t* shell = listen_on(*_ctx, _endpoint + _shellport, zmq::socket_type::router);
-       const RequestServer& server = *_request_server;
-       const std::string key = _key;
-       std::function<bool()> handlers[] = {
-         [&cntrl, &key, &server]() {
-           zmq::multipart_t msg;
-           msg.recv(*cntrl);
-           server.serve(msg, *cntrl);
-           return true;
-         },
-         [&shell, &key, &server]() {
-           zmq::multipart_t msg;
-           msg.recv(*shell);
-           server.serve(msg, *shell);
-           return true;
-         }
-       };
-       zmq::socket_t* sock[2] = {cntrl, shell};
-       poll(*_ctx, sock, handlers, 2);
-     }
+    SEXP makeExternalSocketPtr(zmq::socket_t* sock) {
+      SEXP R_socket = R_NilValue;
+      PROTECT(R_socket = R_MakeExternalPtr(*sock, R_NilValue, R_NilValue));
+      UNPROTECT(1);
+      return R_socket;
+    }
+
+    void serve(zmq::multipart_t& msg, zmq::socket_t& sock) {
+      _request_server->serve(msg, sock);
+    }
+
+    SEXP recv(const std::string& sockName) {
+      zmq::socket_t* sock = sockName.compare("control")==0 ? _cntrl: _shell;
+      zmq::multipart_t msg;
+      msg.recv(*sock);
+      return _request_server->serve(msg, *sock);
+    }
+
+    void post_handle(Rcpp::List res, const std::string& sockName) {
+      zmq::socket_t* sock = sockName.compare("control")==0 ? _cntrl: _shell;
+      _request_server->post_handle(res, *sock);
+    }
 
     ~JuniperKernel() {
       // set linger to 0 on all sockets; destroy sockets; finally destoy ctx
@@ -97,7 +106,15 @@ class JuniperKernel {
       _hbthread.join();
       _iothread.join();
       delete _request_server;
-      _stdin     ->setsockopt(ZMQ_LINGER, 0); delete _stdin;
+      _stdin->setsockopt(ZMQ_LINGER, 0); delete _stdin;
+      if( _shell ) {
+        _shell->setsockopt(ZMQ_LINGER, 0);
+        delete _shell;
+      }
+      if( _cntrl ) {
+        _cntrl->setsockopt(ZMQ_LINGER, 0);
+        delete _cntrl;
+      }
       delete _ctx;
     }
 
@@ -108,6 +125,9 @@ class JuniperKernel {
 
     // jupyter stdin
     zmq::socket_t*  const _stdin;
+
+    zmq::socket_t* _shell;
+    zmq::socket_t* _cntrl;
 
     //misc
     std::string _endpoint;

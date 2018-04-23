@@ -1,4 +1,4 @@
-# Copyright (C) 2017  Spencer Aiello
+# Copyright (C) 2017-2018  Spencer Aiello
 #
 # This file is part of JuniperKernel.
 #
@@ -51,7 +51,7 @@
 #'
 #' @export
 bootKernel <- function() {
-  require(JuniperKernel)  # attach the package to the search path so we can call methods from Rcpp
+  require(JuniperKernel)
   argv <- commandArgs(trailingOnly=TRUE)
 
   if( length(argv)==0L )
@@ -69,5 +69,41 @@ bootKernel <- function() {
   if( !file.exists(userConnFile) )
     stop("Connection file does not exist: ", userConnFile)
 
-  boot_kernel(.JUNIPER$kernel <- init_kernel(userConnFile))
+  cfg <- boot_kernel(.JUNIPER$kernel <- init_kernel(userConnFile))
+  .mainLoop(cfg)
+}
+
+.mainLoop <- function(cfg) {
+  # socket order
+  CONTROL <- 1L
+  SHELL   <- 2L
+  socks <- c(cfg$ctl, cfg$shl)
+  while( TRUE ) {
+    r <- tryCatch(
+            zmq.poll( socks
+                    , rep(.pbd_env$ZMQ.PO$POLLIN, 2L)
+                    , MC = ZMQ.MC(check.eintr = TRUE)
+                    )
+          , interrupt = function(.) 'SIGINT'
+          )
+    if( length(r)==1L && r=='SIGINT' ) next
+
+    if( .hasMsg(CONTROL) && !.handle('control') )
+      break
+    if( .hasMsg(SHELL  ) && !.handle('shell')   )
+      break
+  }
+}
+
+.handle <- function(sockName) {
+  req <- sock_recv(.kernel(), sockName)
+  handler <- get(req$message_type, envir=as.environment('package:JuniperKernel'))
+  res <- doRequest(handler, req)
+  post_handle(.kernel(), res, sockName)
+  req$message_type!='shutdown_request'
+}
+
+
+.hasMsg <- function(i) {
+  bitwAnd(zmq.poll.get.revents(i), .pbd_env$ZMQ.PO$POLLIN)
 }

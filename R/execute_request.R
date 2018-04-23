@@ -1,4 +1,4 @@
-# Copyright (C) 2017  Spencer Aiello
+# Copyright (C) 2017-2018  Spencer Aiello
 #
 # This file is part of JuniperKernel.
 #
@@ -47,9 +47,13 @@ execute_request <- function(request_msg) {
 
   if( status=="ok" ) {
     content$payload = list()
+    help_payload <- .JUNIPER$jk_payload
+    if( !is.null(help_payload) ) {
+      content$payload <- list(list(source='page', data=help_payload))
+    }
     content$user_expressions=list()
   }
-
+  .JUNIPER$jk_payload <- NULL
   list(msg_type = "execute_reply", content = content)
 }
 
@@ -58,6 +62,11 @@ execute_request <- function(request_msg) {
     {
       res <- .chkDTVisible(withVisible(eval(parse(text=code), envir=.GlobalEnv)))
       .setGlobal(".Last.value", res$value, 1L)
+      if( class(res$value)=='help_files_with_topic' ) {
+        .JUNIPER$jk_payload <- .mimeBundle(res$value)
+        return("ok")
+      }
+
       if( res$visible )
         .execute_result(res$value, cnt)
       return("ok")
@@ -84,7 +93,7 @@ execute_request <- function(request_msg) {
 
 # build and send the content of an execute_result iopub message.
 .execute_result <- function(result, cnt) {
-  content <- list(data=.mimeBundle(result), execution_count=cnt, metadata=list("__ignored__"=""))
+  content <- list(data=.mimeBundle(result), execution_count=cnt, metadata=list())
   execute_result(.kernel(), content)
 }
 

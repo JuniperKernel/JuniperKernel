@@ -1,7 +1,7 @@
 Package: JuniperKernel
 Title: Kernel for 'Jupyter'
-Version: 1.2.3.0
-Date: 2018-01-15
+Version: 1.4.0.0
+Date: 2018-04-17
 Authors@R: c(
   person("Spencer Aiello",   role=c("aut", "cre", "cph"), email="spnrpa@gmail.com"),
   person("Wei-Chen Chen",    role="ctb"),
@@ -14,13 +14,12 @@ Authors@R: c(
   person("Johan Mabille",    role="cph"),
   person("Niels Lohmann",    role="cph") )
 Copyright: See the file COPYRIGHTS
-Depends: R (>= 3.2.0)
+Depends: R (>= 3.2.0), pbdZMQ (>= 0.3-2)
 Imports: utils,
          jsonlite,
          repr,
          Rcpp (>= 0.11.0),
          gdtools (>= 0.1.6),
-         pbdZMQ (>= 0.3-2),
          data.table,
          methods
 Suggests: RUnit, roxygen2
@@ -37,6 +36,7 @@ Collate: 'booter.R'
          'juniper.R'
          'kernel_info_request.R'
          'kernelspec.R'
+         'graphics_device.R'
          'RcppExports.R'
          'request.R'
          'shutdown_request.R'

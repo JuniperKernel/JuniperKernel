@@ -1,4 +1,4 @@
-# Copyright (C) 2017  Spencer Aiello
+# Copyright (C) 2017-2018  Spencer Aiello
 #
 # This file is part of JuniperKernel.
 #
@@ -40,5 +40,5 @@
 #'
 #' @export
 shutdown_request <- function(request_msg) {
-  list( msg_type="shutdown_reply", content=list(restart=request_msg$content$restart))
+  list(msg_type="shutdown_reply", content=list(restart=request_msg$content$restart))
 }
