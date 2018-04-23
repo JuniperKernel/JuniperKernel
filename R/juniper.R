@@ -46,3 +46,15 @@ NULL
   # keep non-NULL results (NULL when no such mime repr exists)
   Filter(Negate(is.null), data)
 }
+
+.addPageSection <- function(bundle, title, content) {
+  templates <- list('text/plain' = '%s\n', 'text/html' = '<h1>%s:</h1>\n')
+  for( mime in names(templates) ) {
+    data <- content[[mime]]
+    if( !is.null(data) ) {
+      title <- sprintf(templates[[mime]], title)
+      bundle[[mime]] <- paste0(bundle[[mime]], title, data, '\n', sep='\n')
+    }
+  }
+  bundle
+}

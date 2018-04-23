@@ -92,14 +92,7 @@ class RequestServer {
         return;
       }
 
-      json jres;
-      if( msg_type.compare("history_request")==0 ) {
-        json hist;
-        hist["history"] = {{1,0,""}};
-        jres["content"] = hist;
-        jres["msg_type"] = "history_reply";
-      } else
-        jres = from_list_r(res);
+      json jres = from_list_r(res);
 
       JMessage::reply(_cur_msg, jres["msg_type"], jres["content"]).send(sock);
       if( msg_type.compare("shutdown_request")==0 ) {
