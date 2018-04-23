@@ -70,16 +70,23 @@ doRequest <- function(handler, request_msg) {
   err <- socketConnection("localhost", port=request_msg$stream_err_port, blocking=TRUE, open='w')
   sink(out, type="output")
   sink(err, type="message")
-  if( is.null(.JUNIPER$jkdopts) )
-    JuniperKernel::jk_device_settings()
-  jk_device( .kernel()
-            , .JUNIPER$jkdopts$bg
-            , .JUNIPER$jkdopts$w
-            , .JUNIPER$jkdopts$h
-            , .JUNIPER$jkdopts$ps
-            , FALSE
-            , .JUNIPER$jkdopts$aliases)
-  dev <- grDevices::dev.cur()
+  dev <- {
+    if( is.null(.JUNIPER$jkdopts) )
+      JuniperKernel::jk_device_settings()
+
+    if( .JUNIPER$jkdopts$device_off ) {
+      NULL
+    } else {
+      jk_device( .kernel()
+                , .JUNIPER$jkdopts$bg
+                , .JUNIPER$jkdopts$w
+                , .JUNIPER$jkdopts$h
+                , .JUNIPER$jkdopts$ps
+                , FALSE
+                , .JUNIPER$jkdopts$aliases)
+      grDevices::dev.cur()
+    }
+  }
   tryCatch(
       return(handler(request_msg))
     , finally={
@@ -87,7 +94,8 @@ doRequest <- function(handler, request_msg) {
         sink(type="output" )
         close(err)
         close(out)
-        grDevices::dev.off(dev)
+        if(!is.null(dev) )
+          grDevices::dev.off(dev)
       }
   )
 }

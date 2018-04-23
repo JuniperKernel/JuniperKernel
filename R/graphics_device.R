@@ -45,15 +45,16 @@
 #' @author Spencer Aiello
 #'
 #' @export
-jk_device_settings <- function(background_color="white", width = 10L, height = 5L, pointsize = 12L, system_fonts=NULL, user_fonts=NULL) {
+jk_device_settings <- function(background_color="white", width = 10L, height = 5L,
+                               pointsize = 12L, system_fonts=NULL, user_fonts=NULL, device_off=FALSE) {
   if( is.null(system_fonts) )
-  system_fonts <- list(sans="Arial", serif="Times", mono="Courier", symbol="Symbol")
+    system_fonts <- list(sans="Arial", serif="Times", mono="Courier", symbol="Symbol")
 
   if( is.null(user_fonts) )
-  user_fonts <- list()
+    user_fonts <- list()
 
   aliases <- list(system=system_fonts, user=user_fonts)
-  invisible(.JUNIPER$jkdopts <- list(bg = background_color, w=width, h=height, ps=pointsize, aliases=aliases))
+  invisible(.JUNIPER$jkdopts <- list(bg = background_color, w=width, h=height, ps=pointsize, aliases=aliases, device_off=device_off))
 }
 
 
@@ -65,5 +66,5 @@ jk_device_settings <- function(background_color="white", width = 10L, height = 5
 #' @author Spencer Aiello
 #' @export
 jk_device_defaults <- function() {
-  jk_device_settings(background_color="white", width = 10L, height = 5L, pointsize = 12L, system_fonts=NULL, user_fonts=NULL)
+  jk_device_settings()
 }

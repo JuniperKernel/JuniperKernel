@@ -128,7 +128,6 @@ void execute_result(SEXP kernel, Rcpp::List data) {
 
 // [[Rcpp::export]]
 void jk_device(SEXP kernel, std::string bg, double width, double height, double pointsize, bool standalone, Rcpp::List aliases) {
-  std::cout << "jk_device called" << std::endl;
   makeDevice(get_kernel(kernel), bg, width, height, pointsize, standalone, aliases);
 }
 
