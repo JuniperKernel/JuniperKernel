@@ -92,7 +92,14 @@ class RequestServer {
         return;
       }
 
-      json jres = from_list_r(res);
+      json jres;
+      if( msg_type.compare("history_request")==0 ) {
+        json hist;
+        hist["history"] = {{1,0,""}};
+        jres["content"] = hist;
+        jres["msg_type"] = "history_reply";
+      } else
+        jres = from_list_r(res);
 
       JMessage::reply(_cur_msg, jres["msg_type"], jres["content"]).send(sock);
       if( msg_type.compare("shutdown_request")==0 ) {
@@ -132,10 +139,9 @@ class RequestServer {
 
     const SEXP handle() const {
       json req = _cur_msg.get();
-      std::string msg_type = req["header"]["msg_type"];
       req["stream_out_port"] = _stream_out_port;  // stitch the stdout port into the client request
       req["stream_err_port"] = _stream_err_port;  // stitch the stderr into the client request
-      req["message_type"] = msg_type;
+      req["message_type"] = req["header"]["msg_type"];
       return from_json_r(req);
     }
 

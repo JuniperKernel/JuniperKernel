@@ -76,17 +76,10 @@ doRequest <- function(handler, request_msg) {
   tryCatch(
       return(handler(request_msg))
     , finally={
-        sink(type="message");
-        sink(type="output" );
-        err_status <- close(err);
-        out_status <- close(out);
-
-        # TODO: write the statuses to a file; backend will read this file
-        #       in case it couldn't detect a zero message disconnect
-        # if( is.null(err_status) ) err_status <- 0
-        # if( is.null(out_status) ) out_status <- 0
-        # line <- paste0(c(err_status, out_status), sep="\n")
-        # write(line,file=.tmpStatusFile(),append=TRUE)
+        sink(type="message")
+        sink(type="output" )
+        close(err)
+        close(out)
         grDevices::dev.off(dev)
       }
   )
