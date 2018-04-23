@@ -38,6 +38,11 @@
 #'    name and file elements with name indicating the font alias in the SVG output
 #'    and file the path to a font file.
 #'
+#' @param device_off
+#'    Use this to toggle the JuniperKernel graphics device on and off. If you would like to
+#'    to save plots to a pdf file, e.g., you would first turn off the JuniperKernel device
+#'    here and then create a new pdf graphics device.
+#'
 #' @return Invisibly return a list of the settings.
 #'
 #' @details Use this method to set the graphics settings used by JuniperKernel.
