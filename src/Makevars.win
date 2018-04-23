@@ -5,11 +5,22 @@ else
     FLV = i386
 endif
 R_SCMD = ${R_HOME}/bin${R_ARCH_BIN}/Rscript -e
-ZMQ_CPPFLAGS = $(shell ${R_SCMD} "pbdZMQ::get.zmq.cppflags(arch='/"${FLV}"')")
-ZMQ_LDFLAGS = $(shell ${R_SCMD} "pbdZMQ::get.zmq.ldflags(arch='/"${FLV}"')")
+LIBPATHS = $(shell ${R_SCMD} "print(.libPaths())")
+ZMQ_CPPFLAGS = $(shell ${R_SCMD} "library(pbdZMQ); pbdZMQ::get.zmq.cppflags(arch='/"${FLV}"')")
+ZMQ_LDFLAGS = $(shell ${R_SCMD} "library(pbdZMQ); pbdZMQ::get.zmq.ldflags(arch='/"${FLV}"')")
 
 CXX_STD = CXX11
 PKG_CPPFLAGS = -I../inst/include -I. ${ZMQ_CPPFLAGS}
 PKG_LIBS = ${ZMQ_LDFLAGS}
 
-all: $(SHLIB)
+all: echo_target $(SHLIB)
+
+
+echo_target:
+	@echo "===========================WIN VARS=========================="
+	@echo "${R_SCMD}"
+	@echo "${LIBPATHS}"
+	@echo `${R_SCMD} "'pbdZMQ' %in% rownames(installed.packages())"`
+	@echo "${ZMQ_CPPFLAGS}"
+	@echo "${ZMQ_LDFLAGS}"
+	@echo "============================================================="

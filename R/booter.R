@@ -51,8 +51,7 @@
 #'
 #' @export
 bootKernel <- function() {
-  require(JuniperKernel)  # attach the package to the search path so we can call methods from Rcpp
-  require(pbdZMQ)
+  require(JuniperKernel)
   argv <- commandArgs(trailingOnly=TRUE)
 
   if( length(argv)==0L )
@@ -89,7 +88,6 @@ bootKernel <- function() {
           )
     if( length(r)==1L && r=='SIGINT' ) next
 
-    sockName <- ""
     if( .hasMsg(CONTROL) && !.handle('control') )
       break
     if( .hasMsg(SHELL  ) && !.handle('shell')   )
