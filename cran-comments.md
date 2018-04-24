@@ -1,9 +1,6 @@
-## JuniperKernel 1.4.0.0 Submission
+## JuniperKernel 1.4.1.0 Submission
 In this version we have:
-* Add ability to change the default device settings as well as toggle it on/off.
-* Proper handling of warning messages.
-* In the notebook client, help is shown as a pager element.
-
+* Made a patch to listen for Windows events
 
 ## Test environments
 * local OS X install, R 3.4.3

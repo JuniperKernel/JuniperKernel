@@ -98,7 +98,7 @@ void start_intr_thread(int interrupt_event) {
         false,
         INFINITE
       );
-      if( WAIT_OBJECT_0 <= dwevent  && dwevent < 1 )
+      if( WAIT_OBJECT_0 <= dwevent && dwevent < 1 )
         UserBreak = 1;
       if( dwevent < 0 )
         break;
