@@ -23,6 +23,7 @@
 #include <zmq_addon.hpp>
 #include <juniper/sockets.h>
 #include <juniper/conf.h>
+#include <Rembedded.h>
 
 
 std::thread start_hb_thread(zmq::context_t& ctx, const std::string& endpoint) {
@@ -79,6 +80,33 @@ std::thread start_io_thread(zmq::context_t& ctx, const std::string& endpoint) {
     poll(ctx, sock, handlers, 4);
   });
   return iothread;
+}
+
+void start_intr_thread(int interrupt_event) {
+#ifdef _WIN32
+  std::thread intr_thread([interrupt_event](){
+    HANDLE h[1];
+    #ifdef _WIN64
+      h[0] = reinterpret_cast<void*>((uint64_t)interrupt_event);
+    #else
+      h[0] = reinterpret_cast<void*>((uint32_t)interrupt_event);
+    #endif
+    while(true) {
+      DWORD dwevent = WaitForMultipleObjects(
+        1,
+        h,
+        false,
+        INFINITE
+      );
+      if( WAIT_OBJECT_0 <= dwevent  && dwevent < 1 )
+        UserBreak = 1;
+      if( dwevent < 0 )
+        break;
+    }
+  });
+  intr_thread.detach();
+#else
+#endif
 }
 
 #endif // #ifndef juniper_juniper_background_H
