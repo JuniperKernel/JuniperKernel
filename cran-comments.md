@@ -1,13 +1,16 @@
-## JuniperKernel 1.2.3.0 Submission
+## JuniperKernel 1.4.0.0 Submission
 In this version we have:
-* This is a patch submission to update the 'pbdZMQ' dependency to the latest version.
+* Add ability to change the default device settings as well as toggle it on/off.
+* Proper handling of warning messages.
+* In the notebook client, help is shown as a pager element.
+
 
 ## Test environments
 * local OS X install, R 3.4.3
-* local Windows 10 install, R 3.4.3 and R.3.4.1
-* ubuntu 14.04.5 LTS (on travis-ci), R 3.4.3
-* Windows Server 2012 R2 x64 (build 9600) (on Appveyor), R 3.4.3
-* win-builder (release, devel, oldrelease)
+* local Windows 10 install, R 3.4.3
+* ubuntu 14.04.5 LTS (on travis-ci), R 3.5.0
+* Windows Server 2012 R2 x64 (build 9600) (on Appveyor), R 3.4.4
+* win-builder (release, devel)
 
 ## R CMD check results
 There were no ERRORs or WARNINGs.

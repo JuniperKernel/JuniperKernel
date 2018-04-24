@@ -1,6 +1,17 @@
 **If you are viewing this file on CRAN, please check latest news on GitHub [here](https://github.com/JuniperKernel/JuniperKernel/blob/master/NEWS.md).**
 
-### Changes in v1.2.3.0
+### Changes in v1.4.0.0
+
+1. Add ability to change the default device settings as well as toggle it on/off.
+2. Proper handling of warning messages.
+3. Help is shown as a pager element and no longer clutters the notebook client.
+
+### Bug Fixes
+
+* Fix Rcpp::List -> json recursive utility. Before this was failing when lists were unnamed.
+* Fix history_request implementation so that the interactive console may function properly.
+
+### Changes in v1.2.3.0 (on CRAN 02/05/2018)
 
 #### PATCHES
 
