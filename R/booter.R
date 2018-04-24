@@ -69,7 +69,7 @@ bootKernel <- function() {
   if( !file.exists(userConnFile) )
     stop("Connection file does not exist: ", userConnFile)
 
-  cfg <- boot_kernel(.JUNIPER$kernel <- init_kernel(userConnFile))
+  cfg <- boot_kernel(.JUNIPER$kernel <- init_kernel(userConnFile), as.integer(Sys.getenv("JPY_INTERRUPT_EVENT")))
   .mainLoop(cfg)
 }
 

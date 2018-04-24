@@ -84,9 +84,9 @@ SEXP init_kernel(const std::string& connection_file) {
 }
 
 // [[Rcpp::export]]
-SEXP boot_kernel(SEXP kernel) {
+SEXP boot_kernel(SEXP kernel, int interrupt_event) {
   JuniperKernel* jk = get_kernel(kernel);
-  return jk->start_bg_threads();
+  return jk->start_bg_threads(interrupt_event);
 }
 
 //' The XMock

@@ -1,6 +1,12 @@
 **If you are viewing this file on CRAN, please check latest news on GitHub [here](https://github.com/JuniperKernel/JuniperKernel/blob/master/NEWS.md).**
 
-### Changes in v1.4.0.0
+### Changes in v1.4.1.0
+
+#### PATCHES
+
+1. Build a windows interrupt handler that will listen to a Windows Event set by a parent process.
+
+### Changes in v1.4.0.0 (on CRAN 04/23/2018)
 
 1. Add ability to change the default device settings as well as toggle it on/off.
 2. Proper handling of warning messages.
