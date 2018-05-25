@@ -66,8 +66,8 @@
 #'
 #' @export
 doRequest <- function(handler, request_msg) {
-  out <- socketConnection("localhost", port=request_msg$stream_out_port, blocking=TRUE, open='w')
-  err <- socketConnection("localhost", port=request_msg$stream_err_port, blocking=TRUE, open='w')
+  out <- socketConnection("localhost", port=request_msg$stream_out_port, open='w')
+  err <- socketConnection("localhost", port=request_msg$stream_err_port, open='w')
   sink(out, type="output")
   sink(err, type="message")
   dev <- {
