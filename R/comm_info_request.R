@@ -40,6 +40,10 @@
 #'
 #' @export
 comm_info_request <- function(request_msg) {
-  target <- ifelse(is.null(request_msg$target), "", request_msg$target_name)
-  list(msg_type = "comm_info_reply", content = filter_comms(target))
+  target <- request_msg$target_name
+  comms <- {
+    if( is.null(target) ) list()
+    else                  filter_comms(target)
+  }
+  list(msg_type = "comm_info_reply", content = comms)
 }

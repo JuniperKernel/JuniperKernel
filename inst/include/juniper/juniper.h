@@ -63,9 +63,9 @@ class JuniperKernel {
     // start the background threads
     // called as part of the kernel boot sequence
     SEXP start_bg_threads(int interrupt_event) {
+      start_intr_thread(interrupt_event);
       _hbthread = start_hb_thread(*_ctx, _endpoint + _hbport);
       _iothread = start_io_thread(*_ctx, _endpoint + _ioport);
-      start_intr_thread(interrupt_event);
       Rcpp::List cfg(2);
       Rcpp::StringVector names(2);
       _cntrl = listen_on(*_ctx, _endpoint + _cntrlport, zmq::socket_type::router, true);

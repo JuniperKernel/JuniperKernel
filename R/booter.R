@@ -69,7 +69,8 @@ bootKernel <- function() {
   if( !file.exists(userConnFile) )
     stop("Connection file does not exist: ", userConnFile)
 
-  cfg <- boot_kernel(.JUNIPER$kernel <- init_kernel(userConnFile), as.integer(Sys.getenv("JPY_INTERRUPT_EVENT")))
+  .JUNIPER$kernel <- init_kernel(userConnFile)
+  cfg <- boot_kernel(.kernel(), as.integer(Sys.getenv("JPY_INTERRUPT_EVENT")))
   .mainLoop(cfg)
 }
 
@@ -86,11 +87,11 @@ bootKernel <- function() {
                     )
           , interrupt = function(.) 'SIGINT'
           )
-    if( length(r)==1L && r=='SIGINT' ) next
-
+    if( length(r)==1L && r=='SIGINT' )
+      next
     if( .hasMsg(CONTROL) && !.handle('control') )
       break
-    if( .hasMsg(SHELL  ) && !.handle('shell')   )
+    if( .hasMsg(  SHELL) && !.handle(  'shell') )
       break
   }
 }

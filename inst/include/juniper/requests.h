@@ -58,8 +58,8 @@ class RequestServer {
           _stream_err = listen_on(ctx, "tcp://*:*", zmq::socket_type::stream);
           _stream_out_port = read_port(_stream_out);
           _stream_err_port = read_port(_stream_err);
-          _sout = stream_thread(&ctx, _stream_out, true);
-          _serr = stream_thread(&ctx, _stream_err, false);
+          _sout = stream_thread(&ctx, _stream_out, true, this);
+          _serr = stream_thread(&ctx, _stream_err, false, this);
         }
 
     ~RequestServer() {
@@ -138,12 +138,11 @@ class RequestServer {
       return from_json_r(req);
     }
 
-    std::thread stream_thread(zmq::context_t* ctx, zmq::socket_t* sock, const bool out) const {
-      const RequestServer& rs = *this;
-      std::thread out_thread([&rs, ctx, sock, out]() {  // full fence membar
+    std::thread stream_thread(zmq::context_t* ctx, zmq::socket_t* sock, const bool out, RequestServer* rs) const {
+      std::thread out_thread([rs, ctx, sock, out]() {  // full fence membar
         zmq::socket_t* pubsock = listen_on(*ctx, out?INPROC_OUT_PUB:INPROC_ERR_PUB, zmq::socket_type::pub);
         std::function<bool()> handlers[] = {
-          [&rs, sock, out, pubsock]() {
+          [rs, sock, out, pubsock]() {
             zmq::multipart_t msg;
             msg.recv(*sock);
 
@@ -151,14 +150,16 @@ class RequestServer {
               return true;
 
             std::string name = out ? "stdout":"stderr";
+            std::string msg0 = msg_t_to_string(msg[1]);
+
             // read the message and publish to the internal out/err publishers
-            zmq::multipart_t outerr_msg = rs.stream_outerr(msg_t_to_string(msg[1]), name);
+            zmq::multipart_t outerr_msg = rs->stream_outerr(msg0, name);
             outerr_msg.send(*pubsock);
             return true;
           }
         };
         zmq::socket_t* socket[1] = {sock};
-        poll(*rs._ctx, socket, handlers, 1);
+        poll(*(rs->_ctx), socket, handlers, 1);
         // cleanup out/err internal pubs
         pubsock->setsockopt(ZMQ_LINGER, 0);
         delete pubsock;
