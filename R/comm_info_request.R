@@ -42,7 +42,7 @@
 comm_info_request <- function(request_msg) {
   target <- request_msg$target_name
   comms <- {
-    if( is.null(target) ) list()
+    if( is.null(target) ) list(status="ok", comms=NULL)
     else                  filter_comms(target)
   }
   list(msg_type = "comm_info_reply", content = comms)
