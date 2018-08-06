@@ -62,7 +62,7 @@ execute_request <- function(request_msg) {
     {
       res <- .chkDTVisible(withVisible(eval(parse(text=code), envir=.GlobalEnv)))
       .setGlobal(".Last.value", res$value, 1L)
-      if( class(res$value)=='help_files_with_topic' ) {
+      if( 'help_files_with_topic' %in% class(res$value) ) {
         .JUNIPER$jk_payload <- .mimeBundle(res$value)
         return("ok")
       }
