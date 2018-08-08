@@ -38,6 +38,7 @@ build_script:
   - cmd.exe /c chk.bat
 
 on_failure:
+  - dir
   - 7z a failure.zip *.Rcheck\*
   - appveyor PushArtifact failure.zip
 
