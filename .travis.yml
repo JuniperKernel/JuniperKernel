@@ -48,6 +48,8 @@ before_deploy:
 
 after_failure:
   - ls -la
+  - ls -la src
+  - ls -la build
   - cat ./JuniperKernel.Rcheck/00install.out
   - ldd ./src/JuniperKernel.so
   - ls -la ./inst/zmq
