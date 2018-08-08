@@ -5,6 +5,7 @@
 #### PATCHES
 
 1. Build a windows interrupt handler that will listen to a Windows Event set by a parent process.
+2. Fix NPE caused during comm_info_request due to malformed comm_info_reply object.
 
 ### Changes in v1.4.0.0 (on CRAN 04/23/2018)
 

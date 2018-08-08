@@ -1,12 +1,12 @@
 ## JuniperKernel 1.4.1.0 Submission
 In this version we have:
-* Made a patch to listen for Windows events
+* patched the fix comm_info_reply struct
 
 ## Test environments
-* local OS X install, R 3.4.3
-* local Windows 10 install, R 3.4.3
+* local OS X install, R 3.5.0
+* local Windows 10 install, R 3.5.0
 * ubuntu 14.04.5 LTS (on travis-ci), R 3.5.0
-* Windows Server 2012 R2 x64 (build 9600) (on Appveyor), R 3.4.4
+* Windows Server 2012 R2 x64 (build 9600) (on Appveyor), R 3.5.0
 * win-builder (release, devel)
 
 ## R CMD check results
