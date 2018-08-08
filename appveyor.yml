@@ -38,6 +38,7 @@ build_script:
   - cmd.exe /c chk.bat
 
 on_failure:
+  - cat DESCRIPTION
   - icacls .
   - icacls R
   - icacls src
