@@ -39,7 +39,8 @@ build_script:
 
 on_failure:
   - dir
-  - cd src && dir
+  - dir R
+  - dir src
   - 7z a failure.zip *.Rcheck\*
   - appveyor PushArtifact failure.zip
 
