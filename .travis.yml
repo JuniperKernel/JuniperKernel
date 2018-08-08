@@ -35,6 +35,7 @@ script:
   - ls -la `R RHOME`/etc
   - cat `R RHOME`/etc/Makeconf
   - g++ --version
+  - ls -la
   - make install
   - make check
   - make test
@@ -46,6 +47,7 @@ before_deploy:
   - pwd
 
 after_failure:
+  - ls -la
   - cat ./JuniperKernel.Rcheck/00install.out
   - ldd ./src/JuniperKernel.so
   - ls -la ./inst/zmq
