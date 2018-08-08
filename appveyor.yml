@@ -38,9 +38,9 @@ build_script:
   - cmd.exe /c chk.bat
 
 on_failure:
-  - dir
-  - dir R
-  - dir src
+  - Dir | Get-Acl
+  - Dir | Get-Acl
+  - Dir | Get-Acl
   - 7z a failure.zip *.Rcheck\*
   - appveyor PushArtifact failure.zip
 
