@@ -9,6 +9,7 @@ if(length(files) > 0){
   dir.create(dest, recursive = TRUE, showWarnings = FALSE)
   print(paste("copying from", files, "TO", dest))
   file.copy(files, dest, overwrite = TRUE, recursive = TRUE)
+  print(list.files(dest))
 
   ### For Mac OSX:
   ### Overwrite RPATH from the shared library installed to the destination.
