@@ -30,10 +30,14 @@ C:\Rtools\bin\cp .\inst\nl_json.hpp .\inst\include\xeus\nl_json.hpp
 Rscript -e Rcpp::compileAttributes()
 if %ERRORLEVEL% EQU 1 exit 1
 
-Rscript -e roxygen2::roxygenize()
+Rscript -e "install.packages('devtools',repo='https://cran.r-project.org')"
 if %ERRORLEVEL% EQU 1 exit 1
 
-Rscript -e "install.packages('devtools',repo='https://cran.r-project.org')"
+:: install a version of roxygen2 that does not attempt to build the package...
+Rscript -e "devtools::install_version('roxygen2', version='5.0.1', repo='https://cran.r-project.org')"
+if %ERRORLEVEL% EQU 1 exit 1
+
+Rscript -e roxygen2::roxygenize()
 if %ERRORLEVEL% EQU 1 exit 1
 
 Rscript -e "install.packages('subprocess',repo='https://cran.r-project.org')"
