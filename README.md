@@ -27,7 +27,7 @@ The development of JuniperKernel is sponsored by [Bloomberg](https://www.techatb
 
 If you're going to build from scratch, then these packages will be necessary to fetch:
  
-- R packages: BH,  Rcpp (>= 0.11.0), gdtools (>= 0.1.6), pbdZMQ (>= 0.3-0), roxygen2, jsonlite, repr
+- R packages: BH,  Rcpp (>= 0.11.0), gdtools (>= 0.1.6), pbdZMQ (>= 0.3-0), roxygen2, jsonlite, repr, data.table
 
 Other necessary bacon bits (fetched automatically--c.f. Makevars/Makevars.win):
 
