@@ -20,10 +20,10 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <xeus/nl_json.hpp>
+#include <nlohmann/json.hpp>
 #include <juniper/conf.h>
-#include <zmq.h>
-#include <zmq.hpp>
+#include <zmq/zmq.h>
+#include <zmq/zmq.hpp>
 #include <juniper/gdevice.h>
 #include <juniper/juniper.h>
 #include <juniper/xbridge.h>
@@ -150,9 +150,8 @@ SEXP filter_comms(std::string target_name) {
 // [[Rcpp::export]]
 void comm_request(const std::string type) {
   xmock& xm = get_xmock();
-  JMessage jm = xm._jk->_request_server->_cur_msg;
-
-  xmessage xmsg = to_xmessage(jm.get(), jm.ids());
+  JMessage* jm = &xm._jk->_request_server->_cur_msg;
+  xmessage xmsg(to_xmessage(jm->get(), jm->ids(), std::move(jm->bufs())));
   if( type=="open" ) xm.comm_manager().comm_open( xmsg);
   if( type=="close") xm.comm_manager().comm_close(xmsg);
   if( type=="msg"  ) xm.comm_manager().comm_msg(  xmsg); 

@@ -21,8 +21,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <chrono>
-#include <zmq.h>
-#include <zmq.hpp>
+#include <zmq/zmq.h>
+#include <zmq/zmq.hpp>
 #include <juniper/sockets.h>
 #include <juniper/utils.h>
 #include <juniper/conf.h>

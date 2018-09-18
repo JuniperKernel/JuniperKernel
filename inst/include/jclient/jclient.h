@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <xeus/nl_json.hpp>
+#include <nlohmann/json.hpp>
 #include <juniper/sockets.h>
 #include <jclient/iopub.h>
 #include <jclient/hb.h>
@@ -32,8 +32,8 @@
 #include <jclient/control.h>
 #include <jclient/stdin.h>
 #include <jclient/iomsg.h>
-#include <zmq.h>
-#include <zmq.hpp>
+#include <zmq/zmq.h>
+#include <zmq/zmq.hpp>
 #include <Rcpp.h>
 
 class JupyterTestClient {

@@ -19,8 +19,8 @@
 
 #include <string>
 #include <thread>
-#include <zmq.hpp>
-#include <zmq_addon.hpp>
+#include <zmq/zmq.hpp>
+#include <zmq/zmq_addon.hpp>
 #include <juniper/sockets.h>
 #include <juniper/conf.h>
 #include <Rembedded.h>

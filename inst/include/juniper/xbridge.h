@@ -19,12 +19,13 @@
 
 #define XEUS_EXPORTS
 
-#include <xeus/nl_json.hpp>
+#include <nlohmann/json.hpp>
 #include <xeus/xjson.hpp>
 #include <xeus/xcomm.hpp>
 #include <xeus/xinterpreter.hpp>
 #include <juniper/juniper.h>
 #include <juniper/jmessage.h>
+#include <juniper/utils.h>
 
 // mock interpreter
 using namespace xeus;
@@ -68,22 +69,29 @@ void xinterpreter::register_comm_manager(xcomm_manager* mgr) {
 }
 
 // xmessage impl
-xmessage_base::xmessage_base(xjson header, xjson parent_header, xjson metadata, xjson content): 
+xmessage_base::xmessage_base(xjson header, xjson parent_header,
+														 xjson metadata, xjson content, buffer_sequence buffers): 
   m_header(header),
   m_parent_header(parent_header),
   m_metadata(metadata),
-  m_content(content){}
+  m_content(content),
+  m_buffers(std::move(buffers)){}
 const xjson& xmessage_base::content() const {return m_content; }
 const xjson& xmessage_base::metadata() const { return m_metadata; }
 
-xmessage::xmessage(const guid_list& zmq_id, xjson header, xjson parent_header, xjson metadata, xjson content):
-  xmessage_base(header,parent_header,metadata,content){ m_zmq_id=zmq_id;}
+xmessage::xmessage(const guid_list& zmq_id, xjson header, xjson parent_header,
+									 xjson metadata, xjson content, buffer_sequence buffers):
+  xmessage_base(std::move(header),
+								std::move(parent_header),
+								std::move(metadata),
+								std::move(content),
+								std::move(buffers)){ m_zmq_id=zmq_id;}
 
 // xcomm impl
-void xtarget::publish_message(const std::string& msg_type, xjson metadata, xjson content) const {
-  get_xmock()._jk->_request_server->iopub(msg_type, content, metadata);
+void xtarget::publish_message(const std::string& msg_type, xjson metadata, xjson content, buffer_sequence buffers) const {
+  get_xmock()._jk->_request_server->iopub(msg_type, std::move(content), std::move(metadata), std::move(buffers));
 }
-xjson xcomm_manager::get_metadata() const { return {{"started", JMessage::now()}}; }
+xjson xcomm_manager::get_metadata() const { return {{"started", now()}}; }
 void xcomm_manager::register_comm_target(const std::string& target_name, const target_function_type& callback){ 
   m_targets[target_name] = xtarget(target_name, callback, this);
 }
@@ -108,8 +116,12 @@ typename std::map<K,T>::iterator pos(std::map<K, T> m, K key, std::string type) 
   return position;
 }
 
-xmessage to_xmessage(const json& request, const xmessage::guid_list& zmq_id) {
-  return xmessage(zmq_id, request["header"], request["parent_header"], request["metadata"], request["content"]);
+xmessage to_xmessage(const json& request, const xmessage::guid_list& zmq_id, buffer_sequence buffers) {
+  return xmessage(zmq_id, std::move(request["header"]),
+									std::move(request["parent_header"]),
+									std::move(request["metadata"]),
+									std::move(request["content"]),
+									std::move(buffers));
 }
 
 void xcomm_manager::comm_open(const xmessage& request) {
@@ -125,7 +137,6 @@ void xcomm_manager::comm_open(const xmessage& request) {
   xguid id = content["comm_id"];
   xcomm comm = xcomm(&target, id);
   target(std::move(comm), request);
-  comm.open(get_metadata(), content["data"]);
 }
 
 void xcomm_manager::comm_close(const xmessage& request) { 

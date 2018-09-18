@@ -1,11 +1,11 @@
 ::quantstack bacon bits
 :: xtl
-set "XTL_VERSION=0.4.0"
+set "XTL_VERSION=0.4.16"
 set "XTL_TAR_FILE=%XTL_VERSION%.tar.gz"
 set "XTL_URL=https://github.com/QuantStack/xtl/archive/%XTL_TAR_FILE%"
 
 :: xeus
-set "XEUS_VERSION=0.9.0"
+set "XEUS_VERSION=0.14.1"
 set "XEUS_TAR_FILE=%XEUS_VERSION%.tar.gz"
 set "XEUS_URL=https://github.com/QuantStack/xeus/archive/%XEUS_TAR_FILE%"
 
@@ -24,8 +24,6 @@ powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.Security
 C:\Rtools\bin\tar -xzf %XEUS_TAR_FILE%
 C:\Rtools\bin\mv xeus-%XEUS_VERSION%\include\xeus .\inst\include
 C:\Rtools\bin\rm -rf xeus-%XEUS_VERSION% %XEUS_TAR_FILE%
-
-C:\Rtools\bin\cp .\inst\nl_json.hpp .\inst\include\xeus\nl_json.hpp
 
 Rscript -e Rcpp::compileAttributes()
 if %ERRORLEVEL% EQU 1 exit 1
@@ -50,3 +48,4 @@ mkdir build
 C:\Rtools\bin\mv Juniper*gz build
 cd build
 R CMD INSTALL Juniper*gz
+::R CMD INSTALL --no-multiarch Juniper*gz 

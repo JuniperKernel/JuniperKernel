@@ -1,4 +1,4 @@
-// Copyright (C) 2017-2018  Spencer Aiello
+//Copyright (C) 2017-2018  Spencer Aiello
 //
 // This file is part of JuniperKernel.
 //
@@ -20,13 +20,12 @@
 #include <atomic>
 #include <fstream>
 #include <string>
-#include <zmq.hpp>
-#include <zmq_addon.hpp>
-#include <xeus/nl_json.hpp>
-#include <hmac.h>
-#include <ctime>
+#include <zmq/zmq.hpp>
+#include <zmq/zmq_addon.hpp>
+#include <nlohmann/json.hpp>
+#include <brumme/hmac.h>
+#include <brumme/sha256.h>
 #include <iostream>
-#include <sha256.h>
 #include <juniper/external.h>
 #include <juniper/utils.h>
 #include <Rcpp.h>
@@ -36,6 +35,7 @@ static const std::string DELIMITER = "<IDS|MSG>";
 
 using nlohmann::json;
 using namespace std::chrono;
+using buffer_sequence = std::vector<zmq::message_t>;
 // Here's where we read and write messages using the jupyter protocol.
 // Since the protocol is actually serialized python dicts (a.k.a. JSON),
 // we are stuck with json (de)serialization.
@@ -43,14 +43,31 @@ class JMessage {
   
 public:
   std::string _key; // used for creating the hmac signature
-  static JMessage read(zmq::multipart_t& request, const std::string& key) {
-    JMessage jm;
-    jm._key = key;
-    return jm.read_ids(request).read_hmac(request).read_body(request);
-  }
+	JMessage() {}
+ 	JMessage(buffer_sequence buffers): _b0(std::move(buffers)) {}
+	JMessage& operator=(JMessage&& jm) = default;
+	JMessage(JMessage&& jm):
+		_key(jm._key),
+		_msg(jm._msg),
+		_b0(std::move(jm._b0)),
+		_hmac(jm._hmac),
+		_ids(jm._ids){}
 
-  static zmq::multipart_t reply(const JMessage& parent, const std::string& msg_type, const json& content, const json& metadata=json({})) {
-    JMessage jm;
+	static JMessage read(zmq::multipart_t& request, const std::string& key) {
+		std::vector<zmq::message_t> buffers;
+    JMessage jm(std::move(buffers));
+    jm._key = key;
+    return std::move(jm.read_ids(request).read_hmac(request).read_body(request));
+  }
+  static zmq::multipart_t reply(const JMessage& parent, const std::string& msg_type,
+																const json& content, const json& metadata=json({})) {
+		std::vector<zmq::message_t> buffers;
+		return reply(parent, msg_type, std::move(content), std::move(metadata), std::move(buffers));
+	}
+  static zmq::multipart_t reply(const JMessage& parent, const std::string& msg_type,
+																const json& content, const json& metadata,
+																buffer_sequence buffers) {
+    JMessage jm(std::move(buffers));
     jm._key = parent._key;
     // construct header
     jm._msg["header"]["msg_id"] = uniq_id();
@@ -62,25 +79,24 @@ public:
 
     jm._msg["parent_header"] = parent._msg["header"];
     jm._ids = parent._ids;
-    jm._msg["metadata"] = metadata;
-    jm._msg["content"] = content;
+    jm._msg["metadata"] = std::move(metadata);
+    jm._msg["content"] = std::move(content);
     return jm.to_multipart_t();
   }
 
   json get() const { return _msg; }
   std::vector<std::string> ids() { return _ids; }
-  // from https://stackoverflow.com/questions/9527960/how-do-i-construct-an-iso-8601-datetime-in-c
-  static std::string now() {
-    time_t now;
-    time(&now);
-    char buf[sizeof "2011-10-08T07:07:09Z"];
-    strftime(buf, sizeof buf, "%FT%TZ", gmtime(&now));
-    // this will work too, if your compiler doesn't support %F or %T:
-    //strftime(buf, sizeof buf, "%Y-%m-%dT%H:%M:%SZ", gmtime(&now));
-    std::stringstream s;
-    s << buf;
-    return s.str();
-  }
+	std::vector<zmq::message_t>& bufs() { return _b0; }
+
+	void dump() {
+		Rcpp::Rcout << "{"                << std::endl;
+		Rcpp::Rcout << "  ids: "          << std::endl;
+		for( std::string id: _ids )
+  		Rcpp::Rcout << "       " << id << "," << std::endl;
+		Rcpp::Rcout << "  msg: "          << std::endl;
+		Rcpp::Rcout << "       " << _msg  << std::endl;
+		Rcpp::Rcout << "}"                << std::endl;
+	}
 
   static long long int current_time_nanos() {
     return duration_cast<nanoseconds>(high_resolution_clock::now().time_since_epoch()).count();
@@ -95,7 +111,8 @@ public:
 
 private:
   json _msg;
-  std::string _hmac;
+	std::vector<zmq::message_t> _b0;
+	std::string _hmac;
   std::vector<std::string> _ids;
   static std::atomic<long long> _ctr;  // atomic counter for uniq ids
 
@@ -126,6 +143,9 @@ private:
     _msg["metadata"]      = read_json(msg.pop(), data);
     _msg["content"]       = read_json(msg.pop(), data);
 
+		while( !msg.empty() )
+			_b0.emplace_back(msg.pop());
+
     // validate
     std::string hmac2dig = hmac<SHA256>(data.str(), _key);
     if( hmac2dig!=_hmac )
@@ -152,10 +172,9 @@ private:
     zmq::multipart_t multi_msg;
     
     // add IDS
-    for(std::string id: _ids) {
+    for(std::string id: _ids)
       multi_msg.add(to_msg(id));
-    }
-
+    
     // now the delimiter
     multi_msg.add(to_msg(DELIMITER));
     
@@ -168,11 +187,18 @@ private:
 
     // serialize the signature and main message body
     std::string hmacsig = hmac<SHA256>(data.str(), _key);
+
     multi_msg.add(to_msg(hmacsig));
     multi_msg.add(to_msg(header));
     multi_msg.add(to_msg(parent_header));
     multi_msg.add(to_msg(metadata));
     multi_msg.add(to_msg(content));
+
+		for(zmq::message_t& buf: _b0)
+			multi_msg.add(std::move(buf));
+
+		_b0.clear();  // put _b0 into a defined state (all elems have been moved)
+
     return multi_msg;
   }
 };

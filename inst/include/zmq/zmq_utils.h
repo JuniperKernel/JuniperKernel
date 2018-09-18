@@ -34,15 +34,17 @@
     compilers even have an equivalent concept.
     So in the worst case, this include file is treated as silently empty. */
 
-#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__) || defined(_MSC_VER)
+#if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)               \
+  || defined(_MSC_VER)
 #if defined(__GNUC__) || defined(__GNUG__)
-//WCC #pragma GCC diagnostic push
-//WCC #pragma GCC diagnostic warning "-Wcpp"
-//WCC #pragma GCC diagnostic ignored "-Werror"
-//WCC #pragma GCC diagnostic ignored "-Wall"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic warning "-Wcpp"
+#pragma GCC diagnostic ignored "-Werror"
+#pragma GCC diagnostic ignored "-Wall"
 #endif
-//WCC #pragma message("Warning: zmq_utils.h is deprecated. All its functionality is provided by zmq.h.")
+#pragma message(                                                               \
+  "Warning: zmq_utils.h is deprecated. All its functionality is provided by zmq.h.")
 #if defined(__GNUC__) || defined(__GNUG__)
-//WCC #pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
 #endif
 #endif

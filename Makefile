@@ -1,4 +1,3 @@
-#SHELL := /bin/bash
 .DELETE_ON_ERROR:
 
 # for printing variable values
@@ -17,12 +16,12 @@ RSCRIPT=$(R_HOME)/bin/Rscript
 
 #quantstack bacon bits
 # xtl
-XTL_VERSION = 0.4.0
+XTL_VERSION = 0.4.16
 XTL_TAR_FILE = ${XTL_VERSION}.tar.gz
 XTL_URL = https://github.com/QuantStack/xtl/archive/${XTL_TAR_FILE}
 
 # xeus
-XEUS_VERSION = 0.9.0
+XEUS_VERSION = 0.14.1
 XEUS_TAR_FILE = ${XEUS_VERSION}.tar.gz
 XEUS_URL = https://github.com/QuantStack/xeus/archive/${XEUS_TAR_FILE}
 
@@ -62,7 +61,6 @@ headers: ./inst/include/xtl ./inst/include/xeus
 	@tar -xzf ${XEUS_TAR_FILE}
 	@mv xeus-${XEUS_VERSION}/include/xeus ./inst/include
 	@rm -rf xeus-${XEUS_VERSION} ${XEUS_TAR_FILE}
-	@cp ./inst/nl_json.hpp ./inst/include/xeus/nl_json.hpp
 
 check: build/JuniperKernel_$(PKG_VERSION).tar.gz
 	@echo "running R CMD check"

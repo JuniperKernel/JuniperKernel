@@ -17,8 +17,9 @@
 #ifndef juniper_juniper_utils_H
 #define juniper_juniper_utils_H
 #include <string>
-#include <xeus/nl_json.hpp>
-#include <zmq.hpp>
+#include <ctime>
+#include <nlohmann/json.hpp>
+#include <zmq/zmq.hpp>
 #include <Rcpp.h>
 
 using nlohmann::json;
@@ -181,4 +182,15 @@ static std::string read_str(const zmq::message_t& msg) {
     ss << static_cast<char>(buf[i]);
   return ss.str();
 }
+ 
+static std::string now() {
+  time_t now;
+  time(&now);
+  char buf[sizeof "2011-10-08T07:07:09Z"];
+	//  size_t sz = strftime(buf, sizeof buf, "%FT%TZ", gmtime(&now));
+  // this will work too, if your compiler doesn't support %F or %T:
+  strftime(buf, sizeof buf, "%Y-%m-%dT%H:%M:%SZ", gmtime(&now));
+	return buf;
+}
+
 #endif // #ifndef juniper_juniper_utils_H

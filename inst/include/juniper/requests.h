@@ -20,8 +20,8 @@
 #include <atomic>
 #include <string>
 #include <thread>
-#include <zmq.hpp>
-#include <zmq_addon.hpp>
+#include <zmq/zmq.hpp>
+#include <zmq/zmq_addon.hpp>
 #include <Rcpp.h>
 #include <juniper/sockets.h>
 #include <juniper/conf.h>
@@ -30,6 +30,7 @@
 
 // Every incoming message has a type, which tells the server which handler
 // the message should be passed to for further execution.
+using buffer_sequence = std::vector<zmq::message_t>;
 class RequestServer {
   public:
     mutable JMessage _cur_msg;  // messages are handled 1 at a time; keep a ref
@@ -78,7 +79,7 @@ class RequestServer {
     //  5. send the multipart_t over the socket
     //  6. 'idle' is published over iopub
     SEXP serve(zmq::multipart_t& request, zmq::socket_t& sock) const {
-      _cur_msg = JMessage::read(request, _key);  // read and validate
+      _cur_msg = std::move(JMessage::read(request, _key));  // read and validate
       return busy().handle();
     }
 
@@ -111,8 +112,12 @@ class RequestServer {
     void execute_result(const json& data) const { iopub("execute_result", data); }
     void display_data(const json& data) const   { iopub("display_data"  , data); }
     void shutdown() const { zmq::message_t m(0); _inproc_sig->send(m); }
-    void iopub(const std::string& msg_type, const json& content, const json& metadata=json({})) const {
-      JMessage::reply(_cur_msg, msg_type, content, metadata).send(*_inproc_pub);
+  	void iopub(const std::string& msg_type, const json& content,
+							 const json& metadata, buffer_sequence buffers) const {
+	  	JMessage::reply(_cur_msg, msg_type, content, metadata, std::move(buffers)).send(*_inproc_pub);
+    }
+  	void iopub(const std::string& msg_type, const json& content, const json& metadata=json({})) const {
+			iopub(msg_type, content, metadata, std::vector<zmq::message_t>());
     }
     const RequestServer& busy() const { iopub("status", {{"execution_state", "busy"}}); return *this; }
     const RequestServer& idle() const { iopub("status", {{"execution_state", "idle"}}); return *this; }
