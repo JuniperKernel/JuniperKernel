@@ -40,9 +40,9 @@ install: install_roxygen2_5 build/JuniperKernel_$(PKG_VERSION).tar.gz
 	@(cd build && R CMD INSTALL JuniperKernel_$(PKG_VERSION).tar.gz)
 
 install_roxygen2_5:
-	@echo "Installing roxygen 5.0.1..."
+	@echo "Installing roxygen 6.0.1..."
 	@$(RSCRIPT) -e "install.packages('devtools', repos='http://cran.rstudio.com')"
-	@$(RSCRIPT) -e "devtools::install_version('roxygen2', version='5.0.1', repos='http://cran.rstudio.com')"
+	@$(RSCRIPT) -e "devtools::install_version('roxygen2', version='6.0.1', repos='http://cran.rstudio.com')"
 
 headers: ./inst/include/xtl ./inst/include/xeus
 

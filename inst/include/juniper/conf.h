@@ -20,14 +20,14 @@
 #include <fstream>
 #include <string>
 #include <nlohmann/json.hpp>
-#include <zmq/zmq.hpp>
+#include <zmq.hpp>
 // ERROR defined in zmq.hpp, but we want
 // the one from Rcpp
 #ifdef ERROR 
 #undef ERROR
 #endif
 #include <Rcpp.h>
-#include <zmq/zmq_addon.hpp>
+#include <zmq_addon.hpp>
 
 #define LINGER 1000 // number of millis to linger for
 #define INPROC_PUB "inproc://pub"

@@ -23,8 +23,8 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <zmq/zmq.hpp>
-#include <zmq/zmq_addon.hpp>
+#include <zmq.hpp>
+#include <zmq_addon.hpp>
 #include <nlohmann/json.hpp>
 #include <juniper/conf.h>
 #include <juniper/sockets.h>

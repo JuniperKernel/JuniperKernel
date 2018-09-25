@@ -32,8 +32,8 @@
 #include <jclient/control.h>
 #include <jclient/stdin.h>
 #include <jclient/iomsg.h>
-#include <zmq/zmq.h>
-#include <zmq/zmq.hpp>
+#include <zmq.h>
+#include <zmq.hpp>
 #include <Rcpp.h>
 
 class JupyterTestClient {

@@ -19,8 +19,8 @@
 
 #include <cassert>
 #include <string>
-#include <zmq/zmq.hpp>
-#include <zmq/zmq_addon.hpp>
+#include <zmq.hpp>
+#include <zmq_addon.hpp>
 #include <juniper/conf.h>
 
 zmq::socket_t* init_socket(zmq::socket_t* socket, const std::string& endpoint, bool handover=false) {

@@ -78,6 +78,7 @@ xmessage_base::xmessage_base(xjson header, xjson parent_header,
   m_buffers(std::move(buffers)){}
 const xjson& xmessage_base::content() const {return m_content; }
 const xjson& xmessage_base::metadata() const { return m_metadata; }
+const buffer_sequence& xmessage_base::buffers() const { return m_buffers; }
 
 xmessage::xmessage(const guid_list& zmq_id, xjson header, xjson parent_header,
 									 xjson metadata, xjson content, buffer_sequence buffers):

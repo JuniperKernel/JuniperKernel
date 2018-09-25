@@ -19,7 +19,7 @@
 #include <string>
 #include <ctime>
 #include <nlohmann/json.hpp>
-#include <zmq/zmq.hpp>
+#include <zmq.hpp>
 #include <Rcpp.h>
 
 using nlohmann::json;

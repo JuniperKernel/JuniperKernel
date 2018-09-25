@@ -20,8 +20,8 @@
 #include <atomic>
 #include <string>
 #include <thread>
-#include <zmq/zmq.hpp>
-#include <zmq/zmq_addon.hpp>
+#include <zmq.hpp>
+#include <zmq_addon.hpp>
 #include <Rcpp.h>
 #include <juniper/sockets.h>
 #include <juniper/conf.h>

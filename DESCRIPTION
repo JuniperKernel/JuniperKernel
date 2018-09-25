@@ -63,4 +63,4 @@ Description: Provides a full implementation of the 'Jupyter' <http://
 URL: https://github.com/JuniperKernel/JuniperKernel
 License: GPL (>= 2)
 BugReports: https://github.com/JuniperKernel/JuniperKernel/issues
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

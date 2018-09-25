@@ -24,3 +24,22 @@
   invisible()
 } # End of .onLoad().
 
+
+#' Fetch the Ld Flags for the JuniperKernel Library.
+#' @title Fetch the Ld Flags for JuniperKernel.
+#' @param arch Either /x64 or /i386 for windows; otherwise should be left empty.
+#' @return Invisibly return the ldflags
+#' @author Spencer Aiello
+#' @export
+JKLdFlags <- function(arch = '') {
+  file.name <- paste("./libs", arch, "/", sep = "")
+  dir.path <- tools::file_path_as_absolute(system.file(file.name, package = 'JuniperKernel'))
+  ldflags <- {
+    if( arch == "/i386" || arch == "/x64" )
+      paste0("\"", dir.path, "/JuniperKernel.dll", "\"")
+    else
+      paste0("\"", dir.path, "/JuniperKernel.so" , "\"")
+  }
+  cat(ldflags)
+  invisible(ldflags)
+}

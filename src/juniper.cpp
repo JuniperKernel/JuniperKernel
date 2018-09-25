@@ -22,8 +22,8 @@
 #include <stdlib.h>
 #include <nlohmann/json.hpp>
 #include <juniper/conf.h>
-#include <zmq/zmq.h>
-#include <zmq/zmq.hpp>
+#include <zmq.h>
+#include <zmq.hpp>
 #include <juniper/gdevice.h>
 #include <juniper/juniper.h>
 #include <juniper/xbridge.h>

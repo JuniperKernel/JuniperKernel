@@ -20,8 +20,8 @@
 #include <thread>
 #include <stdio.h>
 #include <stdlib.h>
-#include <zmq/zmq.h>
-#include <zmq/zmq.hpp>
+#include <zmq.h>
+#include <zmq.hpp>
 #include <nlohmann/json.hpp>
 #include <juniper/sockets.h>
 #include <juniper/utils.h>
