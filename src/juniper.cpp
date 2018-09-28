@@ -67,14 +67,13 @@ static JuniperKernel* get_kernel(SEXP kernel) {
 }
 
 xmock* _xm;
-SEXP R_xm;
+SEXP R_xm = nullptr;
 // [[Rcpp::export]]
 SEXP init_kernel(const std::string& connection_file) {
   JuniperKernel* jk = JuniperKernel::make(connection_file);
 
   _xm = new xmock();
   _xm->_jk=jk;  // mocked interpreter needs pointer to the kernel
-  R_xm = createExternalPointer<xmock>(_xm, xmockFinalizer, "xmock*");
 
   // even if boot_kernel is exceptional and we don't run delete jk
   // this finalizer will be run on R's exit and a cleanup will trigger then
@@ -100,7 +99,7 @@ SEXP boot_kernel(SEXP kernel, int interrupt_event) {
 // [[Rcpp::export]]
 SEXP the_xmock() {
   if( _xm )
-    return R_xm;
+    return R_xm ? (R_xm = createExternalPointer<xmock>(_xm, xmockFinalizer, "xmock*")) : R_xm;
   Rcpp::stop("no xmock available.");
 }
 

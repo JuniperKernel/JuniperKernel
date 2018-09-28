@@ -1,3 +1,4 @@
+
 // Copyright (C) 2017-2018  Spencer Aiello
 //
 // This file is part of JuniperKernel.
@@ -35,6 +36,7 @@
 class JuniperKernel {
   public:
     const RequestServer* _request_server;
+	  mutable SEXP _R_xm;
     JuniperKernel(const config& conf):
       _ctx(new zmq::context_t(1)),
 
