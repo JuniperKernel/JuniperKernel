@@ -18,6 +18,12 @@ The development of JuniperKernel is sponsored by [Bloomberg](https://www.techatb
 > installJuniper(useJupyterDefault = TRUE)  # install into default Jupyter kernel location
 ```
 
+## Install via Conda
+
+Availability is architecture dependent, [see](https://anaconda.org/conda-forge/r-juniperkernel/files):
+* `conda install -c conda-forge r-juniperkernel` or
+* `conda install -c conda-forge/label/gcc7 r-juniperkernel`
+
 ## Building
 
 ##### Requirements
